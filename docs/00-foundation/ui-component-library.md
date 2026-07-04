@@ -73,6 +73,16 @@ they follow the theme.
   **`Badge`** (`neutral | accent | positive | negative | warning | info`),
   **`Stat`**, **`PlaceholderTable`**, **`ComingSoon`**.
 
+## Reports (`components/report`)
+
+Decision-document components composed by **`ReportLayout`** from a `ReportModel`:
+`ReportHeader`, `ExecutiveSummaryCard` (with the 5-question decision lens),
+`KeyFindingsList`, `EvidenceTable`, `SourceList`, `RiskMatrix` (likelihood ×
+impact), `RecommendationBlock`, `DecisionMemoSection`, `AppendixSection`,
+`VersionHistoryPanel`, and the client `ExportToolbar` (browser print; PDF/share
+disabled). Server-rendered and print-ready. Full spec:
+[`report-ux.md`](./report-ux.md).
+
 ## Design tokens & integration
 
 - Colour, type and spacing tokens: [`design-tokens.md`](./design-tokens.md).

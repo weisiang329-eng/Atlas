@@ -12,7 +12,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface lg:flex">
+    <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-surface lg:flex print:hidden">
       <div className="flex h-14 items-center gap-2.5 border-b border-border px-5">
         <span className="grid h-7 w-7 place-items-center rounded bg-accent font-mono text-sm font-bold text-black">
           A
