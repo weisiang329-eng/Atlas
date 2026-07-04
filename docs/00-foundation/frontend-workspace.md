@@ -43,6 +43,7 @@ Sidebar, grouped. Every item is a real route; `soon` = navigable placeholder.
 | `/financials`                 | Financial overview (KPIs, trend charts, states demo) |
 | `/financials/income-statement` `/balance-sheet` `/cash-flow` | Statements (`StatementTable`) |
 | `/financials/metrics`         | Metrics with sparklines (`DataTable`)      |
+| `/financials/ratios`          | Ratio dashboard — grouped ratios (`KpiCard`) |
 | `/financials/historical-trends` | Trend charts (`TrendChart`)              |
 | `/financials/quarterly` `/financials/annual` | Results (`ResultsTable`, paginated) |
 | `/reports`                    | Report library (9 report types)            |
