@@ -45,8 +45,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${sans.variable} ${mono.variable} ${serif.variable}`}
+    >
       <body className="font-sans antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var e=document.documentElement;if(localStorage.getItem('atlas-theme')==='light')e.classList.add('light');if(localStorage.getItem('atlas-density')==='compact')e.setAttribute('data-density','compact');}catch(_){}})();",
+          }}
+        />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

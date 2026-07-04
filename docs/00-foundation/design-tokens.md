@@ -57,6 +57,20 @@ per theme for native form controls.
 - Radius: `rounded` for controls, `rounded-panel` (0.5rem) for surfaces.
 - Elevation: `shadow-panel` — the single card elevation. Avoid ad-hoc shadows.
 
+## Density
+
+A root **`data-density`** attribute on `<html>` switches the vertical rhythm of
+dense surfaces globally. Dense components reference `var(--cell-py)` (table cell
+padding) rather than a fixed `py-*`.
+
+- `comfortable` (default): `--cell-py: 0.625rem`.
+- `compact`: `--cell-py: 0.3125rem`.
+
+Set from **Settings → Appearance** (persisted to `localStorage`; restored before
+paint by an inline script in the root layout). To make a new dense surface
+density-aware, use `py-[var(--cell-py)]` on its cells. Theme (`.light`) and
+density are the two user-controlled appearance axes.
+
 ## Rules
 
 - Reference tokens, never raw colour values, in components.
