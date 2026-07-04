@@ -1,17 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import type { Level, ReportModel, ReportStatus } from "@/lib/mock/reports";
-
-const STATUS_TONE: Record<ReportStatus, "neutral" | "warning" | "positive"> = {
-  Draft: "neutral",
-  "In review": "warning",
-  Final: "positive",
-};
-
-const CONFIDENCE_TONE: Record<Level, "negative" | "warning" | "positive"> = {
-  Low: "negative",
-  Medium: "warning",
-  High: "positive",
-};
+import { StatusBadge, ConfidenceBadge } from "@/components/ui/status-badge";
+import type { ReportModel } from "@/lib/mock/reports";
 
 /** Document masthead: type, title, subject and the report's meta chips. */
 export function ReportHeader({ report }: { report: ReportModel }) {
@@ -44,15 +33,13 @@ export function ReportHeader({ report }: { report: ReportModel }) {
         <div className="flex items-center gap-1.5">
           <dt className="uppercase tracking-wide text-faint">Status</dt>
           <dd>
-            <Badge tone={STATUS_TONE[report.status]}>{report.status}</Badge>
+            <StatusBadge status={report.status} />
           </dd>
         </div>
         <div className="flex items-center gap-1.5">
           <dt className="uppercase tracking-wide text-faint">Confidence</dt>
           <dd>
-            <Badge tone={CONFIDENCE_TONE[report.confidence]}>
-              {report.confidence}
-            </Badge>
+            <ConfidenceBadge level={report.confidence} />
           </dd>
         </div>
       </dl>

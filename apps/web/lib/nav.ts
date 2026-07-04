@@ -100,6 +100,12 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "System",
     items: [
       {
+        label: "Style Guide",
+        href: "/style-guide",
+        glyph: "SG",
+        description: "Living design-system gallery.",
+      },
+      {
         label: "Admin",
         href: "/admin",
         glyph: "AD",

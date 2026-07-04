@@ -102,6 +102,16 @@ a11y core (`lib/use-overlay.ts`: focus trap, Escape, scroll lock, focus restore)
 - **`SearchInput`** — styled search field primitive.
 - **`FilterBar`** — controlled search + segmented filter row for lists/tables
   (in use on the report library via `ReportsBrowser`).
+- **`Tabs`** — in-page tabbed content (stateful; distinct from route-based `TabNav`).
+- **`Dropdown`** — accessible action/selection menu.
+- **`ToastProvider` / `useToast`** — app-wide notifications (mounted at the root).
+- **`FormField` / `ValidationMessage` / `TextInput` / `Select`** — labelled,
+  validated form controls.
+- **`StatusBadge` / `ConfidenceBadge`** — one status/confidence → colour mapping.
+
+Per-component reference (Purpose · Props · Do · Don't · A11y · Future):
+[`component-catalog.md`](./component-catalog.md). Living gallery: `/style-guide`.
+Accessibility standard: [`accessibility-notes.md`](./accessibility-notes.md).
 
 ## Reports (`components/report`)
 
