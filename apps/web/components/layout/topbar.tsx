@@ -10,12 +10,10 @@ export function Topbar({ title }: { title: string }) {
   return (
     <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b border-border bg-bg/85 px-4 backdrop-blur sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
+        <span className="font-mono text-2xs text-faint">atlas /</span>
         <h1 className="truncate font-sans text-sm font-semibold text-fg">
           {title}
         </h1>
-        <span className="hidden font-mono text-2xs text-faint sm:inline">
-          / atlas / invest
-        </span>
       </div>
 
       <div className="flex items-center gap-3">
