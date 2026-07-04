@@ -9,6 +9,8 @@ interface DrawerProps {
   onClose: () => void;
   side?: "left" | "right";
   title?: string;
+  /** Custom header content, replacing the default title (close button is kept). */
+  header?: ReactNode;
   children: ReactNode;
   className?: string;
 }
@@ -23,6 +25,7 @@ export function Drawer({
   onClose,
   side = "right",
   title,
+  header,
   children,
   className,
 }: DrawerProps) {
@@ -51,7 +54,7 @@ export function Drawer({
         )}
       >
         <header className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 className="font-serif text-base text-fg">{title}</h2>
+          {header ?? <h2 className="font-serif text-base text-fg">{title}</h2>}
           <button
             type="button"
             onClick={onClose}
