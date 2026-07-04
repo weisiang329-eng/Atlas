@@ -59,6 +59,8 @@ export function ResultsTable({
       getRowId={(r) => r.id}
       pageSize={pageSize}
       caption={caption}
+      searchable
+      searchPlaceholder="Search periods"
     />
   );
 }
