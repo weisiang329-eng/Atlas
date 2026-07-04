@@ -21,11 +21,11 @@ const WORKSPACES = [
     live: true,
   },
   {
-    href: "/industries",
-    eyebrow: "Roadmap",
-    title: "Industries",
-    body: "Industry taxonomy and supply-chain intelligence. Planned module.",
-    live: false,
+    href: "/financials",
+    eyebrow: "Workspace",
+    title: "Financials",
+    body: "Statements, metrics, historical trends and quarterly / annual results.",
+    live: true,
   },
 ];
 

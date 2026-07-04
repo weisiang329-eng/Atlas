@@ -61,14 +61,22 @@ apps/web/
       decision-journal/page.tsx
     industries|portfolio|watchlist|alerts|admin|settings/page.tsx   Planned modules
   components/
-    layout/       App shell: sidebar, topbar, tab-nav
-    ui/           Primitives: panel, badge, stat, page-header, section-heading,
-                  placeholder-table, empty-state, coming-soon
+    layout/       App shell: sidebar, topbar, tab-nav, mobile-nav
+    data/         data-table (paginated), statement-table, results-table
+    chart/        chart-container, trend-chart, bar-series, sparkline (pure SVG)
+    ui/           panel, badge, stat, page-header, section-heading, timeline,
+                  document-viewer, placeholder-table, coming-soon, and the async
+                  state system: data-state, loading-state, error-state, empty-state
   lib/
-    nav.ts        Navigation model (top nav + company / research sub-tabs)
+    nav.ts        Navigation model (top nav + company / research / financial tabs)
     cn.ts         Class-name merge helper
-    mock/         Labelled sample data (identifiers only, no fabricated metrics)
+    mock/         Labelled sample data (companies, financials, documents, timeline)
 ```
+
+The financial workspace lives at `app/financials` (overview + income-statement,
+balance-sheet, cash-flow, metrics, historical-trends, quarterly, annual). The
+reusable component library is documented in
+[`docs/00-foundation/ui-component-library.md`](../../docs/00-foundation/ui-component-library.md).
 
 Old Sprint 000 routes (`/dashboard`, `/company`) now redirect to `/` and
 `/companies` (see `next.config.mjs`).

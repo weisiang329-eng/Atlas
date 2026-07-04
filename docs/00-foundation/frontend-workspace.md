@@ -9,11 +9,11 @@ data is labelled and carries no fabricated metrics.
 
 Sidebar, grouped. Every item is a real route; `soon` = navigable placeholder.
 
-| Group     | Items                                  |
-| --------- | -------------------------------------- |
-| Workspace | Home · Companies · Industries* · Research |
-| Positions | Portfolio* · Watchlist* · Alerts*      |
-| System    | Admin* · Settings*                     |
+| Group     | Items                                             |
+| --------- | ------------------------------------------------- |
+| Workspace | Home · Companies · Industries* · Research · Financials |
+| Positions | Portfolio* · Watchlist* · Alerts*                 |
+| System    | Admin* · Settings*                                |
 
 `*` placeholder module (renders a "planned" page).
 
@@ -40,7 +40,16 @@ Sidebar, grouped. Every item is a real route; `soon` = navigable placeholder.
 | `/research/versions`          | Revision history (`research_version`)      |
 | `/research/hypotheses`        | Open theses (`research_hypothesis`)        |
 | `/research/decision-journal`  | Decisions (`decision_journal`)             |
+| `/financials`                 | Financial overview (KPIs, trend charts, states demo) |
+| `/financials/income-statement` `/balance-sheet` `/cash-flow` | Statements (`StatementTable`) |
+| `/financials/metrics`         | Metrics with sparklines (`DataTable`)      |
+| `/financials/historical-trends` | Trend charts (`TrendChart`)              |
+| `/financials/quarterly` `/financials/annual` | Results (`ResultsTable`, paginated) |
 | `/industries` `/portfolio` `/watchlist` `/alerts` `/admin` `/settings` | Planned modules |
+
+The financial workspace operates on a **fictional sample subject** (Helios
+Compute Corp); all figures are illustrative mock data. Component contracts are
+documented in [`ui-component-library.md`](./ui-component-library.md).
 
 Company and research sections mirror the `company_*` and `research_*` groups in
 [`schemas/database-v0.md`](../../schemas/database-v0.md), so the UI maps 1:1 onto

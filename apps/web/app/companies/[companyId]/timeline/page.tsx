@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Panel, PanelBody } from "@/components/ui/panel";
-import { EmptyState } from "@/components/ui/empty-state";
+import { Badge } from "@/components/ui/badge";
+import { Timeline } from "@/components/ui/timeline";
+import { MOCK_TIMELINE } from "@/lib/mock/timeline";
 
 export const metadata: Metadata = { title: "Timeline" };
 
@@ -10,14 +12,12 @@ export default function CompanyTimelinePage() {
     <>
       <SectionHeading
         title="Timeline"
-        description="Chronological record of events, research versions and decisions for this company."
+        description="Chronological record of events, research versions and decisions. History is never deleted."
+        action={<Badge tone="accent">Sample events</Badge>}
       />
       <Panel>
         <PanelBody>
-          <EmptyState
-            title="No events yet"
-            body="News, filings, rating changes and decision-journal entries will stream into a single audit-friendly timeline. History is never deleted."
-          />
+          <Timeline events={MOCK_TIMELINE} />
         </PanelBody>
       </Panel>
     </>
