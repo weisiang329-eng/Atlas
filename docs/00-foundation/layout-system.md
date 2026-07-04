@@ -16,6 +16,11 @@ layout, one dashboard grid — a new module is composition, not new scaffolding.
   content use `Tabs` instead.
 - **`DashboardGrid` + `Widget`** — responsive 12-column grid (2-up tablet,
   stacked mobile); `Widget` sets the large-screen `span`.
+- **`SplitPaneLayout`** — two-pane, side-by-side from `lg`, stacked below;
+  `leftWidth` = `sm`/`md`/`lg`/`half`. The base for document viewers, comparison
+  and master–detail. `DocumentViewer` is built on it.
+- **`DetailPanelLayout`** — master (list) + detail on `SplitPaneLayout`; shows an
+  empty state when nothing is selected. Parent owns selection.
 
 ## The workspace pattern
 
@@ -39,8 +44,7 @@ and a thin layout — no copied shell/header/tab scaffolding.
 
 ## Future extension
 
-- `SplitPaneLayout` / `DetailPanelLayout` for master–detail and side-by-side
-  workflows (procurement, M&A comparison).
-- Density system (`data-density`) to switch the spacing scale globally.
 - Optional per-workspace right rail (`WorkspaceLayout` already centralises the
   header/tabs seam where it would attach).
+- A resizable divider for `SplitPaneLayout` (drag to re-proportion).
+- `DetailPanelLayout` wired into the Companies index for an inbox-style browse.

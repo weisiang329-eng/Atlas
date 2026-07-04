@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { SplitPaneLayout } from "@/components/layout/split-pane-layout";
 import { cn } from "@/lib/cn";
 
 export interface DocItem {
@@ -25,11 +26,13 @@ export function DocumentViewer({ documents }: { documents: DocItem[] }) {
   const selected = documents.find((d) => d.id === selectedId) ?? null;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr]">
-      <ul
-        className="flex max-h-[28rem] flex-col overflow-y-auto rounded-panel border border-border bg-surface"
-        aria-label="Documents"
-      >
+    <SplitPaneLayout
+      leftWidth="md"
+      left={
+        <ul
+          className="flex max-h-[28rem] flex-col overflow-y-auto rounded-panel border border-border bg-surface"
+          aria-label="Documents"
+        >
         {documents.map((doc) => {
           const active = doc.id === selectedId;
           return (
@@ -53,9 +56,10 @@ export function DocumentViewer({ documents }: { documents: DocItem[] }) {
             </li>
           );
         })}
-      </ul>
-
-      <div className="flex min-h-[24rem] flex-col rounded-panel border border-border bg-surface">
+        </ul>
+      }
+      right={
+        <div className="flex min-h-[24rem] flex-col rounded-panel border border-border bg-surface">
         {selected ? (
           <>
             <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-3">
@@ -88,7 +92,8 @@ export function DocumentViewer({ documents }: { documents: DocItem[] }) {
             No document selected.
           </div>
         )}
-      </div>
-    </div>
+        </div>
+      }
+    />
   );
 }
