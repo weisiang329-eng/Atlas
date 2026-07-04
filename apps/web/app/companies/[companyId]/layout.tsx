@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import { AppShell } from "@/components/layout/app-shell";
-import { TabNav } from "@/components/layout/tab-nav";
+import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { Badge } from "@/components/ui/badge";
 import { companyTabs } from "@/lib/nav";
 import { getMockCompany } from "@/lib/mock/companies";
@@ -18,8 +17,11 @@ export default async function CompanyLayout({
   const monogram = (company?.ticker ?? companyId).slice(0, 2).toUpperCase();
 
   return (
-    <AppShell title={company?.name ?? "Company"}>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <WorkspaceLayout
+      title={company?.name ?? "Company"}
+      tabs={companyTabs(companyId)}
+      header={
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           <span className="grid h-14 w-14 shrink-0 place-items-center rounded-panel border border-border bg-surface-2 font-mono text-lg font-semibold text-faint">
             {monogram}
@@ -48,9 +50,9 @@ export default async function CompanyLayout({
           </div>
         </div>
       </div>
-
-      <TabNav items={companyTabs(companyId)} />
-      <div className="pt-6">{children}</div>
-    </AppShell>
+      }
+    >
+      {children}
+    </WorkspaceLayout>
   );
 }
