@@ -12,6 +12,10 @@ export interface Column<T> {
   numeric?: boolean;
   align?: "left" | "right" | "center";
   className?: string;
+  /** Make the column header clickable to sort. */
+  sortable?: boolean;
+  /** Value used for sorting; defaults to row[key]. */
+  sortAccessor?: (row: T) => string | number;
 }
 
 interface DataTableProps<T> {
@@ -41,16 +45,47 @@ export function DataTable<T>({
   onRowClick,
 }: DataTableProps<T>) {
   const [page, setPage] = useState(0);
+  const [sort, setSort] = useState<{ key: string; dir: "asc" | "desc" } | null>(
+    null,
+  );
 
-  const paginated = Boolean(pageSize && rows.length > pageSize);
-  const pageCount = paginated ? Math.ceil(rows.length / pageSize!) : 1;
+  const sortedRows = useMemo(() => {
+    if (!sort) return rows;
+    const col = columns.find((c) => c.key === sort.key);
+    const accessor =
+      col?.sortAccessor ??
+      ((r: T) => (r as Record<string, unknown>)[sort.key] as string | number);
+    const copy = [...rows];
+    copy.sort((a, b) => {
+      const av = accessor(a);
+      const bv = accessor(b);
+      const cmp =
+        typeof av === "number" && typeof bv === "number"
+          ? av - bv
+          : String(av ?? "").localeCompare(String(bv ?? ""));
+      return sort.dir === "asc" ? cmp : -cmp;
+    });
+    return copy;
+  }, [rows, sort, columns]);
+
+  const paginated = Boolean(pageSize && sortedRows.length > pageSize);
+  const pageCount = paginated ? Math.ceil(sortedRows.length / pageSize!) : 1;
   const current = Math.min(page, pageCount - 1);
 
   const visible = useMemo(() => {
-    if (!paginated) return rows;
+    if (!paginated) return sortedRows;
     const start = current * pageSize!;
-    return rows.slice(start, start + pageSize!);
-  }, [rows, paginated, current, pageSize]);
+    return sortedRows.slice(start, start + pageSize!);
+  }, [sortedRows, paginated, current, pageSize]);
+
+  function toggleSort(key: string) {
+    setPage(0);
+    setSort((prev) => {
+      if (!prev || prev.key !== key) return { key, dir: "asc" };
+      if (prev.dir === "asc") return { key, dir: "desc" };
+      return null;
+    });
+  }
 
   const alignClass = (c: Column<T>) =>
     c.align === "center"
@@ -72,19 +107,47 @@ export function DataTable<T>({
             )}
           >
             <tr className="border-b border-border">
-              {columns.map((c) => (
-                <th
-                  key={c.key}
-                  scope="col"
-                  className={cn(
-                    "whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint",
-                    alignClass(c),
-                    c.className,
-                  )}
-                >
-                  {c.header}
-                </th>
-              ))}
+              {columns.map((c) => {
+                const isSorted = sort?.key === c.key;
+                const ariaSort: "ascending" | "descending" | "none" | undefined =
+                  c.sortable
+                  ? isSorted
+                    ? sort!.dir === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                  : undefined;
+                return (
+                  <th
+                    key={c.key}
+                    scope="col"
+                    aria-sort={ariaSort}
+                    className={cn(
+                      "whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint",
+                      alignClass(c),
+                      c.className,
+                    )}
+                  >
+                    {c.sortable ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleSort(c.key)}
+                        className={cn(
+                          "inline-flex items-center gap-1 uppercase tracking-[0.08em] transition-colors hover:text-fg focus-visible:outline focus-visible:outline-2 -outline-offset-2 focus-visible:outline-accent",
+                          isSorted && "text-fg",
+                        )}
+                      >
+                        {c.header}
+                        <span aria-hidden className="text-[9px] leading-none">
+                          {isSorted ? (sort!.dir === "asc" ? "▲" : "▼") : "↕"}
+                        </span>
+                      </button>
+                    ) : (
+                      c.header
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
@@ -124,7 +187,8 @@ export function DataTable<T>({
         <div className="flex items-center justify-between gap-4 border-t border-border px-3 py-2 text-xs text-muted">
           <span className="tabular-nums">
             {current * pageSize! + 1}–
-            {Math.min((current + 1) * pageSize!, rows.length)} of {rows.length}
+            {Math.min((current + 1) * pageSize!, sortedRows.length)} of{" "}
+            {sortedRows.length}
           </span>
           <div className="flex items-center gap-1">
             <button
