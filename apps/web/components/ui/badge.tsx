@@ -1,13 +1,21 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type BadgeTone = "neutral" | "accent" | "positive" | "negative";
+type BadgeTone =
+  | "neutral"
+  | "accent"
+  | "positive"
+  | "negative"
+  | "warning"
+  | "info";
 
 const TONE: Record<BadgeTone, string> = {
   neutral: "border-border text-muted",
   accent: "border-accent-dim text-accent",
   positive: "border-positive/40 text-positive",
   negative: "border-negative/40 text-negative",
+  warning: "border-warning/40 text-warning",
+  info: "border-info/40 text-info",
 };
 
 interface BadgeProps {

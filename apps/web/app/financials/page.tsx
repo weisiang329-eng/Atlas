@@ -1,5 +1,5 @@
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Stat } from "@/components/ui/stat";
+import { StatGrid } from "@/components/ui/stat-grid";
 import { ChartContainer } from "@/components/chart/chart-container";
 import { TrendChart } from "@/components/chart/trend-chart";
 import { BarSeries } from "@/components/chart/bar-series";
@@ -14,17 +14,15 @@ export default function FinancialOverviewPage() {
         description="Headline figures and trends for the selected subject. Sample data — no calculations are performed in the UI."
       />
 
-      <div className="mb-6 grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border bg-border lg:grid-cols-4">
-        {[
-          { label: "Revenue (FY24)", value: "21,000", hint: "USD millions" },
-          { label: "Operating income", value: "8,250", hint: "USD millions" },
-          { label: "Net income", value: "6,910", hint: "USD millions" },
-          { label: "Free cash flow", value: "5,350", hint: "USD millions" },
-        ].map((s) => (
-          <div key={s.label} className="bg-surface p-4">
-            <Stat label={s.label} value={s.value} hint={s.hint} />
-          </div>
-        ))}
+      <div className="mb-6">
+        <StatGrid
+          items={[
+            { label: "Revenue (FY24)", value: "21,000", hint: "USD millions" },
+            { label: "Operating income", value: "8,250", hint: "USD millions" },
+            { label: "Net income", value: "6,910", hint: "USD millions" },
+            { label: "Free cash flow", value: "5,350", hint: "USD millions" },
+          ]}
+        />
       </div>
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
