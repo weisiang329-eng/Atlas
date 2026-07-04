@@ -21,6 +21,8 @@ const config: Config = {
         "accent-dim": "var(--accent-dim)",
         positive: "var(--positive)",
         negative: "var(--negative)",
+        warning: "var(--warning)",
+        info: "var(--info)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],

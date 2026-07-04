@@ -56,6 +56,25 @@ export function TableSkeleton({
   );
 }
 
+/** KPI-strip skeleton matching StatGrid. */
+export function StatGridSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div
+      role="status"
+      aria-busy="true"
+      className="grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border bg-border lg:grid-cols-4"
+    >
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="flex flex-col gap-2 bg-surface p-4">
+          <Skeleton className="h-3 w-1/2" />
+          <Skeleton className="h-6 w-2/3" />
+        </div>
+      ))}
+      <span className="sr-only">Loading</span>
+    </div>
+  );
+}
+
 /** Chart-shaped skeleton. */
 export function ChartSkeleton({ height = 160 }: { height?: number }) {
   return (

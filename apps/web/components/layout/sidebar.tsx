@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_GROUPS } from "@/lib/nav";
-import { cn } from "@/lib/cn";
+import { NavGroups } from "@/components/layout/nav-groups";
 
 /**
  * Left navigation rail. Client component so it can highlight the active route.
@@ -27,51 +25,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {NAV_GROUPS.map((group) => (
-          <div key={group.title} className="mb-6">
-            <p className="eyebrow px-2 pb-2">{group.title}</p>
-            <ul className="space-y-0.5">
-              {group.items.map((item) => {
-                const active =
-                  item.href === "/"
-                    ? pathname === "/"
-                    : pathname.startsWith(item.href);
-
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
-                      title={item.description}
-                      className={cn(
-                        "flex items-center gap-2.5 rounded px-2 py-1.5 text-sm transition-colors",
-                        active
-                          ? "bg-surface-2 font-medium text-fg"
-                          : "text-muted hover:bg-surface-2 hover:text-fg",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "grid h-6 w-6 shrink-0 place-items-center rounded font-mono text-2xs font-semibold",
-                          active ? "bg-accent text-black" : "bg-surface-2 text-faint",
-                        )}
-                      >
-                        {item.glyph}
-                      </span>
-                      <span className="flex-1 truncate">{item.label}</span>
-                      {item.soon ? (
-                        <span className="text-2xs uppercase tracking-wide text-faint">
-                          soon
-                        </span>
-                      ) : null}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+      <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Primary">
+        <NavGroups pathname={pathname} />
       </nav>
 
       <div className="border-t border-border px-5 py-3">

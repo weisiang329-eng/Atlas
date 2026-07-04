@@ -50,13 +50,33 @@ Dependency-free, pure-SVG, server-rendered (no client JS, no chart library):
 All expose `ariaLabel` and use `role="img"`; colours come from CSS variables so
 they follow the theme.
 
-## Content components (`components/ui`)
+## Dashboard framework (`components/dashboard`)
 
+- **`DashboardGrid`** — responsive 12-column grid (2-up on tablet, stacked on
+  mobile). Every dashboard composes onto one spatial system.
+- **`Widget`** — a cell with a large-screen `span` (3/4/6/8/9/12).
+
+## Layout & content (`components/layout`, `components/ui`)
+
+- **`AppShell`** — sidebar + top bar + scrollable workspace (owns the container
+  width, so every route aligns identically).
+- **`Sidebar`** / **`MobileNav`** — both render the shared **`NavGroups`**, which
+  is driven entirely by the `NAV_GROUPS` model. Add a module in one place and it
+  appears in both.
+- **`TabNav`** — reusable sub-navigation.
+- **`StatGrid`** — the canonical KPI strip (hairline-divided `Stat`s); used on
+  every overview so headline figures are laid out identically.
 - **`Timeline`** — vertical event log (company history, versions, decisions).
 - **`DocumentViewer`** — two-pane list + preview shell; preview waits on a
   storage contract.
 - **`Panel` / `PanelHeader` / `PanelBody`**, **`PageHeader`**, **`SectionHeading`**,
-  **`Badge`**, **`Stat`**, **`PlaceholderTable`**, **`ComingSoon`**.
+  **`Badge`** (`neutral | accent | positive | negative | warning | info`),
+  **`Stat`**, **`PlaceholderTable`**, **`ComingSoon`**.
+
+## Design tokens & integration
+
+- Colour, type and spacing tokens: [`design-tokens.md`](./design-tokens.md).
+- Backend integration seams (prepared, not wired): [`integration-points.md`](./integration-points.md).
 
 ## Navigation & layout (`components/layout`)
 

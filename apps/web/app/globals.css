@@ -3,9 +3,17 @@
 @tailwind utilities;
 
 /*
- * Atlas design tokens.
- * Dark is the primary, institutional-terminal theme; a light theme is provided
- * so the shell is dark-mode ready and toggleable via the `.light` class on <html>.
+ * Atlas design tokens — the single source of truth for colour.
+ * Dark is the primary, institutional-terminal theme; the light theme is a full
+ * override toggled via the `.light` class on <html>, so the app is dark-mode
+ * ready without any hardcoded palette. Documented in
+ * docs/00-foundation/design-tokens.md.
+ *
+ * Groups:
+ *   Surfaces   bg / surface / surface-2 / border
+ *   Text       fg / muted / faint
+ *   Brand      accent / accent-dim
+ *   Semantic   positive / negative / warning / info  (state, NOT the accent)
  */
 :root {
   --bg: #080b11;
@@ -19,6 +27,8 @@
   --accent-dim: #7a5c1f;
   --positive: #3fb96b;
   --negative: #f2555a;
+  --warning: #e0a63a;
+  --info: #5aa9e6;
   --grid-line: rgba(255, 255, 255, 0.022);
 }
 
@@ -34,6 +44,8 @@
   --accent-dim: #e6d3a6;
   --positive: #1a7f43;
   --negative: #c4383d;
+  --warning: #b7791f;
+  --info: #2b6cb0;
   --grid-line: rgba(15, 30, 55, 0.03);
 }
 

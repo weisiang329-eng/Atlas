@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Stat } from "@/components/ui/stat";
+import { StatGrid } from "@/components/ui/stat-grid";
 import { RESEARCH_TABS } from "@/lib/nav";
 
 const DESCRIPTIONS: Record<string, string> = {
@@ -19,17 +19,15 @@ const CARDS = RESEARCH_TABS.filter((t) => t.href !== "/research").map((t) => ({
 export default function ResearchOverviewPage() {
   return (
     <>
-      <div className="mb-6 grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-border bg-border lg:grid-cols-4">
-        {[
-          { label: "Notes", value: "—" },
-          { label: "Reports", value: "—" },
-          { label: "Open Hypotheses", value: "—" },
-          { label: "Evidence Items", value: "—" },
-        ].map((s) => (
-          <div key={s.label} className="bg-surface p-4">
-            <Stat label={s.label} value={s.value} hint="Not wired" />
-          </div>
-        ))}
+      <div className="mb-6">
+        <StatGrid
+          items={[
+            { label: "Notes", value: "—", hint: "Not wired" },
+            { label: "Reports", value: "—", hint: "Not wired" },
+            { label: "Open Hypotheses", value: "—", hint: "Not wired" },
+            { label: "Evidence Items", value: "—", hint: "Not wired" },
+          ]}
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
