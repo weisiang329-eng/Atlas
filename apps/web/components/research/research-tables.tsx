@@ -25,7 +25,7 @@ export function NotesTable({ rows }: { rows: NoteRow[] }) {
     { key: "author", header: "Author" },
     { key: "updated", header: "Updated" },
   ];
-  return <DataTable columns={columns} rows={rows} getRowId={(r) => r.id} caption="Research notes" />;
+  return <DataTable columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Research notes" />;
 }
 
 export function ReportsTable({ rows }: { rows: ReportRow[] }) {
@@ -36,7 +36,7 @@ export function ReportsTable({ rows }: { rows: ReportRow[] }) {
     { key: "status", header: "Status", render: (r) => <StatusBadge status={r.status} /> },
     { key: "date", header: "Date" },
   ];
-  return <DataTable columns={columns} rows={rows} getRowId={(r) => r.id} caption="Research reports" />;
+  return <DataTable columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Research reports" />;
 }
 
 export function EvidenceTableView({ rows }: { rows: EvidenceRow[] }) {
@@ -47,7 +47,7 @@ export function EvidenceTableView({ rows }: { rows: EvidenceRow[] }) {
     { key: "confidence", header: "Confidence", render: (r) => <ConfidenceBadge level={r.confidence} /> },
     { key: "date", header: "Date" },
   ];
-  return <DataTable columns={columns} rows={rows} getRowId={(r) => r.id} caption="Evidence log" />;
+  return <DataTable columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Evidence log" />;
 }
 
 export function VersionsTable({ rows }: { rows: VersionRow[] }) {
@@ -58,7 +58,7 @@ export function VersionsTable({ rows }: { rows: VersionRow[] }) {
     { key: "change", header: "Change" },
     { key: "date", header: "Date" },
   ];
-  return <DataTable columns={columns} rows={rows} getRowId={(r) => r.id} caption="Version history" />;
+  return <DataTable columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Version history" />;
 }
 
 export function HypothesesTable({ rows }: { rows: HypothesisRow[] }) {
@@ -69,7 +69,7 @@ export function HypothesesTable({ rows }: { rows: HypothesisRow[] }) {
     { key: "confidence", header: "Confidence", render: (r) => <ConfidenceBadge level={r.confidence} /> },
     { key: "updated", header: "Updated" },
   ];
-  return <DataTable columns={columns} rows={rows} getRowId={(r) => r.id} caption="Hypotheses" />;
+  return <DataTable columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Hypotheses" />;
 }
 
 export function DecisionsTable({ rows }: { rows: DecisionRow[] }) {
@@ -80,5 +80,5 @@ export function DecisionsTable({ rows }: { rows: DecisionRow[] }) {
     { key: "outcome", header: "Outcome" },
     { key: "date", header: "Date" },
   ];
-  return <DataTable columns={columns} rows={rows} getRowId={(r) => r.id} caption="Decision journal" />;
+  return <DataTable columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Decision journal" />;
 }

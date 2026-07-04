@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { FilterBar } from "@/components/ui/filter-bar";
 import { cn } from "@/lib/cn";
 
 export interface Column<T> {
@@ -27,6 +28,9 @@ interface DataTableProps<T> {
   stickyHeader?: boolean;
   caption?: string;
   onRowClick?: (row: T) => void;
+  /** Show a built-in search box that filters rows across all column values. */
+  searchable?: boolean;
+  searchPlaceholder?: string;
 }
 
 /**
@@ -43,19 +47,35 @@ export function DataTable<T>({
   stickyHeader = true,
   caption,
   onRowClick,
+  searchable = false,
+  searchPlaceholder = "Search",
 }: DataTableProps<T>) {
   const [page, setPage] = useState(0);
+  const [query, setQuery] = useState("");
   const [sort, setSort] = useState<{ key: string; dir: "asc" | "desc" } | null>(
     null,
   );
 
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!searchable || !q) return rows;
+    return rows.filter((r) =>
+      columns.some((c) => {
+        const v = c.sortAccessor
+          ? c.sortAccessor(r)
+          : (r as Record<string, unknown>)[c.key];
+        return String(v ?? "").toLowerCase().includes(q);
+      }),
+    );
+  }, [rows, columns, query, searchable]);
+
   const sortedRows = useMemo(() => {
-    if (!sort) return rows;
+    if (!sort) return filteredRows;
     const col = columns.find((c) => c.key === sort.key);
     const accessor =
       col?.sortAccessor ??
       ((r: T) => (r as Record<string, unknown>)[sort.key] as string | number);
-    const copy = [...rows];
+    const copy = [...filteredRows];
     copy.sort((a, b) => {
       const av = accessor(a);
       const bv = accessor(b);
@@ -66,7 +86,7 @@ export function DataTable<T>({
       return sort.dir === "asc" ? cmp : -cmp;
     });
     return copy;
-  }, [rows, sort, columns]);
+  }, [filteredRows, sort, columns]);
 
   const paginated = Boolean(pageSize && sortedRows.length > pageSize);
   const pageCount = paginated ? Math.ceil(sortedRows.length / pageSize!) : 1;
@@ -96,6 +116,19 @@ export function DataTable<T>({
 
   return (
     <div className="flex flex-col">
+      {searchable ? (
+        <div className="px-3 pt-3">
+          <FilterBar
+            search={query}
+            onSearch={(v) => {
+              setQuery(v);
+              setPage(0);
+            }}
+            placeholder={searchPlaceholder}
+            right={`${sortedRows.length} / ${rows.length}`}
+          />
+        </div>
+      ) : null}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-sm">
           {caption ? (
