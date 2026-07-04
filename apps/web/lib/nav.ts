@@ -158,6 +158,7 @@ export const FINANCIAL_TABS: SubTab[] = [
   { label: "Balance Sheet", href: "/financials/balance-sheet" },
   { label: "Cash Flow", href: "/financials/cash-flow" },
   { label: "Metrics", href: "/financials/metrics" },
+  { label: "Ratios", href: "/financials/ratios" },
   { label: "Historical Trends", href: "/financials/historical-trends" },
   { label: "Quarterly", href: "/financials/quarterly" },
   { label: "Annual", href: "/financials/annual" },
