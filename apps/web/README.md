@@ -3,10 +3,14 @@
 Frontend for the Atlas Intelligence Platform — an institutional research
 terminal for AI-native decision intelligence.
 
-This package is the **Sprint 000 frontend foundation** (Issue #2). It ships the
-application shell, design system, and placeholder routes only. No product
-features (scoring, company database, dashboards with real data, auth) are built
-yet — see the Sprint 000 brief in `/tasks/sprint-000-foundation.md`.
+This package holds the Atlas web frontend. It currently ships the **Milestone 1
+Company Intelligence foundation** on top of the Sprint 000 shell: the Company
+and Research workspaces, full navigation, and reusable layout primitives —
+**structure and layout only**. No product features (scoring, real company data,
+AI chat, portfolio/trading, auth, OCR, ERP integration, payments) are built. Any
+sample data is clearly labelled and carries no fabricated metrics.
+
+See the route map in [`docs/00-foundation/frontend-workspace.md`](../../docs/00-foundation/frontend-workspace.md).
 
 ## Stack
 
@@ -40,18 +44,34 @@ npm run dev                  # http://localhost:3000
 ```text
 apps/web/
   app/
-    layout.tsx          Root layout, fonts, metadata
-    globals.css         Tailwind + design tokens (dark default, light ready)
-    page.tsx            Overview (home)
-    dashboard/page.tsx  Research terminal workspace (placeholder)
-    company/page.tsx    Company profile scaffold (placeholder)
+    layout.tsx                    Root layout, fonts, metadata
+    globals.css                   Tailwind + design tokens (dark default, light ready)
+    page.tsx                      Home / overview (dashboard-first)
+    companies/
+      page.tsx                    Companies index (sample universe)
+      [companyId]/
+        layout.tsx                Company header + section tabs
+        page.tsx                  → redirects to overview
+        overview|profile|products|management|financials|
+        research|valuation|documents|timeline/page.tsx
+    research/
+      layout.tsx                  Research header + section tabs
+      page.tsx                    Research overview
+      notes|reports|evidence|versions|hypotheses|
+      decision-journal/page.tsx
+    industries|portfolio|watchlist|alerts|admin|settings/page.tsx   Planned modules
   components/
-    layout/             App shell: sidebar, topbar
-    ui/                 Shared primitives: panel, badge, stat, empty-state
+    layout/       App shell: sidebar, topbar, tab-nav
+    ui/           Primitives: panel, badge, stat, page-header, section-heading,
+                  placeholder-table, empty-state, coming-soon
   lib/
-    nav.ts              Navigation model (live + planned modules)
-    cn.ts               Class-name merge helper
+    nav.ts        Navigation model (top nav + company / research sub-tabs)
+    cn.ts         Class-name merge helper
+    mock/         Labelled sample data (identifiers only, no fabricated metrics)
 ```
+
+Old Sprint 000 routes (`/dashboard`, `/company`) now redirect to `/` and
+`/companies` (see `next.config.mjs`).
 
 ## Design direction
 

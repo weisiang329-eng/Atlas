@@ -1,18 +1,18 @@
 /**
- * Navigation model for the Atlas shell.
+ * Navigation model for the Atlas shell (Milestone 1).
  *
- * Sprint 000 only wires the three foundation routes (home, company, dashboard).
- * The remaining Atlas modules are listed as `status: "planned"` so the sidebar
- * already reflects the long-term platform shape without shipping any feature.
+ * Every entry is a real, routable link — `soon: true` only tags a module whose
+ * page is an intentional placeholder, it does not disable the link. Company and
+ * research sub-navigation is derived from the same model so the shell stays
+ * data-driven and scalable.
  */
-export type NavStatus = "live" | "planned";
-
 export interface NavItem {
   label: string;
   href: string;
-  /** Short glyph shown in the collapsed rail; intentionally text, not an icon lib. */
+  /** Two-letter mono glyph for the collapsed rail; text, not an icon library. */
   glyph: string;
-  status: NavStatus;
+  /** Placeholder module (renders a "coming soon" page) vs a built workspace. */
+  soon?: boolean;
   description: string;
 }
 
@@ -26,66 +26,107 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "Workspace",
     items: [
       {
-        label: "Overview",
+        label: "Home",
         href: "/",
-        glyph: "AT",
-        status: "live",
-        description: "Platform status and foundation summary.",
+        glyph: "HM",
+        description: "Platform overview and status.",
       },
       {
-        label: "Dashboard",
-        href: "/dashboard",
-        glyph: "DB",
-        status: "live",
-        description: "Research terminal workspace (placeholder).",
-      },
-      {
-        label: "Company",
-        href: "/company",
+        label: "Companies",
+        href: "/companies",
         glyph: "CO",
-        status: "live",
-        description: "Company profile scaffold (placeholder).",
+        description: "Company intelligence workspace.",
+      },
+      {
+        label: "Industries",
+        href: "/industries",
+        glyph: "ID",
+        soon: true,
+        description: "Industry and supply-chain intelligence.",
+      },
+      {
+        label: "Research",
+        href: "/research",
+        glyph: "RS",
+        description: "Research notes, reports and evidence.",
       },
     ],
   },
   {
-    title: "Modules",
+    title: "Positions",
     items: [
       {
-        label: "Atlas Invest",
-        href: "/invest",
-        glyph: "IN",
-        status: "planned",
-        description: "Public company and investment research.",
+        label: "Portfolio",
+        href: "/portfolio",
+        glyph: "PF",
+        soon: true,
+        description: "Holdings and exposure (planned).",
       },
       {
-        label: "Atlas Industry",
-        href: "/industry",
-        glyph: "ID",
-        status: "planned",
-        description: "Industry and supply-chain intelligence.",
+        label: "Watchlist",
+        href: "/watchlist",
+        glyph: "WL",
+        soon: true,
+        description: "Tracked companies (planned).",
       },
       {
-        label: "Atlas ERP",
-        href: "/erp",
-        glyph: "ER",
-        status: "planned",
-        description: "Internal business performance intelligence.",
-      },
-      {
-        label: "Atlas M&A",
-        href: "/ma",
-        glyph: "MA",
-        status: "planned",
-        description: "Acquisition target and synergy analysis.",
-      },
-      {
-        label: "Atlas Board",
-        href: "/board",
-        glyph: "BD",
-        status: "planned",
-        description: "Board packs, KPI reviews and strategic memos.",
+        label: "Alerts",
+        href: "/alerts",
+        glyph: "AL",
+        soon: true,
+        description: "Signal and event alerts (planned).",
       },
     ],
   },
+  {
+    title: "System",
+    items: [
+      {
+        label: "Admin",
+        href: "/admin",
+        glyph: "AD",
+        soon: true,
+        description: "Workspace administration (planned).",
+      },
+      {
+        label: "Settings",
+        href: "/settings",
+        glyph: "ST",
+        soon: true,
+        description: "Preferences and configuration (planned).",
+      },
+    ],
+  },
+];
+
+export interface SubTab {
+  label: string;
+  href: string;
+}
+
+/** Company detail sub-navigation. Mirrors the `company_*` data-model groups. */
+export function companyTabs(companyId: string): SubTab[] {
+  const base = `/companies/${companyId}`;
+  return [
+    { label: "Overview", href: `${base}/overview` },
+    { label: "Profile", href: `${base}/profile` },
+    { label: "Products", href: `${base}/products` },
+    { label: "Management", href: `${base}/management` },
+    { label: "Financials", href: `${base}/financials` },
+    { label: "Research", href: `${base}/research` },
+    { label: "Valuation", href: `${base}/valuation` },
+    { label: "Documents", href: `${base}/documents` },
+    { label: "Timeline", href: `${base}/timeline` },
+  ];
+}
+
+/** Research workspace sub-navigation. Mirrors the `research_*` data-model groups. */
+export const RESEARCH_TABS: SubTab[] = [
+  { label: "Overview", href: "/research" },
+  { label: "Notes", href: "/research/notes" },
+  { label: "Reports", href: "/research/reports" },
+  { label: "Evidence", href: "/research/evidence" },
+  { label: "Versions", href: "/research/versions" },
+  { label: "Hypotheses", href: "/research/hypotheses" },
+  { label: "Decision Journal", href: "/research/decision-journal" },
 ];

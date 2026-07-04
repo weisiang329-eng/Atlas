@@ -7,7 +7,8 @@ import { cn } from "@/lib/cn";
 
 /**
  * Left navigation rail. Client component so it can highlight the active route.
- * Hidden below `lg`; the top bar exposes navigation on small screens.
+ * Hidden below `lg`; every item is a real link (placeholder modules are tagged
+ * "soon" but remain navigable).
  */
 export function Sidebar() {
   const pathname = usePathname();
@@ -36,58 +37,35 @@ export function Sidebar() {
                   item.href === "/"
                     ? pathname === "/"
                     : pathname.startsWith(item.href);
-                const planned = item.status === "planned";
-                const content = (
-                  <>
-                    <span
-                      className={cn(
-                        "grid h-6 w-6 shrink-0 place-items-center rounded font-mono text-2xs font-semibold",
-                        active
-                          ? "bg-accent text-black"
-                          : "bg-surface-2 text-faint",
-                      )}
-                    >
-                      {item.glyph}
-                    </span>
-                    <span className="flex-1 truncate">{item.label}</span>
-                    {planned ? (
-                      <span className="text-2xs uppercase tracking-wide text-faint">
-                        soon
-                      </span>
-                    ) : null}
-                  </>
-                );
-
-                const base =
-                  "flex items-center gap-2.5 rounded px-2 py-1.5 text-sm transition-colors";
 
                 return (
                   <li key={item.href}>
-                    {planned ? (
+                    <Link
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      title={item.description}
+                      className={cn(
+                        "flex items-center gap-2.5 rounded px-2 py-1.5 text-sm transition-colors",
+                        active
+                          ? "bg-surface-2 font-medium text-fg"
+                          : "text-muted hover:bg-surface-2 hover:text-fg",
+                      )}
+                    >
                       <span
                         className={cn(
-                          base,
-                          "cursor-not-allowed text-faint",
+                          "grid h-6 w-6 shrink-0 place-items-center rounded font-mono text-2xs font-semibold",
+                          active ? "bg-accent text-black" : "bg-surface-2 text-faint",
                         )}
-                        title="Planned module — not built in Sprint 000"
-                        aria-disabled="true"
                       >
-                        {content}
+                        {item.glyph}
                       </span>
-                    ) : (
-                      <Link
-                        href={item.href}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          base,
-                          active
-                            ? "bg-surface-2 font-medium text-fg"
-                            : "text-muted hover:bg-surface-2 hover:text-fg",
-                        )}
-                      >
-                        {content}
-                      </Link>
-                    )}
+                      <span className="flex-1 truncate">{item.label}</span>
+                      {item.soon ? (
+                        <span className="text-2xs uppercase tracking-wide text-faint">
+                          soon
+                        </span>
+                      ) : null}
+                    </Link>
                   </li>
                 );
               })}
@@ -97,8 +75,8 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-border px-5 py-3">
-        <p className="text-2xs text-faint">Sprint 000 · Foundation</p>
-        <p className="font-mono text-2xs text-faint">v0.0.0</p>
+        <p className="text-2xs text-faint">Milestone 1 · Company Intelligence</p>
+        <p className="font-mono text-2xs text-faint">v0.1.0</p>
       </div>
     </aside>
   );
