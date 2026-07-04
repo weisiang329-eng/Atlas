@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Atlas design tokens.
+ * Dark is the primary, institutional-terminal theme; a light theme is provided
+ * so the shell is dark-mode ready and toggleable via the `.light` class on <html>.
+ */
+:root {
+  --bg: #080b11;
+  --surface: #0e131c;
+  --surface-2: #131a26;
+  --border: #202a3a;
+  --fg: #e7ebf2;
+  --muted: #8c96a8;
+  --faint: #5b657a;
+  --accent: #f2b13d;
+  --accent-dim: #7a5c1f;
+  --positive: #3fb96b;
+  --negative: #f2555a;
+  --grid-line: rgba(255, 255, 255, 0.022);
+}
+
+.light {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --border: #d9dee6;
+  --fg: #15202e;
+  --muted: #5b6675;
+  --faint: #97a0ad;
+  --accent: #b7791f;
+  --accent-dim: #e6d3a6;
+  --positive: #1a7f43;
+  --negative: #c4383d;
+  --grid-line: rgba(15, 30, 55, 0.03);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  html.light {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-feature-settings: "cv05", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Faint blueprint grid — subtle terminal texture behind the workspace. */
+  .atlas-grid {
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+    border: 3px solid var(--bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--faint);
+  }
+}
+
+@layer components {
+  /* Small uppercase eyebrow used across the terminal for section labels. */
+  .eyebrow {
+    @apply font-mono text-2xs uppercase tracking-[0.16em] text-faint;
+  }
+}
