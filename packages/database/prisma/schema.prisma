@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  identifiers CompanyIdentifier[]
+}
+
+model CompanyIdentifier {
+  id        String   @id @default(uuid())
+  companyId String
+  type      String
+  value     String
+  source    String?
+  sourceUrl String?
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([type, value])
+  @@index([companyId])
+}

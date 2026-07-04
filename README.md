@@ -54,8 +54,8 @@ Atlas/
   prompts/           Versioned prompt library
   agents/            AI agent definitions and workflows
   schemas/           Data schemas, OpenAPI, JSON schema, ERD notes
-  apps/              Future application code
-  packages/          Shared libraries
+  apps/              Application code, including the Sprint 000 API scaffold
+  packages/          Shared libraries and service packages, including database schema
   infra/             Deployment, CI/CD, Docker, IaC
   research/          Company and industry research templates
   adr/               Architecture Decision Records
@@ -65,3 +65,15 @@ Atlas/
 Sprint 000: Foundation.
 
 No business feature should be built before the foundation is complete.
+
+
+## Sprint 000 Local Setup
+
+```bash
+npm install
+npm run lint
+npm run typecheck
+npm test
+```
+
+The initial backend scaffold lives in `apps/api` and exposes `GET /health`. The PostgreSQL/Prisma schema skeleton lives in `packages/database/prisma/schema.prisma`.

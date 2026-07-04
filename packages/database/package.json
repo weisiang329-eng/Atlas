@@ -1,0 +1,10 @@
+{
+  "name": "@atlas/database",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "node scripts/validate-prisma-schema.mjs",
+    "typecheck": "node scripts/validate-prisma-schema.mjs",
+    "test": "node scripts/validate-prisma-schema.mjs"
+  }
+}
