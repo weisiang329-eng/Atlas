@@ -2,7 +2,12 @@ import type { ReactNode } from "react";
 import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { Badge } from "@/components/ui/badge";
 import { companyTabs } from "@/lib/nav";
-import { getMockCompany } from "@/lib/mock/companies";
+import { getMockCompany, MOCK_COMPANIES } from "@/lib/mock/companies";
+
+// Static export: pre-render every company in the sample universe.
+export function generateStaticParams() {
+  return MOCK_COMPANIES.map((c) => ({ companyId: c.id }));
+}
 
 export default async function CompanyLayout({
   children,
