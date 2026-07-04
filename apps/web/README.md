@@ -93,6 +93,13 @@ amber accent on deep slate. Theming is driven entirely by CSS variables in
 `app/globals.css`; a `.light` class on `<html>` flips to the light theme, so the
 shell is dark-mode ready without a hardcoded palette.
 
+## Deployment
+
+Static export (`output: "export"`) → **Cloudflare Pages**. `npm run build` emits
+`out/`; redirects live in `public/_redirects`. Full guide:
+[`management/deployment/cloudflare.md`](../../management/deployment/cloudflare.md)
+and [`adr/ADR-Cloudflare-Deployment-Strategy.md`](../../adr/ADR-Cloudflare-Deployment-Strategy.md).
+
 ## Conventions
 
 - No business logic in UI components (per the Atlas Development Standard).
