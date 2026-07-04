@@ -56,6 +56,12 @@ export const NAV_GROUPS: NavGroup[] = [
         glyph: "FN",
         description: "Statements, metrics and results (sample data).",
       },
+      {
+        label: "Reports",
+        href: "/reports",
+        glyph: "RP",
+        description: "Intelligence reports and decision documents.",
+      },
     ],
   },
   {

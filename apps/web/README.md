@@ -62,8 +62,10 @@ apps/web/
     industries|portfolio|watchlist|alerts|admin|settings/page.tsx   Planned modules
   components/
     layout/       App shell: sidebar, topbar, tab-nav, mobile-nav
+    dashboard/    dashboard-grid, widget (12-col framework)
     data/         data-table (paginated), statement-table, results-table
     chart/        chart-container, trend-chart, bar-series, sparkline (pure SVG)
+    report/       report-layout + 11 report components (see report-ux.md)
     ui/           panel, badge, stat, page-header, section-heading, timeline,
                   document-viewer, placeholder-table, coming-soon, and the async
                   state system: data-state, loading-state, error-state, empty-state
@@ -73,10 +75,12 @@ apps/web/
     mock/         Labelled sample data (companies, financials, documents, timeline)
 ```
 
-The financial workspace lives at `app/financials` (overview + income-statement,
-balance-sheet, cash-flow, metrics, historical-trends, quarterly, annual). The
-reusable component library is documented in
-[`docs/00-foundation/ui-component-library.md`](../../docs/00-foundation/ui-component-library.md).
+The financial workspace lives at `app/financials`; the report workspace at
+`app/reports` (library + `[reportId]` document). The reusable component library
+is documented in
+[`docs/00-foundation/ui-component-library.md`](../../docs/00-foundation/ui-component-library.md)
+and reports specifically in
+[`docs/00-foundation/report-ux.md`](../../docs/00-foundation/report-ux.md).
 
 Old Sprint 000 routes (`/dashboard`, `/company`) now redirect to `/` and
 `/companies` (see `next.config.mjs`).

@@ -103,3 +103,38 @@
     @apply font-mono text-2xs uppercase tracking-[0.16em] text-faint;
   }
 }
+
+/*
+ * Print — reports must be board-ready on paper and print-to-PDF. Force a clean
+ * light document and drop app chrome. App chrome also carries `print:hidden`.
+ */
+@media print {
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f3f4f6;
+    --border: #d0d5dd;
+    --fg: #111418;
+    --muted: #333a44;
+    --faint: #5b6675;
+    --accent: #8a5a12;
+    --accent-dim: #c9a25a;
+    --positive: #1a7f43;
+    --negative: #b3261e;
+    --warning: #8a5a12;
+    --info: #245a99;
+    --grid-line: transparent;
+  }
+  html {
+    color-scheme: light;
+  }
+  body {
+    background: #ffffff;
+  }
+  .atlas-grid {
+    background-image: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+}
