@@ -45,7 +45,7 @@ export function StatementTable({
           <tr className="border-b border-border">
             <th
               scope="col"
-              className="sticky left-0 z-[1] bg-surface px-3 py-2.5 text-left align-bottom"
+              className="sticky left-0 z-[1] bg-surface px-3 py-[var(--cell-py)] text-left align-bottom"
             >
               <span className="font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint">
                 Line item
@@ -60,7 +60,7 @@ export function StatementTable({
               <th
                 key={p}
                 scope="col"
-                className="whitespace-nowrap px-3 py-2.5 text-right font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
+                className="whitespace-nowrap px-3 py-[var(--cell-py)] text-right font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
               >
                 {p}
               </th>
@@ -95,7 +95,7 @@ export function StatementTable({
                 <th
                   scope="row"
                   className={cn(
-                    "sticky left-0 bg-surface px-3 py-2 text-left font-sans font-normal",
+                    "sticky left-0 bg-surface px-3 py-[var(--cell-py)] text-left font-sans font-normal",
                     row.indent && "pl-6",
                     isTotal ? "font-semibold text-fg" : "text-muted",
                   )}
@@ -106,7 +106,7 @@ export function StatementTable({
                   <td
                     key={vi}
                     className={cn(
-                      "whitespace-nowrap px-3 py-2 text-right font-mono tabular-nums",
+                      "whitespace-nowrap px-3 py-[var(--cell-py)] text-right font-mono tabular-nums",
                       isTotal ? "font-semibold text-fg" : "text-fg",
                       v !== null && v < 0 && "text-negative",
                     )}

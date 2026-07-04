@@ -6,8 +6,9 @@ layout, one dashboard grid — a new module is composition, not new scaffolding.
 ## Primitives (`components/layout`, `components/dashboard`)
 
 - **`AppShell`** — the outermost frame: sidebar (`Sidebar` ≥`lg` + `MobileNav`
-  drawer below) + top bar (`Topbar`, with `CommandSearch`) + a scrollable,
-  width-capped workspace. Owns the container width so every route aligns.
+  below, built on the shared `Drawer`) + top bar (`Topbar`, with `CommandSearch`)
+  + a scrollable, width-capped workspace. Owns the container width so every route
+  aligns.
 - **`WorkspaceLayout`** — shell + header + tab navigation + content, in one
   component. Default header is a `PageHeader` (`eyebrow`/`heading`/`description`/
   `actions`); pass a **`header`** slot to override with a custom masthead (the

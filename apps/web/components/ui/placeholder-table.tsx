@@ -20,7 +20,7 @@ export function PlaceholderTable({
             {columns.map((col) => (
               <th
                 key={col}
-                className="whitespace-nowrap px-3 py-2 font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
+                className="whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
               >
                 {col}
               </th>
