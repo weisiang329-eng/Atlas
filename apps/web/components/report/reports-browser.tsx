@@ -3,15 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { FilterBar, type FilterOption } from "@/components/ui/filter-bar";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { ReportStatus, ReportTypeMeta } from "@/lib/mock/reports";
-
-const STATUS_TONE: Record<ReportStatus, "neutral" | "warning" | "positive"> = {
-  Draft: "neutral",
-  "In review": "warning",
-  Final: "positive",
-};
+import type { ReportTypeMeta } from "@/lib/mock/reports";
 
 const FILTERS: FilterOption[] = [
   { label: "All", value: "all" },
@@ -63,7 +57,7 @@ export function ReportsBrowser({ items }: { items: ReportTypeMeta[] }) {
             >
               <div className="mb-2 flex items-center justify-between gap-2">
                 <span className="eyebrow">{r.type}</span>
-                <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>
+                <StatusBadge status={r.status} />
               </div>
               <p className="text-sm font-medium text-fg">{r.subject}</p>
               <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted">
