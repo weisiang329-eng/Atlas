@@ -2,28 +2,27 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
-import { StatGrid } from "@/components/ui/stat-grid";
+import { KpiCard } from "@/components/ui/kpi-card";
+import { ActivityFeed } from "@/components/ui/activity-feed";
 import { Badge } from "@/components/ui/badge";
 import { DashboardGrid, Widget } from "@/components/dashboard/dashboard-grid";
+import { HOME_KPIS, ACTIVITY } from "@/lib/mock/activity";
 
 const WORKSPACES = [
   {
     href: "/companies",
     title: "Companies",
     body: "Profiles, products, management, financials, valuation and documents for the coverage universe.",
-    live: true,
   },
   {
     href: "/research",
     title: "Research",
     body: "Evidence-first notes, versioned reports, hypotheses and a decision journal.",
-    live: true,
   },
   {
     href: "/financials",
     title: "Financials",
     body: "Statements, metrics, historical trends and quarterly / annual results.",
-    live: true,
   },
 ];
 
@@ -33,18 +32,13 @@ export default function HomePage() {
       <PageHeader
         eyebrow="Decision Intelligence Platform"
         title="Company Intelligence workspace"
-        description="Atlas turns market change into evidence-backed decisions. Every workspace is composed from one shared component system — structure and layout only, with clearly-labelled sample data."
+        description="Atlas turns market change into evidence-backed decisions. Every workspace is composed from one shared component system — clearly-labelled sample data throughout."
       />
 
-      <div className="mb-6">
-        <StatGrid
-          items={[
-            { label: "Coverage", value: "06", hint: "Sample universe" },
-            { label: "Research Notes", value: "—", hint: "Not wired" },
-            { label: "Open Alerts", value: "—", hint: "Not wired" },
-            { label: "Workspaces", value: "03", hint: "Live" },
-          ]}
-        />
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {HOME_KPIS.map((k) => (
+          <KpiCard key={k.label} {...k} />
+        ))}
       </div>
 
       <DashboardGrid>
@@ -56,9 +50,7 @@ export default function HomePage() {
             >
               <div className="mb-3 flex items-center justify-between">
                 <span className="eyebrow">Workspace</span>
-                <Badge tone={w.live ? "positive" : "neutral"}>
-                  {w.live ? "Live" : "Soon"}
-                </Badge>
+                <Badge tone="positive">Live</Badge>
               </div>
               <h2 className="font-serif text-lg text-fg">{w.title}</h2>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
@@ -74,23 +66,27 @@ export default function HomePage() {
           </Widget>
         ))}
 
-        <Widget span={12}>
+        <Widget span={8}>
           <Panel>
             <PanelHeader
-              eyebrow="Platform"
-              title="Architecture scope"
-              action={<Badge tone="accent">Structure only</Badge>}
+              eyebrow="Feed"
+              title="Recent activity"
+              action={<Badge tone="accent">Sample</Badge>}
             />
             <PanelBody>
-              <p className="mb-4 text-sm leading-relaxed text-muted">
-                Built as a reusable UI system: shared shell and navigation, a
-                dashboard framework, typed tables, pure-SVG charts, and one async
-                state model. Intentionally not built yet:
-              </p>
+              <ActivityFeed items={ACTIVITY} />
+            </PanelBody>
+          </Panel>
+        </Widget>
+
+        <Widget span={4}>
+          <Panel>
+            <PanelHeader eyebrow="Platform" title="Not built yet" />
+            <PanelBody>
               <div className="flex flex-wrap gap-2">
                 {[
                   "AI chat",
-                  "Portfolio & trading",
+                  "Portfolio",
                   "Authentication",
                   "OCR",
                   "ERP integration",

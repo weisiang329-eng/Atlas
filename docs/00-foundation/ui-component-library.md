@@ -82,6 +82,10 @@ Composed in the Knowledge workspace (`/knowledge`).
 - **`TabNav`** — reusable sub-navigation.
 - **`StatGrid`** — the canonical KPI strip (hairline-divided `Stat`s); used on
   every overview so headline figures are laid out identically.
+- **`KpiCard`** — metric tile with an optional semantic delta and inline
+  `Sparkline`; for values whose movement matters (home dashboard).
+- **`ActivityFeed`** — chronological, colour-coded event stream (filings,
+  research, alerts, decisions).
 - **`Timeline`** — vertical event log (company history, versions, decisions).
 - **`DocumentViewer`** — two-pane list + preview shell; preview waits on a
   storage contract.
