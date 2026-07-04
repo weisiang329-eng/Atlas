@@ -50,6 +50,12 @@ export const NAV_GROUPS: NavGroup[] = [
         glyph: "RS",
         description: "Research notes, reports and evidence.",
       },
+      {
+        label: "Financials",
+        href: "/financials",
+        glyph: "FN",
+        description: "Statements, metrics and results (sample data).",
+      },
     ],
   },
   {
@@ -119,6 +125,18 @@ export function companyTabs(companyId: string): SubTab[] {
     { label: "Timeline", href: `${base}/timeline` },
   ];
 }
+
+/** Financial workspace sub-navigation. */
+export const FINANCIAL_TABS: SubTab[] = [
+  { label: "Overview", href: "/financials" },
+  { label: "Income Statement", href: "/financials/income-statement" },
+  { label: "Balance Sheet", href: "/financials/balance-sheet" },
+  { label: "Cash Flow", href: "/financials/cash-flow" },
+  { label: "Metrics", href: "/financials/metrics" },
+  { label: "Historical Trends", href: "/financials/historical-trends" },
+  { label: "Quarterly", href: "/financials/quarterly" },
+  { label: "Annual", href: "/financials/annual" },
+];
 
 /** Research workspace sub-navigation. Mirrors the `research_*` data-model groups. */
 export const RESEARCH_TABS: SubTab[] = [
