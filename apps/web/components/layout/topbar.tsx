@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { CommandSearch } from "@/components/layout/command-search";
 
 /**
  * Workspace top bar: page title on the left, a mock command hint and
@@ -19,12 +20,7 @@ export function Topbar({ title }: { title: string }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="hidden items-center gap-2 rounded border border-border bg-surface px-2.5 py-1.5 font-mono text-2xs text-faint md:flex">
-          <span>Search</span>
-          <kbd className="rounded border border-border px-1 text-faint">
-            &#8984;K
-          </kbd>
-        </div>
+        <CommandSearch />
         <Badge tone="positive">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-positive" />
           Live

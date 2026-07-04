@@ -73,6 +73,22 @@ they follow the theme.
   **`Badge`** (`neutral | accent | positive | negative | warning | info`),
   **`Stat`**, **`PlaceholderTable`**, **`ComingSoon`**.
 
+## Interaction (`components/ui`, `components/layout`)
+
+Overlay and filtering primitives — all keyboard-accessible, all sharing one
+a11y core (`lib/use-overlay.ts`: focus trap, Escape, scroll lock, focus restore).
+
+- **`Dialog`** — accessible modal (`role="dialog"`, `aria-modal`, overlay-click
+  and Escape to close). Base for confirmations, detail views, the palette.
+- **`Drawer`** — side sheet (left/right) on the same a11y core; for filters and
+  contextual panels.
+- **`CommandSearch`** — the ⌘K / Ctrl+K command palette in the top bar. Substring
+  search across navigation, companies, reports and workspace tabs; arrow-key
+  selection, Enter to navigate. Built on `Dialog`.
+- **`SearchInput`** — styled search field primitive.
+- **`FilterBar`** — controlled search + segmented filter row for lists/tables
+  (in use on the report library via `ReportsBrowser`).
+
 ## Reports (`components/report`)
 
 Decision-document components composed by **`ReportLayout`** from a `ReportModel`:
