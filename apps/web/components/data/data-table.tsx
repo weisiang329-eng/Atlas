@@ -77,7 +77,7 @@ export function DataTable<T>({
                   key={c.key}
                   scope="col"
                   className={cn(
-                    "whitespace-nowrap px-3 py-2.5 font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint",
+                    "whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint",
                     alignClass(c),
                     c.className,
                   )}
@@ -103,7 +103,7 @@ export function DataTable<T>({
                   <td
                     key={c.key}
                     className={cn(
-                      "whitespace-nowrap px-3 py-2.5 text-fg",
+                      "whitespace-nowrap px-3 py-[var(--cell-py)] text-fg",
                       c.numeric && "font-mono tabular-nums",
                       alignClass(c),
                       c.className,

@@ -18,7 +18,7 @@ export function EvidenceTable({ items }: { items: EvidenceItem[] }) {
               <th
                 key={h}
                 scope="col"
-                className="whitespace-nowrap px-3 py-2.5 font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
+                className="whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
               >
                 {h}
               </th>
@@ -28,13 +28,13 @@ export function EvidenceTable({ items }: { items: EvidenceItem[] }) {
         <tbody>
           {items.map((e, i) => (
             <tr key={i} className="border-b border-border last:border-0">
-              <td className="px-3 py-2.5 text-fg">{e.claim}</td>
-              <td className="px-3 py-2.5 text-muted">{e.source}</td>
-              <td className="px-3 py-2.5 text-muted">{e.type}</td>
-              <td className="px-3 py-2.5">
+              <td className="px-3 py-[var(--cell-py)] text-fg">{e.claim}</td>
+              <td className="px-3 py-[var(--cell-py)] text-muted">{e.source}</td>
+              <td className="px-3 py-[var(--cell-py)] text-muted">{e.type}</td>
+              <td className="px-3 py-[var(--cell-py)]">
                 <Badge tone={CONF[e.confidence]}>{e.confidence}</Badge>
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 font-mono text-2xs text-faint">
+              <td className="whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs text-faint">
                 {e.date}
               </td>
             </tr>

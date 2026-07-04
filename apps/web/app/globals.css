@@ -30,6 +30,14 @@
   --warning: #e0a63a;
   --info: #5aa9e6;
   --grid-line: rgba(255, 255, 255, 0.022);
+
+  /* Density — vertical rhythm for dense surfaces (tables). Compact overrides below. */
+  --cell-py: 0.625rem;
+}
+
+/* Density system: root attribute switches the spacing scale globally. */
+[data-density="compact"] {
+  --cell-py: 0.3125rem;
 }
 
 .light {

@@ -14,7 +14,7 @@ export function DecisionMemoSection({ entries }: { entries: DecisionEntry[] }) {
               <th
                 key={h}
                 scope="col"
-                className="whitespace-nowrap px-3 py-2.5 font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
+                className="whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs font-medium uppercase tracking-[0.08em] text-faint"
               >
                 {h}
               </th>
@@ -24,14 +24,14 @@ export function DecisionMemoSection({ entries }: { entries: DecisionEntry[] }) {
         <tbody>
           {entries.map((d, i) => (
             <tr key={i} className="border-b border-border last:border-0">
-              <td className="whitespace-nowrap px-3 py-2.5 font-mono text-2xs text-muted">
+              <td className="whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs text-muted">
                 {d.date}
               </td>
-              <td className="px-3 py-2.5 text-fg">{d.decision}</td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-muted">
+              <td className="px-3 py-[var(--cell-py)] text-fg">{d.decision}</td>
+              <td className="whitespace-nowrap px-3 py-[var(--cell-py)] text-muted">
                 {d.owner}
               </td>
-              <td className="px-3 py-2.5 text-muted">{d.outcome}</td>
+              <td className="px-3 py-[var(--cell-py)] text-muted">{d.outcome}</td>
             </tr>
           ))}
         </tbody>
