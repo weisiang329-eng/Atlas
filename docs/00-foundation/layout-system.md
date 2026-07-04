@@ -20,7 +20,8 @@ layout, one dashboard grid — a new module is composition, not new scaffolding.
   `leftWidth` = `sm`/`md`/`lg`/`half`. The base for document viewers, comparison
   and master–detail. `DocumentViewer` is built on it.
 - **`DetailPanelLayout`** — master (list) + detail on `SplitPaneLayout`; shows an
-  empty state when nothing is selected. Parent owns selection.
+  empty state when nothing is selected. Parent owns selection. In use on the
+  Companies index (`CompaniesBrowser`: FilterBar + list + live preview).
 
 ## The workspace pattern
 
@@ -47,4 +48,4 @@ and a thin layout — no copied shell/header/tab scaffolding.
 - Optional per-workspace right rail (`WorkspaceLayout` already centralises the
   header/tabs seam where it would attach).
 - A resizable divider for `SplitPaneLayout` (drag to re-proportion).
-- `DetailPanelLayout` wired into the Companies index for an inbox-style browse.
+- Three-pane (nav + list + detail) for large screens.
