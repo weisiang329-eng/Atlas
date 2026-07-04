@@ -28,8 +28,10 @@ is a status change, not a redesign.
 ## Tables (`components/data`)
 
 - **`DataTable<T>`** — generic, typed columns, right-aligned tabular numerics,
-  sticky header, row click. **Performance-first**: `pageSize` paginates large
-  datasets client-side so only one page is ever in the DOM (demo: 48 quarters).
+  sticky header, row click, **sortable columns** (`sortable` per column;
+  asc → desc → clear, `aria-sort`, numeric/string auto-compare). **Performance-first**:
+  `pageSize` paginates large datasets client-side so only one page is ever in the
+  DOM (demo: 48 quarters, sortable).
 - **`StatementTable`** — financial statements: label column + one column per
   period, with section headers, indented lines and emphasized totals. Negatives
   render in parentheses and the `negative` colour. Reused across income
