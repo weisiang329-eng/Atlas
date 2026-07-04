@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { StatGrid } from "@/components/ui/stat-grid";
 import { RESEARCH_TABS } from "@/lib/nav";
+import { NOTES, REPORTS, EVIDENCE, HYPOTHESES } from "@/lib/mock/research";
+
+const OPEN_HYPOTHESES = HYPOTHESES.filter((h) => h.status === "Open").length;
 
 const DESCRIPTIONS: Record<string, string> = {
   Notes: "Working research notes tagged by company and theme.",
@@ -22,10 +25,10 @@ export default function ResearchOverviewPage() {
       <div className="mb-6">
         <StatGrid
           items={[
-            { label: "Notes", value: "—", hint: "Not wired" },
-            { label: "Reports", value: "—", hint: "Not wired" },
-            { label: "Open Hypotheses", value: "—", hint: "Not wired" },
-            { label: "Evidence Items", value: "—", hint: "Not wired" },
+            { label: "Notes", value: String(NOTES.length), hint: "Sample" },
+            { label: "Reports", value: String(REPORTS.length), hint: "Sample" },
+            { label: "Open Hypotheses", value: String(OPEN_HYPOTHESES), hint: "Sample" },
+            { label: "Evidence Items", value: String(EVIDENCE.length), hint: "Sample" },
           ]}
         />
       </div>

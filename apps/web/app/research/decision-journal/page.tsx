@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Panel } from "@/components/ui/panel";
-import { PlaceholderTable } from "@/components/ui/placeholder-table";
+import { Badge } from "@/components/ui/badge";
+import { DecisionsTable } from "@/components/research/research-tables";
+import { DECISIONS } from "@/lib/mock/research";
 
 export const metadata: Metadata = { title: "Decision Journal" };
 
@@ -11,11 +13,10 @@ export default function DecisionJournalPage() {
       <SectionHeading
         title="Decision Journal"
         description="Logged decisions with context and outcome for later review. Maps to decision_journal."
+        action={<Badge tone="accent">Sample</Badge>}
       />
       <Panel className="overflow-hidden">
-        <PlaceholderTable
-          columns={["Decision", "Context", "Conviction", "Outcome", "Date"]}
-        />
+        <DecisionsTable rows={DECISIONS} />
       </Panel>
     </>
   );

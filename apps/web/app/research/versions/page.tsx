@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Panel } from "@/components/ui/panel";
-import { PlaceholderTable } from "@/components/ui/placeholder-table";
+import { Badge } from "@/components/ui/badge";
+import { VersionsTable } from "@/components/research/research-tables";
+import { VERSIONS } from "@/lib/mock/research";
 
 export const metadata: Metadata = { title: "Versions" };
 
@@ -11,11 +13,10 @@ export default function ResearchVersionsPage() {
       <SectionHeading
         title="Versions"
         description="Full revision history so research is reproducible. Maps to research_version."
+        action={<Badge tone="accent">Sample</Badge>}
       />
       <Panel className="overflow-hidden">
-        <PlaceholderTable
-          columns={["Version", "Report", "Author", "Change", "Date"]}
-        />
+        <VersionsTable rows={VERSIONS} />
       </Panel>
     </>
   );

@@ -10,6 +10,9 @@ const STATUS_TONE: Record<string, Tone> = {
   Pending: "warning",
   Blocked: "negative",
   Archived: "neutral",
+  Open: "info",
+  Confirmed: "positive",
+  Rejected: "negative",
 };
 
 /**
