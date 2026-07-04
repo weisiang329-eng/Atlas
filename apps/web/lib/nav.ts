@@ -62,6 +62,12 @@ export const NAV_GROUPS: NavGroup[] = [
         glyph: "RP",
         description: "Intelligence reports and decision documents.",
       },
+      {
+        label: "Knowledge",
+        href: "/knowledge",
+        glyph: "KG",
+        description: "Relationships, exposure and decision structure.",
+      },
     ],
   },
   {
@@ -131,6 +137,14 @@ export function companyTabs(companyId: string): SubTab[] {
     { label: "Timeline", href: `${base}/timeline` },
   ];
 }
+
+/** Knowledge workspace sub-navigation. */
+export const KNOWLEDGE_TABS: SubTab[] = [
+  { label: "Overview", href: "/knowledge" },
+  { label: "Relationship Graph", href: "/knowledge/graph" },
+  { label: "Heatmap", href: "/knowledge/heatmap" },
+  { label: "Decision Tree", href: "/knowledge/decision-tree" },
+];
 
 /** Financial workspace sub-navigation. */
 export const FINANCIAL_TABS: SubTab[] = [

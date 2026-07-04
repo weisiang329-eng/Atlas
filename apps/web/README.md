@@ -66,6 +66,7 @@ apps/web/
     data/         data-table (paginated), statement-table, results-table
     chart/        chart-container, trend-chart, bar-series, sparkline (pure SVG)
     report/       report-layout + 11 report components (see report-ux.md)
+    viz/          heatmap, relationship-graph, knowledge-graph, decision-tree (pure SVG)
     ui/           panel, badge, stat, page-header, section-heading, timeline,
                   document-viewer, placeholder-table, coming-soon, and the async
                   state system: data-state, loading-state, error-state, empty-state

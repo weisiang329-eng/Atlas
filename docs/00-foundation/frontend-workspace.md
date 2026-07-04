@@ -9,11 +9,11 @@ data is labelled and carries no fabricated metrics.
 
 Sidebar, grouped. Every item is a real route; `soon` = navigable placeholder.
 
-| Group     | Items                                                        |
-| --------- | ------------------------------------------------------------ |
-| Workspace | Home · Companies · Industries* · Research · Financials · Reports |
-| Positions | Portfolio* · Watchlist* · Alerts*                            |
-| System    | Admin* · Settings*                                           |
+| Group     | Items                                                                     |
+| --------- | ------------------------------------------------------------------------- |
+| Workspace | Home · Companies · Industries* · Research · Financials · Reports · Knowledge |
+| Positions | Portfolio* · Watchlist* · Alerts*                                         |
+| System    | Admin* · Settings*                                                        |
 
 `*` placeholder module (renders a "planned" page).
 
@@ -47,6 +47,8 @@ Sidebar, grouped. Every item is a real route; `soon` = navigable placeholder.
 | `/financials/quarterly` `/financials/annual` | Results (`ResultsTable`, paginated) |
 | `/reports`                    | Report library (9 report types)            |
 | `/reports/[reportId]`         | Intelligence report document (`ReportLayout`) |
+| `/knowledge`                  | Knowledge overview (graph + heatmap)       |
+| `/knowledge/graph` `/heatmap` `/decision-tree` | Visualization primitives (`components/viz`) |
 | `/industries` `/portfolio` `/watchlist` `/alerts` `/admin` `/settings` | Planned modules |
 
 The financial workspace operates on a **fictional sample subject** (Helios
