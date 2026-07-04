@@ -50,6 +50,20 @@ Dependency-free, pure-SVG, server-rendered (no client JS, no chart library):
 All expose `ariaLabel` and use `role="img"`; colours come from CSS variables so
 they follow the theme.
 
+## Visualization (`components/viz`)
+
+Dependency-free, deterministic, server-rendered visualization primitives (no
+charting/graph libraries, no physics — identical output every render):
+
+- **`Heatmap`** — rows × columns intensity grid; green → amber → red tint.
+- **`RelationshipGraph`** — entity graph, radial layout, colour by entity kind.
+- **`KnowledgeGraph`** — `RelationshipGraph` + an entity-kind legend.
+- **`DecisionTree`** — top-down hierarchical tree (decision → option → outcome).
+
+These join the existing viz-family pieces: `Timeline`, `RiskMatrix`, and the
+`components/chart` primitives (`TrendChart`, `BarSeries`, `Sparkline`).
+Composed in the Knowledge workspace (`/knowledge`).
+
 ## Dashboard framework (`components/dashboard`)
 
 - **`DashboardGrid`** — responsive 12-column grid (2-up on tablet, stacked on
