@@ -9,10 +9,10 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   MARKET_CURRENCY,
-  type LedgerTrade,
   type Market,
+  type NewTrade,
   type Side,
-} from "@/lib/loaders/use-ledger";
+} from "@/lib/loaders/use-book";
 import { useT } from "@/lib/i18n/use-locale";
 import { cn } from "@/lib/cn";
 
@@ -71,7 +71,7 @@ const LABEL = "mb-1 block font-mono text-2xs uppercase tracking-[0.08em] text-fa
 export function TradeEntryForm({
   onAdd,
 }: {
-  onAdd: (t: Omit<LedgerTrade, "id">) => void;
+  onAdd: (t: NewTrade) => void | Promise<void>;
 }) {
   const t = useT();
   const [side, setSide] = useState<Side>("buy");
@@ -82,6 +82,8 @@ export function TradeEntryForm({
   const [tradedAt, setTradedAt] = useState("");
   const [feeOverride, setFeeOverride] = useState("");
   const [fxRate, setFxRate] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const currency = MARKET_CURRENCY[market];
   const qty = Number(quantity) || 0;
@@ -95,25 +97,40 @@ export function TradeEntryForm({
   const fx = fxRate === "" ? (DEFAULT_FX[currency] ?? 1) : Number(fxRate) || 1;
   const valid = symbol.trim() !== "" && qty > 0 && px > 0;
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!valid) return;
-    onAdd({
-      symbol: symbol.trim().toUpperCase(),
-      market,
-      side,
-      quantity: qty,
-      price: px,
-      currency,
-      fxRate: fx,
-      // Default to now, in the same ISO shape the importer will use.
-      tradedAt: tradedAt ? `${tradedAt}T00:00:00Z` : new Date().toISOString(),
-      fees,
-    });
-    setSymbol("");
-    setQuantity("");
-    setPrice("");
-    setFeeOverride("");
+    if (!valid || saving) return;
+    setSaving(true);
+    setSubmitError(null);
+    try {
+      // `currency` is deliberately not sent: the server derives it from the
+      // market, so that mapping has exactly one home.
+      await onAdd({
+        symbol: symbol.trim().toUpperCase(),
+        market,
+        side,
+        quantity: qty,
+        price: px,
+        fxRate: fx,
+        // Same ISO shape the broker importer will use.
+        tradedAt: tradedAt ? `${tradedAt}T00:00:00Z` : new Date().toISOString(),
+        // Only send a fee when the user overrode it; otherwise the server's
+        // schedule is authoritative.
+        ...(feeOverride === "" ? {} : { fees }),
+      });
+      setSymbol("");
+      setQuantity("");
+      setPrice("");
+      setFeeOverride("");
+    } catch (err) {
+      // The API returns a specific validation message; showing "something went
+      // wrong" would leave the user guessing which field to fix.
+      setSubmitError(
+        err instanceof Error ? err.message : "Could not save the trade.",
+      );
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -254,12 +271,21 @@ export function TradeEntryForm({
         </p>
       ) : null}
 
+      {submitError ? (
+        <p
+          role="alert"
+          className="rounded border border-negative/40 bg-negative/10 px-2.5 py-2 text-2xs text-negative"
+        >
+          {submitError}
+        </p>
+      ) : null}
+
       <button
         type="submit"
-        disabled={!valid}
+        disabled={!valid || saving}
         className="rounded bg-accent px-3 py-2 text-sm font-medium text-black transition-opacity hover:opacity-90 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
       >
-        {t("ledger.record")}
+        {saving ? t("common.loading") : t("ledger.record")}
       </button>
     </form>
   );

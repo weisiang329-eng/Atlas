@@ -37,7 +37,17 @@ export async function apiFetch<T>(
     headers: { "content-type": "application/json", ...init?.headers },
   });
   if (!res.ok) {
-    throw new ApiError(res.status, "The request could not be completed.");
+    // Surface the server's own message. Writes validate their input, and a
+    // form that can only say "the request could not be completed" leaves the
+    // user guessing which field was wrong.
+    let message = "The request could not be completed.";
+    try {
+      const body = (await res.json()) as { error?: unknown };
+      if (typeof body.error === "string" && body.error) message = body.error;
+    } catch {
+      /* non-JSON error body — keep the generic message */
+    }
+    throw new ApiError(res.status, message);
   }
   return (await res.json()) as T;
 }

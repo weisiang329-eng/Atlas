@@ -171,3 +171,225 @@ export async function recordAgentUse(db: Db, ip: string): Promise<number> {
     .returning({ count: schema.agentUsage.count });
   return rows[0]?.count ?? 1;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * Portfolio accounting (PMS) — docs/PORTFOLIO-ACCOUNTING.md
+ * Trades are append-only; lots and closures are written by the matcher.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+export async function ensureAccount(
+  db: Db,
+  account: { id: string; name: string; broker: string; baseCurrency?: string },
+): Promise<schema.PmsAccount> {
+  const rows = await db
+    .insert(schema.pmsAccount)
+    .values({
+      id: account.id,
+      name: account.name,
+      broker: account.broker,
+      baseCurrency: account.baseCurrency ?? "MYR",
+    })
+    .onConflictDoUpdate({
+      target: schema.pmsAccount.id,
+      set: { name: account.name, broker: account.broker },
+    })
+    .returning();
+  return rows[0]!;
+}
+
+export async function ensureInstrument(
+  db: Db,
+  inst: {
+    id: string;
+    symbol: string;
+    market: "US" | "MY" | "HK" | "SG";
+    currency: string;
+    name: string;
+  },
+): Promise<schema.PmsInstrument> {
+  const rows = await db
+    .insert(schema.pmsInstrument)
+    .values(inst)
+    .onConflictDoUpdate({
+      target: schema.pmsInstrument.id,
+      set: { name: inst.name, currency: inst.currency },
+    })
+    .returning();
+  return rows[0]!;
+}
+
+export async function listTrades(
+  db: Db,
+  accountId: string,
+): Promise<schema.PmsTrade[]> {
+  return db
+    .select()
+    .from(schema.pmsTrade)
+    .where(eq(schema.pmsTrade.accountId, accountId))
+    .orderBy(asc(schema.pmsTrade.tradedAt), asc(schema.pmsTrade.id));
+}
+
+export async function insertTrade(
+  db: Db,
+  trade: typeof schema.pmsTrade.$inferInsert,
+): Promise<schema.PmsTrade> {
+  const rows = await db.insert(schema.pmsTrade).values(trade).returning();
+  return rows[0]!;
+}
+
+export async function insertTradeFees(
+  db: Db,
+  fees: (typeof schema.pmsTradeFee.$inferInsert)[],
+): Promise<void> {
+  if (fees.length === 0) return;
+  await db.insert(schema.pmsTradeFee).values(fees);
+}
+
+export async function listTradeFees(
+  db: Db,
+  tradeIds: number[],
+): Promise<schema.PmsTradeFee[]> {
+  if (tradeIds.length === 0) return [];
+  return db
+    .select()
+    .from(schema.pmsTradeFee)
+    .where(inArray(schema.pmsTradeFee.tradeId, tradeIds));
+}
+
+export async function insertLot(
+  db: Db,
+  lot: typeof schema.pmsLot.$inferInsert,
+): Promise<schema.PmsLot> {
+  const rows = await db.insert(schema.pmsLot).values(lot).returning();
+  return rows[0]!;
+}
+
+/** Open lots for one instrument, oldest first — the matcher's input. */
+export async function listOpenLots(
+  db: Db,
+  accountId: string,
+  instrumentId: string,
+): Promise<schema.PmsLot[]> {
+  return db
+    .select()
+    .from(schema.pmsLot)
+    .where(
+      and(
+        eq(schema.pmsLot.accountId, accountId),
+        eq(schema.pmsLot.instrumentId, instrumentId),
+      ),
+    )
+    .orderBy(asc(schema.pmsLot.openedAt), asc(schema.pmsLot.id));
+}
+
+export async function listAllLots(
+  db: Db,
+  accountId: string,
+): Promise<schema.PmsLot[]> {
+  return db
+    .select()
+    .from(schema.pmsLot)
+    .where(eq(schema.pmsLot.accountId, accountId))
+    .orderBy(asc(schema.pmsLot.openedAt), asc(schema.pmsLot.id));
+}
+
+export async function updateLotRemaining(
+  db: Db,
+  lotId: number,
+  remainingQty: number,
+): Promise<void> {
+  await db
+    .update(schema.pmsLot)
+    .set({ remainingQty })
+    .where(eq(schema.pmsLot.id, lotId));
+}
+
+export async function insertClosures(
+  db: Db,
+  closures: (typeof schema.pmsLotClosure.$inferInsert)[],
+): Promise<void> {
+  if (closures.length === 0) return;
+  await db.insert(schema.pmsLotClosure).values(closures);
+}
+
+export async function listClosures(
+  db: Db,
+  accountId: string,
+): Promise<schema.PmsLotClosure[]> {
+  const lots = await listAllLots(db, accountId);
+  const ids = lots.map((l) => l.id);
+  if (ids.length === 0) return [];
+  return db
+    .select()
+    .from(schema.pmsLotClosure)
+    .where(inArray(schema.pmsLotClosure.lotId, ids))
+    .orderBy(asc(schema.pmsLotClosure.closedAt));
+}
+
+export async function listInstruments(
+  db: Db,
+): Promise<schema.PmsInstrument[]> {
+  return db.select().from(schema.pmsInstrument);
+}
+
+export async function deleteTradeCascade(
+  db: Db,
+  accountId: string,
+  tradeId: number,
+): Promise<void> {
+  // Lots and closures cascade from the trade FK, so removing the trade is
+  // enough. Callers must re-run the matcher afterwards: deleting a BUY can
+  // orphan closures that were matched against its lot.
+  await db
+    .delete(schema.pmsTrade)
+    .where(
+      and(eq(schema.pmsTrade.id, tradeId), eq(schema.pmsTrade.accountId, accountId)),
+    );
+}
+
+/**
+ * Reset derived state so the book can be replayed from its trades.
+ *
+ * Closures are deleted; lots are NOT. Lots are kept and rewound to fully open,
+ * because a lot's identity must survive a replay: specific-lot selling stores
+ * lot ids, and deleting-then-reinserting hands out fresh serials every time,
+ * silently invalidating those references. Lots whose trade was deleted have
+ * already cascaded away via the foreign key.
+ */
+export async function resetDerived(db: Db, accountId: string): Promise<void> {
+  const lots = await listAllLots(db, accountId);
+  const ids = lots.map((l) => l.id);
+  if (ids.length > 0) {
+    await db
+      .delete(schema.pmsLotClosure)
+      .where(inArray(schema.pmsLotClosure.lotId, ids));
+  }
+  await db
+    .update(schema.pmsLot)
+    .set({ remainingQty: sql`${schema.pmsLot.originalQty}` })
+    .where(eq(schema.pmsLot.accountId, accountId));
+}
+
+/** Create the lot for a buy, or refresh it if the replay has seen it before. */
+export async function upsertLot(
+  db: Db,
+  lot: typeof schema.pmsLot.$inferInsert,
+): Promise<schema.PmsLot> {
+  const rows = await db
+    .insert(schema.pmsLot)
+    .values(lot)
+    .onConflictDoUpdate({
+      target: schema.pmsLot.tradeId,
+      set: {
+        openedAt: lot.openedAt,
+        originalQty: lot.originalQty,
+        remainingQty: lot.remainingQty,
+        costPrice: lot.costPrice,
+        feesTotal: lot.feesTotal,
+        currency: lot.currency,
+        fxRate: lot.fxRate,
+      },
+    })
+    .returning();
+  return rows[0]!;
+}

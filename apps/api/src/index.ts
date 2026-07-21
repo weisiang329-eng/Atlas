@@ -15,6 +15,7 @@ import { industries } from "./routes/industries";
 import { scores } from "./routes/scores";
 import { graph } from "./routes/graph";
 import { agent } from "./routes/agent";
+import { pms } from "./routes/pms";
 
 export interface Env {
   /**
@@ -94,6 +95,7 @@ app.route("/v1/industries", industries);
 app.route("/v1/scores", scores);
 app.route("/v1/graph", graph);
 app.route("/v1/agent", agent);
+app.route("/v1/pms", pms);
 
 app.notFound((c) =>
   c.json({ error: "The requested resource was not found." }, 404),

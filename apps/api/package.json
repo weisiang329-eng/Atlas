@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "seed:build": "node seed/generate.mjs && node seed/glove/generate.mjs && node seed/glove/generate-metrics.mjs && node seed/edgar/generate.mjs && node seed/graph/generate.mjs",
-    "db:test": "node seed/test-pg.mjs && node --experimental-strip-types seed/test-pms.mjs",
+    "db:test": "node seed/test-pg.mjs && node --experimental-strip-types seed/test-pms.mjs && node --experimental-strip-types seed/test-pms-db.mjs",
     "cf-typegen": "wrangler types",
     "test:pms": "node --experimental-strip-types seed/test-pms.mjs"
   },
