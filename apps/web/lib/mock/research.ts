@@ -96,3 +96,62 @@ export const DECISIONS: DecisionRow[] = [
   { id: "d2", decision: "Open power/cooling coverage", context: "Value migrating downstream", conviction: "Medium", outcome: "Scheduled", date: "2025-02-20" },
   { id: "d3", decision: "Add concentration monitor", context: "Top-customer share rising", conviction: "Medium", outcome: "In place", date: "2025-02-12" },
 ];
+
+/**
+ * MOCK research workspace data (Aurora Phase 2b adoption, P008-linked shape) —
+ * powers the /research/evidence, /research/hypotheses and /research/versions
+ * page rewrites. Fictional sample, distinct field shape from the legacy
+ * EvidenceRow/HypothesisRow/VersionRow above (kept for ReportsTable /
+ * research-tables.tsx, which stay untouched). Named with a `Sample`/`SAMPLE_`
+ * prefix to avoid colliding with the legacy exports in this same file.
+ */
+export interface ResearchNote {
+  id: string;
+  title: string;
+  entity: string;
+  status: "draft" | "final";
+  updatedAt: number;
+}
+export const RESEARCH_NOTES: ResearchNote[] = [
+  { id: "rn1", title: "HLXC 护城河与算力需求拐点", entity: "HLXC", status: "final", updatedAt: Date.now() - 5 * 864e5 },
+  { id: "rn2", title: "存储周期定位：VTXM 下行风险", entity: "VTXM", status: "final", updatedAt: Date.now() - 12 * 864e5 },
+  { id: "rn3", title: "手套 ASP 触底信号复核", entity: "MRGV", status: "draft", updatedAt: Date.now() - 2 * 864e5 },
+];
+
+export interface SampleEvidenceRow {
+  id: string;
+  claim: string;
+  source: string;
+  confidence: "high" | "med" | "low";
+}
+export const SAMPLE_EVIDENCE: SampleEvidenceRow[] = [
+  { id: "e1", claim: "HLXC 数据中心订单积压环比 +30%", source: "10-Q (mock) · 2026 Q2", confidence: "high" },
+  { id: "e2", claim: "存储合约价环比连续两季放缓", source: "行业价格代理序列", confidence: "med" },
+  { id: "e3", claim: "手套稼动率回升至 71%", source: "MARGMA 月报 (mock)", confidence: "med" },
+  { id: "e4", claim: "先进制程出口新规草案影响产能分配", source: "监管征求意见稿 (mock)", confidence: "low" },
+];
+
+export interface SampleHypothesisRow {
+  id: string;
+  statement: string;
+  status: "open" | "supported" | "refuted";
+  decision: string;
+}
+export const SAMPLE_HYPOTHESES: SampleHypothesisRow[] = [
+  { id: "h1", statement: "AI 训练需求 12 个月内不放缓", status: "open", decision: "建仓 HLXC" },
+  { id: "h2", statement: "存储周期已见顶", status: "supported", decision: "减持 VTXM" },
+  { id: "h3", statement: "手套周期已触底", status: "open", decision: "观望 MRGV" },
+];
+
+export interface SampleVersionRow {
+  id: string;
+  doc: string;
+  version: string;
+  author: string;
+  at: number;
+}
+export const SAMPLE_VERSIONS: SampleVersionRow[] = [
+  { id: "v1", doc: "HLXC 研究笔记", version: "v3", author: "owner", at: Date.now() - 5 * 864e5 },
+  { id: "v2", doc: "VTXM 研究笔记", version: "v2", author: "analyst.a", at: Date.now() - 12 * 864e5 },
+  { id: "v3", doc: "董事会包 2026Q2", version: "v1 (final)", author: "owner", at: Date.now() - 6 * 864e5 },
+];
