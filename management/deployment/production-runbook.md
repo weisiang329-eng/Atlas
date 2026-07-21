@@ -1,103 +1,97 @@
-# Atlas Production Runbook — Cloudflare + Claude Agent + (optional) Supabase
+# Atlas Production Runbook — Cloudflare + Supabase + Claude
 
 Everything below needs **your credentials** and interactive auth, so it runs on
-your machine, not in an agent session. Each step is a single command. Order
-matters top-to-bottom. After this, Atlas is publicly live with the AI analyst.
+your machine / in your dashboards, not in an agent session. After this, Atlas
+is publicly live: web on Cloudflare Pages, API on a Cloudflare Worker, data in
+Supabase Postgres, AI analyst powered by Claude.
 
 ## 0. Prerequisites (once)
 
 ```bash
-npm install -g wrangler        # Cloudflare CLI
-cd Desktop/Atlas && npm install
-wrangler login                 # opens a browser → authorise your Cloudflare account
+npm install -g wrangler
+cd Desktop/Atlas && git checkout main && git pull && npm install
+wrangler login          # opens a browser → authorise your Cloudflare account
 ```
 
-## 1. Database — Cloudflare D1
+## 1. Database — Supabase Postgres
+
+You already created the project (`fsbcltowqpfniodzaslo`). Load the schema + data:
+
+1. Open **Supabase dashboard → your Atlas project → SQL Editor → New query**.
+2. Run these files **in order** (open each in `apps/api`, paste, Run):
+   1. `apps/api/drizzle/0000_init_postgres.sql`   ← creates all tables
+   2. `apps/api/seed/seed.sql`                     ← AI-infra companies
+   3. `apps/api/seed/edgar/edgar-seed.sql`         ← SEC EDGAR facts
+   4. `apps/api/seed/glove/glove-seed.sql`         ← glove quarterlies
+   5. `apps/api/seed/glove/industry-metrics.sql`   ← ASP / NBR series
+   6. `apps/api/seed/graph/graph-seed.sql`         ← relationships
+
+   All seeds are idempotent (upserts), so re-running any file is safe.
+   (Everything here was verified against a real Postgres engine in CI, so the
+   SQL will apply cleanly.)
+
+3. Get the **connection string**: Settings → Database → Connection string →
+   **Transaction** (the port **6543** pooler). It looks like:
+   `postgresql://postgres.fsbcltowqpfniodzaslo:[PASSWORD]@aws-0-[region].pooler.supabase.com:6543/postgres`
+
+## 2. Secrets — set on the Worker (never in code)
 
 ```bash
 cd apps/api
-wrangler d1 create atlas-db
-# → copy the printed database_id into apps/api/wrangler.toml
-#   (replace PLACEHOLDER_CREATE_WITH_wrangler_d1_create)
-
-# Apply schema + all seeds to the REMOTE database:
-wrangler d1 migrations apply atlas-db --remote
-wrangler d1 execute atlas-db --remote --file=seed/seed.sql                  # AI-infra companies
-wrangler d1 execute atlas-db --remote --file=seed/edgar/edgar-seed.sql      # SEC EDGAR facts
-wrangler d1 execute atlas-db --remote --file=seed/glove/glove-seed.sql      # glove quarterlies
-wrangler d1 execute atlas-db --remote --file=seed/glove/industry-metrics.sql# ASP / NBR series
-wrangler d1 execute atlas-db --remote --file=seed/graph/graph-seed.sql      # relationships
+wrangler secret put DATABASE_URL         # paste the Transaction pooler URL from step 1.3
+wrangler secret put ANTHROPIC_API_KEY    # paste your Claude key (console.anthropic.com)
+# optional: wrangler secret put AGENT_MODEL   (default claude-sonnet-5)
 ```
 
-## 2. Claude agent key — Worker secret
-
-Get a key at https://console.anthropic.com/. It is stored encrypted by
-Cloudflare and read only inside the Worker — **never commit it, never paste it
-into the app or a browser.**
-
-```bash
-cd apps/api
-wrangler secret put ANTHROPIC_API_KEY     # paste the key at the prompt
-# optional: wrangler secret put AGENT_MODEL   (default: claude-sonnet-5)
-```
+> Security: because the DB password was shared in chat, rotate it after setup
+> (Supabase → Settings → Database → Reset database password), then re-run
+> `wrangler secret put DATABASE_URL` with the new string.
 
 ## 3. Deploy the API Worker
 
 ```bash
 cd apps/api
 wrangler deploy
-# → note the deployed URL, e.g. https://atlas-api.<your-subdomain>.workers.dev
+# note the URL, e.g. https://atlas-api.<subdomain>.workers.dev
 # smoke test:
 curl https://atlas-api.<subdomain>.workers.dev/v1/companies/nvidia/score
 curl https://atlas-api.<subdomain>.workers.dev/v1/agent/status   # {"configured":true,...}
 ```
 
-## 4. Point the web app at the API + deploy Pages
+If a request errors, check `wrangler tail` — the most likely cause is the
+`DATABASE_URL` (must be the **Transaction** pooler, port 6543, `prepare:false`
+is already set in code).
 
-Set the API URL as a **build-time** env var for the Pages project
-(Cloudflare dashboard → Pages → atlas web project → Settings → Environment
-variables), then rebuild/deploy:
+## 4. Deploy the web app (Cloudflare Pages)
 
-```
-NEXT_PUBLIC_API_BASE_URL = https://atlas-api.<subdomain>.workers.dev
-```
+Set the API URL as a **build-time** variable and deploy the static export:
 
 ```bash
 cd apps/web
-npm run build            # emits ./out (static export)
+NEXT_PUBLIC_API_BASE_URL=https://atlas-api.<subdomain>.workers.dev npm run build
 wrangler pages deploy out --project-name=<your-pages-project>
 ```
 
-Open the Pages URL. Home shows live coverage; `/agent` chat is active.
+(Or set `NEXT_PUBLIC_API_BASE_URL` in the Pages project's dashboard env vars and
+let Pages build from GitHub.)
 
-## 5. (Optional) Supabase — agent long-term memory (P021)
+Open the Pages URL → Home shows live coverage, `/agent` chat is active.
 
-The agent works fully on D1 tool-calling without this. Add Supabase only when
-you want **semantic memory / RAG** over unstructured research notes (P008/P021)
-— pgvector is the reason to reach for Postgres here.
+## 5. (Optional) Private access / "login"
 
-```bash
-# In the Supabase dashboard: create a project (your account; note the cost tier).
-# Enable the pgvector extension (Database → Extensions → "vector").
-# Then store the connection string + service key as Worker secrets:
-cd apps/api
-wrangler secret put SUPABASE_URL
-wrangler secret put SUPABASE_SERVICE_KEY
-```
+The app has no built-in login (single-user design). To gate the whole site to
+just you, use **Cloudflare Zero Trust → Access**: add an Access application for
+the Pages domain, policy = your email only. Visitors get an email-code login
+before the site loads. No code changes.
 
-Schema + client wiring for the memory store land with P021 (see
-`management/roadmap/execution-status-2026-07-21.md`). Until then these secrets
-are unused — set them only when P021 is built.
+## Verification checklist
 
-## Rollback / re-run
+- [ ] `curl .../v1/scores` returns the ranked universe (Arista 95 …)
+- [ ] `curl .../v1/companies/nvidia/financials` shows FY23–FY26
+- [ ] Web Home shows "17 companies", `/agent` answers a question
+- [ ] (if enabled) Cloudflare Access prompts for your email
 
-- All seeds are idempotent (upsert), so steps in §1 can be re-run safely.
-- `wrangler deploy` / `pages deploy` are atomic; re-run to redeploy.
-- Rotate the Claude key: `wrangler secret put ANTHROPIC_API_KEY` again.
+## Still blocked on external resources
 
-## What is NOT here (still blocked on external resources)
-
-- **P027 live quotes** — needs a market-data API key (Polygon/Finnhub) as a
-  Worker secret `MARKET_DATA_KEY`.
-- **P028 trading** — needs a broker account + an always-on `trading-bridge`
-  host (not Cloudflare). See the execution-status doc.
+- **P027 live quotes** — a market-data API key (`MARKET_DATA_KEY`).
+- **P028 trading** — a broker account + an always-on `trading-bridge` host.

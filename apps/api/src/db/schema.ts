@@ -1,40 +1,39 @@
 /**
- * Atlas database schema (D1 / SQLite via Drizzle).
+ * Atlas database schema (Postgres / Supabase via Drizzle).
  *
- * Scope: the foundation + Financial Intelligence slice (P004). This lands the
- * core of the `database-v0.md` direction — Company, Industry, Financial and a
- * Source (provenance) spine — and deliberately stops there. Later programs
- * (Research, Scoring, Knowledge Graph, Intelligence) extend this file.
+ * Scope: the foundation + Financial Intelligence slice (P004) and everything
+ * built on it (Industry, Knowledge Graph). Financial statements are stored as
+ * canonical *facts* (concept -> value); the engine derives statements, metrics
+ * and ratios from them (see domain/*). Every value carries a `source`.
  *
- * Design principles carried from `schemas/database-v0.md`:
- *   - Every important value carries source metadata (see `source` + `sourceId`).
- *   - Financial statements are stored as canonical *facts* (concept -> value),
- *     not pre-rendered rows. The engine derives income/balance/cash-flow
- *     presentations, metrics and ratios from facts. This maps 1:1 onto XBRL
- *     tags when SEC EDGAR ingestion lands, and keeps the UI free of computation.
+ * Postgres notes: integer primary keys are `serial` (identity); seeds insert
+ * by natural key and let ids auto-assign, so the seeds stay idempotent and
+ * re-runnable. `real` in SQLite became `doublePrecision` (float8) to keep
+ * financial magnitudes exact enough for display.
  */
 import { sql } from "drizzle-orm";
 import {
+  doublePrecision,
   index,
   integer,
-  real,
-  sqliteTable,
+  pgTable,
+  serial,
   text,
   uniqueIndex,
-} from "drizzle-orm/sqlite-core";
+} from "drizzle-orm/pg-core";
 
 const createdAt = () =>
   text("created_at")
     .notNull()
-    .default(sql`(CURRENT_TIMESTAMP)`);
+    .default(sql`(now())::text`);
 
 /**
  * Provenance for every value in the system. A fact without a source is not
  * trustworthy; the UI labels data by its source kind.
  */
-export const source = sqliteTable("source", {
+export const source = pgTable("source", {
   id: text("id").primaryKey(),
-  /** 'seed' | 'sec-edgar' | 'manual' | 'estimate' — how the value was obtained. */
+  /** 'seed' | 'sec-edgar' | 'glove-tracker' | 'manual' | 'estimate'. */
   kind: text("kind").notNull(),
   name: text("name").notNull(),
   url: text("url"),
@@ -48,7 +47,7 @@ export const source = sqliteTable("source", {
  * Industry taxonomy. `sector` is the broad grouping (e.g. "Semiconductors"),
  * `id`/`name` the specific segment (e.g. "GPU / AI Accelerators").
  */
-export const industry = sqliteTable("industry", {
+export const industry = pgTable("industry", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   sector: text("sector").notNull(),
@@ -65,7 +64,7 @@ export const industry = sqliteTable("industry", {
  * The coverage universe. Fields mirror the frontend's `Company` contract
  * (id/name/ticker/exchange/segment/country) plus profile detail.
  */
-export const company = sqliteTable(
+export const company = pgTable(
   "company",
   {
     id: text("id").primaryKey(),
@@ -85,7 +84,7 @@ export const company = sqliteTable(
     createdAt: createdAt(),
     updatedAt: text("updated_at")
       .notNull()
-      .default(sql`(CURRENT_TIMESTAMP)`),
+      .default(sql`(now())::text`),
   },
   (t) => ({
     tickerIdx: index("company_ticker_idx").on(t.ticker),
@@ -97,10 +96,10 @@ export const company = sqliteTable(
  * One reporting period of financials for a company (a fiscal year or quarter).
  * Facts hang off this row.
  */
-export const financialPeriod = sqliteTable(
+export const financialPeriod = pgTable(
   "financial_period",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     companyId: text("company_id")
       .notNull()
       .references(() => company.id, { onDelete: "cascade" }),
@@ -137,15 +136,15 @@ export const financialPeriod = sqliteTable(
  * from the concept catalog (see domain/concepts.ts) such as "Revenue",
  * "NetIncome", "TotalAssets". Values are in the period's `unit`/`currency`.
  */
-export const financialFact = sqliteTable(
+export const financialFact = pgTable(
   "financial_fact",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     periodId: integer("period_id")
       .notNull()
       .references(() => financialPeriod.id, { onDelete: "cascade" }),
     concept: text("concept").notNull(),
-    value: real("value").notNull(),
+    value: doublePrecision("value").notNull(),
     sourceId: text("source_id").references(() => source.id),
     createdAt: createdAt(),
   },
@@ -159,15 +158,14 @@ export const financialFact = sqliteTable(
 
 /**
  * Industry-level time series — cost factors (NBR latex), output prices
- * (MARGMA glove ASP), capacity/utilisation benchmarks. These are the
- * cycle-signal inputs for a sector: an industry's fortunes turn on the spread
- * between its output price and input cost. One flexible series table keyed by
- * `metricKey` (a dedicated commodity table can split off later if needed).
+ * (MARGMA glove ASP), capacity/utilisation benchmarks. Cycle-signal inputs:
+ * an industry's fortunes turn on the spread between output price and input
+ * cost. One flexible series table keyed by `metricKey`.
  */
-export const industryMetric = sqliteTable(
+export const industryMetric = pgTable(
   "industry_metric",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     industryId: text("industry_id")
       .notNull()
       .references(() => industry.id, { onDelete: "cascade" }),
@@ -177,7 +175,7 @@ export const industryMetric = sqliteTable(
     /** 'cost' | 'price' | 'capacity' | 'utilisation' — how to read the series. */
     kind: text("kind").notNull().default("price"),
     observationDate: text("observation_date").notNull(),
-    value: real("value").notNull(),
+    value: doublePrecision("value").notNull(),
     unit: text("unit").notNull(),
     note: text("note"),
     sourceId: text("source_id").references(() => source.id),
@@ -201,13 +199,11 @@ export const industryMetric = sqliteTable(
  * P007). `relationType` is directional:
  *   - "supplies"       from → to  (from is a supplier of to; to is a customer)
  *   - "competes_with"  symmetric
- * The ego-graph builder derives the correct node kind + edge label for either
- * endpoint, so one row serves both companies' views. Every edge is sourced.
  */
-export const relationship = sqliteTable(
+export const relationship = pgTable(
   "relationship",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     fromId: text("from_id")
       .notNull()
       .references(() => company.id, { onDelete: "cascade" }),

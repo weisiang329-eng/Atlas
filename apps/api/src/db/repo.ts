@@ -1,16 +1,20 @@
 /**
- * Data access — thin, typed queries over D1 via Drizzle. Routes call these;
- * nothing here formats or computes (that's src/domain).
+ * Data access — thin, typed queries over Postgres (Supabase) via Drizzle.
+ * Routes call these; nothing here formats or computes (that's src/domain).
+ *
+ * The query builder is driver-agnostic, so these functions run unchanged on
+ * postgres-js (production, over the Supabase pooler) and on PGlite (tests).
  */
 import { and, asc, eq, inArray, or } from "drizzle-orm";
-import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import type { Sql } from "postgres";
 import type { FactMap } from "../domain/concepts";
 import * as schema from "./schema";
 
-export type Db = DrizzleD1Database<typeof schema>;
+export type Db = PostgresJsDatabase<typeof schema>;
 
-export function createDb(d1: D1Database): Db {
-  return drizzle(d1, { schema });
+export function createDb(client: Sql): Db {
+  return drizzle(client, { schema });
 }
 
 export async function listCompanies(db: Db): Promise<schema.Company[]> {

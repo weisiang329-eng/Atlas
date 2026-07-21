@@ -8,6 +8,7 @@
  */
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import postgres from "postgres";
 import { createDb } from "./db/repo";
 import { companies } from "./routes/companies";
 import { industries } from "./routes/industries";
@@ -16,7 +17,11 @@ import { graph } from "./routes/graph";
 import { agent } from "./routes/agent";
 
 export interface Env {
-  DB: D1Database;
+  /**
+   * Postgres connection string (Supabase). Use the Transaction pooler
+   * (port 6543) for serverless. Set as a Worker secret; never in source.
+   */
+  DATABASE_URL: string;
   /** Anthropic API key for the agent (Worker secret; never in source). */
   ANTHROPIC_API_KEY?: string;
   /** Optional Claude model override for the agent. */
@@ -39,9 +44,29 @@ app.use(
   }),
 );
 
+// One Postgres connection per request over the Supabase transaction pooler.
+// `prepare: false` is required for transaction-pooling mode; the connection is
+// closed after the response via waitUntil so it never blocks the reply.
 app.use("*", async (c, next) => {
-  c.set("db", createDb(c.env.DB));
-  await next();
+  const client = postgres(c.env.DATABASE_URL, {
+    prepare: false,
+    max: 1,
+    idle_timeout: 10,
+    fetch_types: false,
+  });
+  c.set("db", createDb(client));
+  try {
+    await next();
+  } finally {
+    // Close the connection without blocking the response when running on
+    // Workers (executionCtx present); otherwise await it. The getter throws
+    // when there is no ExecutionContext, so guard with try/catch.
+    try {
+      c.executionCtx.waitUntil(client.end({ timeout: 5 }));
+    } catch {
+      await client.end({ timeout: 5 });
+    }
+  }
 });
 
 app.get("/health", (c) =>
