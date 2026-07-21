@@ -9,9 +9,9 @@ export default function CompaniesPage() {
   return (
     <AppShell title="Companies">
       <PageHeader
-        eyebrow="Company Intelligence"
-        title="Companies"
-        description="The coverage universe. Profiles and financials are served by the Atlas API; scores arrive with P010."
+        eyebrowKey="page.companies.eyebrow"
+        titleKey="page.companies.title"
+        descriptionKey="page.companies.desc"
         actions={
           <span className="inline-flex cursor-not-allowed items-center rounded border border-border bg-surface px-3 py-2 text-sm text-faint">
             + Add company

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "@/lib/i18n/use-locale";
+import { LOCALES, type Locale } from "@/lib/i18n/dictionary";
 import { cn } from "@/lib/cn";
 
 type Theme = "dark" | "light";
@@ -52,6 +54,7 @@ function Segmented<T extends string>({
 export function AppearanceControls() {
   const [theme, setTheme] = useState<Theme>("dark");
   const [density, setDensity] = useState<Density>("comfortable");
+  const { locale, setLocale, t } = useLocale();
 
   useEffect(() => {
     setTheme(localStorage.getItem("atlas-theme") === "light" ? "light" : "dark");
@@ -76,6 +79,12 @@ export function AppearanceControls() {
 
   return (
     <div className="flex flex-col gap-4">
+      <Segmented<Locale>
+        label={t("common.language")}
+        value={locale}
+        onChange={setLocale}
+        options={LOCALES}
+      />
       <Segmented
         label="Theme"
         value={theme}

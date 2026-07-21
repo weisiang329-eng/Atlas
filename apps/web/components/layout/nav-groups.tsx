@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { NAV_GROUPS } from "@/lib/nav";
+import { NAV_GROUPS, NAV_GROUP_KEYS, NAV_ITEM_KEYS } from "@/lib/nav";
+import { useT } from "@/lib/i18n/use-locale";
 import { cn } from "@/lib/cn";
 
 function isActive(pathname: string, href: string): boolean {
@@ -12,11 +15,19 @@ function isActive(pathname: string, href: string): boolean {
  * New modules appear everywhere by editing the model alone.
  */
 export function NavGroups({ pathname }: { pathname: string }) {
+  const t = useT();
+  // Localised label, falling back to the English literal in the model so the
+  // nav still renders if a key is missing.
+  const groupLabel = (title: string) =>
+    NAV_GROUP_KEYS[title] ? t(NAV_GROUP_KEYS[title]!) : title;
+  const itemLabel = (href: string, label: string) =>
+    NAV_ITEM_KEYS[href] ? t(NAV_ITEM_KEYS[href]!) : label;
+
   return (
     <>
       {NAV_GROUPS.map((group) => (
         <div key={group.title} className="mb-6">
-          <p className="eyebrow px-2 pb-2">{group.title}</p>
+          <p className="eyebrow px-2 pb-2">{groupLabel(group.title)}</p>
           <ul className="space-y-0.5">
             {group.items.map((item) => {
               const active = isActive(pathname, item.href);
@@ -41,7 +52,9 @@ export function NavGroups({ pathname }: { pathname: string }) {
                     >
                       {item.glyph}
                     </span>
-                    <span className="flex-1 truncate">{item.label}</span>
+                    <span className="flex-1 truncate">
+                      {itemLabel(item.href, item.label)}
+                    </span>
                     {item.soon ? (
                       <span className="text-2xs uppercase tracking-wide text-faint">
                         soon

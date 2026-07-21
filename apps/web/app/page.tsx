@@ -32,9 +32,9 @@ export default function HomePage() {
   return (
     <AppShell title="Home">
       <PageHeader
-        eyebrow="Decision Intelligence Platform"
-        title="Atlas Invest"
-        description="Market change into evidence-backed decisions. Live coverage across AI infrastructure and rubber gloves — every figure sourced, every score reproducible, nothing fabricated."
+        eyebrowKey="page.home.eyebrow"
+        titleKey="page.home.title"
+        descriptionKey="page.home.desc"
       />
 
       <HomeDashboard />

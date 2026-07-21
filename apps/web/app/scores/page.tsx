@@ -9,9 +9,9 @@ export default function ScoresPage() {
   return (
     <AppShell title="Rankings">
       <PageHeader
-        eyebrow="Atlas Score"
-        title="Rankings"
-        description="Systematic multi-factor score across the coverage universe, computed from reported fundamentals. Not investment advice."
+        eyebrowKey="page.scores.eyebrow"
+        titleKey="page.scores.title"
+        descriptionKey="page.scores.desc"
       />
       <RankingsLive />
     </AppShell>

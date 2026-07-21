@@ -6,6 +6,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
+import { LocaleProvider } from "@/lib/i18n/use-locale";
 
 const sans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -46,7 +47,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en"
+      lang="zh-CN"
       suppressHydrationWarning
       className={`${sans.variable} ${mono.variable} ${serif.variable}`}
     >
@@ -54,10 +55,12 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var e=document.documentElement;if(localStorage.getItem('atlas-theme')==='light')e.classList.add('light');if(localStorage.getItem('atlas-density')==='compact')e.setAttribute('data-density','compact');}catch(_){}})();",
+              "(function(){try{var e=document.documentElement;if(localStorage.getItem('atlas-theme')==='light')e.classList.add('light');if(localStorage.getItem('atlas-density')==='compact')e.setAttribute('data-density','compact');var l=localStorage.getItem('atlas-locale');if(l==='en')e.lang='en';}catch(_){}})();",
           }}
         />
-        <ToastProvider>{children}</ToastProvider>
+        <LocaleProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

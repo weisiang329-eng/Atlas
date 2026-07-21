@@ -246,3 +246,65 @@ export const RESEARCH_TABS: SubTab[] = [
 
 /** Markets workspace sub-navigation (sample data). */
 export const MARKETS_TABS: SubTab[] = [{ label: "Watchlist", href: "/markets" }];
+
+/* ────────────────────────────────────────────────────────────────────────
+ * Localisation
+ *
+ * The nav model above stays the structural source of truth (routes, glyphs,
+ * ordering). Display strings are looked up by href / group title so the
+ * structure never has to be duplicated per language — a new route needs one
+ * entry above and one key here.
+ *
+ * A missing entry falls back to the English literal in the model, so the nav
+ * always renders even mid-migration.
+ * ──────────────────────────────────────────────────────────────────────── */
+import type { Dict } from "@/lib/i18n/dictionary";
+
+/** href → dictionary key for top-level nav items. */
+export const NAV_ITEM_KEYS: Record<string, keyof Dict> = {
+  "/": "nav.home",
+  "/companies": "nav.companies",
+  "/markets": "nav.markets",
+  "/news": "nav.news",
+  "/industries": "nav.industries",
+  "/value-chain": "nav.valueChain",
+  "/scores": "nav.scores",
+  "/agent": "nav.agent",
+  "/research": "nav.research",
+  "/financials": "fin.incomeStatement",
+  "/reports": "nav.reports",
+  "/knowledge": "nav.knowledge",
+  "/portfolio": "nav.portfolio",
+  "/watchlist": "nav.watchlist",
+  "/alerts": "nav.alerts",
+  "/trading": "nav.trading",
+  "/ceo": "nav.ceo",
+  "/erp": "nav.erp",
+  "/board": "nav.board",
+  "/agents": "nav.agentOps",
+  "/admin": "nav.admin",
+  "/settings": "nav.settings",
+};
+
+/** Group title (as written in NAV_GROUPS) → dictionary key. */
+export const NAV_GROUP_KEYS: Record<string, keyof Dict> = {
+  Workspace: "nav.workspace",
+  Intelligence: "nav.intelligence",
+  Positions: "nav.portfolio",
+  Enterprise: "nav.enterprise",
+  System: "nav.system",
+};
+
+/** Company sub-tab href suffix → dictionary key. */
+export const COMPANY_TAB_KEYS: Record<string, keyof Dict> = {
+  overview: "company.overview",
+  profile: "company.profile",
+  products: "company.products",
+  management: "company.management",
+  financials: "company.financials",
+  relations: "company.relations",
+  research: "company.research",
+  valuation: "company.valuation",
+  documents: "company.documents",
+  timeline: "company.timeline",
+};
