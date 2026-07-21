@@ -41,8 +41,13 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Industries",
         href: "/industries",
         glyph: "ID",
-        soon: true,
         description: "Industry and supply-chain intelligence.",
+      },
+      {
+        label: "Rankings",
+        href: "/scores",
+        glyph: "AS",
+        description: "Atlas Score leaderboard across the coverage universe.",
       },
       {
         label: "Research",

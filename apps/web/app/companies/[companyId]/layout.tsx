@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { Badge } from "@/components/ui/badge";
 import { companyTabs } from "@/lib/nav";
+import { HeaderScore } from "@/components/company/header-score";
 import { getStaticCompany, STATIC_UNIVERSE } from "@/lib/universe";
 
 // Static export: pre-render every company in the sample universe.
@@ -51,7 +52,7 @@ export default async function CompanyLayout({
           </span>
           <div className="rounded border border-border bg-surface px-3 py-2 text-right">
             <p className="eyebrow">Atlas Score</p>
-            <p className="font-mono text-sm text-faint">—</p>
+            <HeaderScore companyId={companyId} />
           </div>
         </div>
       </div>

@@ -16,7 +16,7 @@ import { DataState } from "@/components/ui/data-state";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { ready, type Resource } from "@/lib/resource";
 import { getStaticCompany } from "@/lib/universe";
-import type { CompanyProfile } from "@/lib/types";
+import type { CompanyProfile, ScoreResult } from "@/lib/types";
 
 function useCompanyProfile(companyId: string): Resource<CompanyProfile> {
   const stub = getStaticCompany(companyId);
@@ -48,6 +48,8 @@ const dash = (v: string | number | null | undefined) =>
 export function CompanyOverviewLive({ companyId }: { companyId: string }) {
   const r = useCompanyProfile(companyId);
   const c = r.data;
+  const score = useApiResource<ScoreResult>(`/v1/companies/${companyId}/score`);
+  const s = score.data;
 
   const facts = [
     { label: "Segment", value: dash(c?.segment) },
@@ -62,16 +64,22 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
     <>
       <SectionHeading
         title="Overview"
-        description="Snapshot of the investment case. Scores and price arrive with the scoring engine (P010) and market data (P027)."
+        description="Snapshot of the investment case. Atlas Score is a systematic factor score from fundamentals — not investment advice. Price and market cap arrive with market data (P027)."
       />
 
       <div className="mb-6">
         <StatGrid
           items={[
-            { label: "Atlas Score", value: "—" },
-            { label: "Conviction", value: "—" },
-            { label: "Market Cap", value: "—" },
-            { label: "Upside", value: "—" },
+            {
+              label: "Atlas Score",
+              value: s?.atlasScore === null || s?.atlasScore === undefined ? "—" : `${s.atlasScore}`,
+              hint: s?.grade && s.grade !== "—" ? `Grade ${s.grade} · as of ${s.asOf}` : undefined,
+            },
+            ...(s?.factors ?? []).slice(0, 3).map((f) => ({
+              label: f.label,
+              value: f.score === null ? "—" : String(Math.round(f.score)),
+              hint: `weight ${Math.round(f.weight * 100)}%`,
+            })),
           ]}
         />
       </div>
@@ -110,6 +118,39 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
           </PanelBody>
         </Panel>
       </div>
+
+      {s && s.factors.length > 0 ? (
+        <div className="mt-6">
+          <PanelHeader eyebrow="Atlas Score" title="Factor breakdown" />
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {s.factors.map((f) => (
+              <Panel key={f.key}>
+                <PanelBody>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-sm text-muted">{f.label}</span>
+                    <span className="font-mono text-lg font-semibold text-fg">
+                      {f.score === null ? "—" : Math.round(f.score)}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-2xs text-faint">{f.rationale}</p>
+                  <dl className="mt-2 space-y-1">
+                    {f.metrics.map((m) => (
+                      <div key={m.label} className="flex justify-between text-xs">
+                        <dt className="text-muted">{m.label}</dt>
+                        <dd className="font-mono text-fg">
+                          {m.value}
+                          <span className="ml-1 text-faint">({m.score})</span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </PanelBody>
+              </Panel>
+            ))}
+          </div>
+          <p className="mt-2 text-2xs text-faint">{s.note}</p>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -21,6 +21,7 @@ import {
   presentResults,
   presentTrends,
 } from "../domain/presenters";
+import { computeScore } from "../domain/scoring";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
@@ -115,6 +116,18 @@ companies.get("/:id/ratios", async (c) => {
   );
   if (annual.length === 0) return c.json({ error: "No financial data available." }, 404);
   return c.json(presentRatioGroups(annual.map((p) => p.facts)));
+});
+
+companies.get("/:id/score", async (c) => {
+  const annual = await getPeriodsWithFacts(
+    c.get("db"),
+    c.req.param("id"),
+    "annual",
+    ANNUAL_VIEW_PERIODS,
+  );
+  if (annual.length === 0) return c.json({ error: "No financial data to score." }, 404);
+  const latest = annual[annual.length - 1]!.period.periodLabel;
+  return c.json(computeScore(annual.map((p) => p.facts), latest));
 });
 
 companies.get("/:id/results", async (c) => {

@@ -75,6 +75,45 @@ export interface TrendsPayload {
   freeCashFlow: SeriesPoint[];
 }
 
+// --- Atlas Score (P010) -----------------------------------------------------
+
+export interface ScoreMetric {
+  label: string;
+  value: string;
+  score: number;
+}
+
+export interface FactorScore {
+  key: string;
+  label: string;
+  weight: number;
+  score: number | null;
+  rationale: string;
+  metrics: ScoreMetric[];
+}
+
+/** GET /v1/companies/:id/score */
+export interface ScoreResult {
+  atlasScore: number | null;
+  grade: string;
+  asOf: string | null;
+  factors: FactorScore[];
+  note: string;
+}
+
+/** GET /v1/scores — one leaderboard row. */
+export interface ScoreRow {
+  id: string;
+  name: string;
+  ticker: string;
+  segment: string;
+  country: string;
+  atlasScore: number | null;
+  grade: string;
+  asOf: string | null;
+  factors: Record<string, number | null>;
+}
+
 /** A point in an industry metric or cycle-signal series. */
 export interface IndustrySeriesPoint {
   date: string;
