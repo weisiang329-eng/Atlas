@@ -17,3 +17,11 @@ compatibility_flags = ["nodejs_compat"]
 # Pretty JSON + observability in the dashboard.
 [observability]
 enabled = true
+
+# Bundle migration SQL as text modules so the Worker can apply its own schema.
+# The Worker already holds DATABASE_URL; making it self-migrating means a new
+# table never requires anyone to paste SQL into a dashboard by hand.
+[[rules]]
+type = "Text"
+globs = ["**/*.sql"]
+fallthrough = true
