@@ -1,8 +1,19 @@
 # Atlas Intelligence Platform
 
-> **👋 Taking over this project? Read [`tasks/HANDOFF.md`](tasks/HANDOFF.md) first** —
-> it is the single self-contained guide (status, the PR stack, how to deploy,
-> what's left) and needs no prior context.
+**Live:** [atlas-web-2yd.pages.dev](https://atlas-web-2yd.pages.dev) ·
+API [atlas-api.weisiang329.workers.dev](https://atlas-api.weisiang329.workers.dev)
+
+> ### 👋 New here? Read these four, in order.
+>
+> | # | File | What it gives you |
+> | --- | --- | --- |
+> | 1 | [`CLAUDE.md`](CLAUDE.md) | The rules: stack, conventions, commands |
+> | 2 | [`tasks/HANDOFF.md`](tasks/HANDOFF.md) | Current state, what's next, full backlog |
+> | 3 | [`docs/CODEBASE-MAP.md`](docs/CODEBASE-MAP.md) | Where everything lives and why |
+> | 4 | [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) | How we work: worktree → PR → merge → deploy |
+>
+> Together they are self-contained — you need no prior chat context to take
+> over this project.
 
 Atlas is an AI-native Decision Intelligence Platform for investment, business strategy, industry research, supply-chain monitoring, ERP intelligence, M&A analysis, and board-level decision support.
 
@@ -52,20 +63,37 @@ Before coding any major module, the team must define:
 
 ```text
 Atlas/
-  docs/              Product, architecture, research, scoring and development docs
-  specs/             Formal module specifications
-  tasks/             Sprint plans and task briefs for Codex / Claude Code
-  prompts/           Versioned prompt library
-  agents/            AI agent definitions and workflows
-  schemas/           Data schemas, OpenAPI, JSON schema, ERD notes
-  apps/              Future application code
-  packages/          Shared libraries
-  infra/             Deployment, CI/CD, Docker, IaC
-  research/          Company and industry research templates
+  apps/api/          Hono API on Cloudflare Workers + Supabase Postgres (Drizzle)
+  apps/web/          Next.js 15 static export on Cloudflare Pages
+  docs/              Codebase map, methodology, foundation docs, Aurora design system
+  management/        Plans, programs, roadmap, production runbook
+  tasks/             HANDOFF.md — current state and backlog
+  schemas/           Data-model direction
   adr/               Architecture Decision Records
+  prompts/ agents/   Prompt library and agent definitions
+```
+
+## Stack
+
+Cloudflare Workers (API) · Cloudflare Pages (web) · Supabase Postgres (data) ·
+Hono + Drizzle + TypeScript · Next.js 15 + Tailwind · Claude for the research
+agent. Everything is Cloudflare + Supabase; no other infrastructure.
+
+## Quick start
+
+```bash
+npm install
+cd apps/api && npm run db:test      # verifies schema + all seeds on PGlite
+cd ../web  && npm run build         # static export of every page
 ```
 
 ## Current Stage
-Sprint 000: Foundation.
 
-No business feature should be built before the foundation is complete.
+**Live in production.** Stage 1 (core intelligence) and Stage 2 (investment
+MVP) are delivered, plus the Claude research analyst, the Aurora Glass design
+system, and the mobile experience. Coverage: 17 companies, 2 sectors, 3 data
+sources, ~4,000 sourced facts.
+
+See [`tasks/HANDOFF.md`](tasks/HANDOFF.md) §13 for the complete remaining
+backlog, and [`management/roadmap/`](management/roadmap/) for per-program
+status.
