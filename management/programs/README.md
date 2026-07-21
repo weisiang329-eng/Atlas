@@ -17,10 +17,16 @@ Each program should contain:
 - PR requirements
 - Stop conditions
 
+## Delivered Programs
+
+- P003 — Core Intelligence Backend Engine (2026-07-21, `P004-backend-foundation.md`)
+- UI P003 — Enterprise Design System & Intelligence Workspace OS
+- P004 — Financial Intelligence Engine, backend scope (2026-07-21)
+
 ## Active Programs
 
-- P003 — Core Intelligence Backend Engine
-- UI P003 — Enterprise Design System & Intelligence Workspace OS
+- P004 — Financial Intelligence Engine, frontend live wiring (`../plans/web-live-wiring-plan.md`)
+- P026 — Glove Sector Merge, Phase 1 (`P026-glove-sector-merge.md`)
 
 ## Planned Programs
 
@@ -46,3 +52,4 @@ Each program should contain:
 - P023 — Learning Engine
 - P024 — Automation Engine
 - P025 — Atlas 1.0
+- P026 — Glove Sector Merge, Phases 2–3
