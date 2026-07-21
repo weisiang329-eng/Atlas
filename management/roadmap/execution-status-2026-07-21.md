@@ -1,5 +1,16 @@
 # Atlas Execution Status — 2026-07-21
 
+## Update 2026-07-21 (late) — stack + PRs #39–#43
+
+- Database migrated **D1 → Supabase Postgres** (PR #43; owner's Supabase
+  `fsbcltowqpfniodzaslo`). Verified via PGlite in CI (`npm run db:test`).
+- Delivered since this doc was written: P012 portfolio (#39), P006 value chain
+  (#40), P008 research/decision (#41), company Relations tab (#42).
+- **18 PRs total (#26–#43), all CI-green, none merged, not yet deployed.**
+- Consolidated take-over guide: `tasks/HANDOFF.md`.
+- Open decision: login = Cloudflare Access (A) vs Supabase Auth (B), see HANDOFF §8.
+
+
 Snapshot of what is **built**, what is **buildable now**, and what is
 **blocked on an external resource** (with exactly what unblocks it). Written so
 any session can pick up any remaining program without re-deriving scope.

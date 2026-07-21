@@ -1,5 +1,9 @@
 # Atlas Intelligence Platform
 
+> **👋 Taking over this project? Read [`tasks/HANDOFF.md`](tasks/HANDOFF.md) first** —
+> it is the single self-contained guide (status, the PR stack, how to deploy,
+> what's left) and needs no prior context.
+
 Atlas is an AI-native Decision Intelligence Platform for investment, business strategy, industry research, supply-chain monitoring, ERP intelligence, M&A analysis, and board-level decision support.
 
 ## Mission
