@@ -24,6 +24,8 @@ import init0000 from "../../drizzle/0000_init_postgres.sql";
 import agentUsage0001 from "../../drizzle/0001_agent_usage.sql";
 import pms0002 from "../../drizzle/0002_pms.sql";
 import agents0003 from "../../drizzle/0003_agent_console.sql";
+import industry0004 from "../../drizzle/0004_industry_knowledge.sql";
+import industrySeed0005 from "../../drizzle/0005_industry_seed.sql";
 
 /**
  * Ordered. Never renumber or edit a shipped migration — append a new one.
@@ -42,6 +44,10 @@ const MIGRATIONS: { id: string; sql: string; sentinel: string }[] = [
   { id: "0001_agent_usage", sql: agentUsage0001, sentinel: "agent_usage" },
   { id: "0002_pms", sql: pms0002, sentinel: "pms_trade" },
   { id: "0003_agent_console", sql: agents0003, sentinel: "agent_run" },
+  { id: "0004_industry_knowledge", sql: industry0004, sentinel: "industry_knowledge" },
+  // Reference data, not a table — no sentinel can prove it applied, so it is
+  // written to be idempotent and simply replays harmlessly if ever re-run.
+  { id: "0005_industry_seed", sql: industrySeed0005, sentinel: "__none__" },
 ];
 
 /** Arbitrary but fixed — the lock key every Atlas Worker agrees on. */

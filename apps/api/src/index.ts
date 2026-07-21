@@ -18,6 +18,7 @@ import { graph } from "./routes/graph";
 import { agent } from "./routes/agent";
 import { pms } from "./routes/pms";
 import { analysts } from "./routes/analysts";
+import { industryKnowledgeRoutes } from "./routes/industry-knowledge";
 
 export interface Env {
   /**
@@ -109,6 +110,7 @@ app.route("/v1/graph", graph);
 app.route("/v1/agent", agent);
 app.route("/v1/pms", pms);
 app.route("/v1/analysts", analysts);
+app.route("/v1/industries", industryKnowledgeRoutes);
 
 app.notFound((c) =>
   c.json({ error: "The requested resource was not found." }, 404),
