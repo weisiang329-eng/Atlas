@@ -33,6 +33,44 @@ export async function listIndustries(db: Db): Promise<schema.Industry[]> {
   return db.select().from(schema.industry).orderBy(asc(schema.industry.name));
 }
 
+export async function getIndustry(
+  db: Db,
+  id: string,
+): Promise<schema.Industry | undefined> {
+  const rows = await db
+    .select()
+    .from(schema.industry)
+    .where(eq(schema.industry.id, id))
+    .limit(1);
+  return rows[0];
+}
+
+export async function listCompaniesByIndustry(
+  db: Db,
+  industryId: string,
+): Promise<schema.Company[]> {
+  return db
+    .select()
+    .from(schema.company)
+    .where(eq(schema.company.industryId, industryId))
+    .orderBy(asc(schema.company.name));
+}
+
+/** Industry-level metric series (cost/price/capacity), oldest -> newest. */
+export async function listIndustryMetrics(
+  db: Db,
+  industryId: string,
+): Promise<schema.IndustryMetric[]> {
+  return db
+    .select()
+    .from(schema.industryMetric)
+    .where(eq(schema.industryMetric.industryId, industryId))
+    .orderBy(
+      asc(schema.industryMetric.metricKey),
+      asc(schema.industryMetric.observationDate),
+    );
+}
+
 export interface PeriodWithFacts {
   period: schema.FinancialPeriod;
   facts: FactMap;

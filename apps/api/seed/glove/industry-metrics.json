@@ -1,0 +1,552 @@
+{
+ "provenance": "Imported from weisiang329-eng/glove-tracker migrations (_margma_asp.sql, _nbr_industry_history.sql). MARGMA glove ASP + NBR latex cost, triangulated from MARGMA press releases, Maybank IB primers, ChemAnalyst/ICIS. Extracted 2026-07-21.",
+ "series": [
+  {
+   "metricKey": "asp_my",
+   "label": "Malaysian glove ASP",
+   "kind": "price",
+   "unit": "USD/1000 pcs",
+   "points": [
+    {
+     "date": "2019-09-30",
+     "value": 23.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Pre-pandemic"
+    },
+    {
+     "date": "2019-12-31",
+     "value": 24.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Pre-pandemic"
+    },
+    {
+     "date": "2020-03-31",
+     "value": 28.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "COVID surge begins"
+    },
+    {
+     "date": "2020-06-30",
+     "value": 55.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Pandemic ramp"
+    },
+    {
+     "date": "2020-09-30",
+     "value": 75.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Peak demand · allocation"
+    },
+    {
+     "date": "2020-12-31",
+     "value": 85.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Industry peak · spot prices $120+"
+    },
+    {
+     "date": "2021-03-31",
+     "value": 80.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Still elevated"
+    },
+    {
+     "date": "2021-06-30",
+     "value": 65.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Normalization begins"
+    },
+    {
+     "date": "2021-09-30",
+     "value": 48.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Oversupply surfacing"
+    },
+    {
+     "date": "2021-12-31",
+     "value": 35.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Rapid unwind"
+    },
+    {
+     "date": "2022-03-31",
+     "value": 28.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Oversupply crisis"
+    },
+    {
+     "date": "2022-06-30",
+     "value": 24.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Inventory destocking"
+    },
+    {
+     "date": "2022-09-30",
+     "value": 22.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "MARGMA calls for relief"
+    },
+    {
+     "date": "2022-12-31",
+     "value": 19.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Pressure continues"
+    },
+    {
+     "date": "2023-03-31",
+     "value": 18.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Bottom forming"
+    },
+    {
+     "date": "2023-06-30",
+     "value": 17.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Trough"
+    },
+    {
+     "date": "2023-09-30",
+     "value": 17.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Capacity rationalisation"
+    },
+    {
+     "date": "2023-12-31",
+     "value": 18.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Recovery signal"
+    },
+    {
+     "date": "2024-03-31",
+     "value": 19.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Demand rebuild"
+    },
+    {
+     "date": "2024-06-30",
+     "value": 20.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "FDA alerts on CN imports"
+    },
+    {
+     "date": "2024-09-30",
+     "value": 21.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Tariff anticipation"
+    },
+    {
+     "date": "2024-12-31",
+     "value": 21.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "US tariff Jan 2025 effective"
+    },
+    {
+     "date": "2025-03-31",
+     "value": 22.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Recovery continues"
+    },
+    {
+     "date": "2025-06-30",
+     "value": 22.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "MARGMA optimistic"
+    },
+    {
+     "date": "2025-09-30",
+     "value": 23.5,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Recovery firming"
+    },
+    {
+     "date": "2025-12-31",
+     "value": 24.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA benchmark",
+     "url": "https://margma.com.my/",
+     "note": "Pre-tariff uplift"
+    },
+    {
+     "date": "2026-02-28",
+     "value": 26.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA + Iran war commentary",
+     "url": "https://margma.com.my/",
+     "note": "BD 9-year peak · WRP shutdown"
+    },
+    {
+     "date": "2026-04-20",
+     "value": 28.0,
+     "unit": "USD/1000 pcs",
+     "region": "MY industry",
+     "source": "MARGMA + European Rubber Journal",
+     "url": "https://margma.com.my/",
+     "note": "Current · NBR shortage + tariff tailwind"
+    }
+   ]
+  },
+  {
+   "metricKey": "nbr_latex",
+   "label": "NBR latex cost",
+   "kind": "cost",
+   "unit": "USD/ton",
+   "points": [
+    {
+     "date": "2019-03-31",
+     "value": 1350.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Pre-pandemic normal"
+    },
+    {
+     "date": "2019-06-30",
+     "value": 1320.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Stable pre-pandemic"
+    },
+    {
+     "date": "2019-09-30",
+     "value": 1280.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Soft H2 2019"
+    },
+    {
+     "date": "2019-12-31",
+     "value": 1300.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Year-end normal"
+    },
+    {
+     "date": "2020-03-31",
+     "value": 1450.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "COVID begins"
+    },
+    {
+     "date": "2020-06-30",
+     "value": 1850.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Allocation begins"
+    },
+    {
+     "date": "2020-09-30",
+     "value": 2400.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "Maybank IB glove primer",
+     "url": "https://margma.com.my/",
+     "note": "Tight supply · scarcity premium"
+    },
+    {
+     "date": "2020-12-31",
+     "value": 3200.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "Maybank IB glove primer",
+     "url": "https://margma.com.my/",
+     "note": "Peak · spot touched $4,000+"
+    },
+    {
+     "date": "2021-03-31",
+     "value": 3800.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "Maybank IB glove primer",
+     "url": "https://margma.com.my/",
+     "note": "All-time highs · allocation"
+    },
+    {
+     "date": "2021-06-30",
+     "value": 3400.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "Maybank IB glove primer",
+     "url": "https://margma.com.my/",
+     "note": "Easing · China capacity online"
+    },
+    {
+     "date": "2021-09-30",
+     "value": 2800.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Supply rebuilding"
+    },
+    {
+     "date": "2021-12-31",
+     "value": 2200.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Normalization"
+    },
+    {
+     "date": "2022-03-31",
+     "value": 1900.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Oversupply emerging"
+    },
+    {
+     "date": "2022-06-30",
+     "value": 1600.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Weak demand"
+    },
+    {
+     "date": "2022-09-30",
+     "value": 1400.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Pressure continues"
+    },
+    {
+     "date": "2022-12-31",
+     "value": 1280.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Approaching cost"
+    },
+    {
+     "date": "2023-03-31",
+     "value": 1200.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Trough forming"
+    },
+    {
+     "date": "2023-06-30",
+     "value": 1150.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Bottom"
+    },
+    {
+     "date": "2023-09-30",
+     "value": 1200.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Stabilizing"
+    },
+    {
+     "date": "2023-12-31",
+     "value": 1280.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Signs of recovery"
+    },
+    {
+     "date": "2024-03-31",
+     "value": 1400.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Demand rebuild"
+    },
+    {
+     "date": "2024-06-30",
+     "value": 1500.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Mild recovery"
+    },
+    {
+     "date": "2024-09-30",
+     "value": 1600.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Tariff anticipation"
+    },
+    {
+     "date": "2024-12-31",
+     "value": 1750.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Pre-tariff uplift"
+    },
+    {
+     "date": "2025-03-31",
+     "value": 1800.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "US tariff in effect"
+    },
+    {
+     "date": "2025-06-30",
+     "value": 1850.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Firm"
+    },
+    {
+     "date": "2025-09-30",
+     "value": 1900.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "BD pressure begins"
+    },
+    {
+     "date": "2025-12-31",
+     "value": 2000.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst archives",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Iran tensions"
+    },
+    {
+     "date": "2026-01-31",
+     "value": 2100.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst + Eastmoney news",
+     "url": "https://www.chemanalyst.com/",
+     "note": "BD 9-year peak"
+    },
+    {
+     "date": "2026-02-28",
+     "value": 2180.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "ChemAnalyst + ERJ news",
+     "url": "https://www.chemanalyst.com/",
+     "note": "NBR shortage surfacing"
+    },
+    {
+     "date": "2026-03-31",
+     "value": 2215.0,
+     "unit": "USD/ton",
+     "region": "SEA spot",
+     "source": "Synthesized BD+AN · verified",
+     "url": "https://www.chemanalyst.com/",
+     "note": "Near-current level"
+    }
+   ]
+  }
+ ]
+}

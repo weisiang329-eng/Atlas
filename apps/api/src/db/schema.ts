@@ -152,8 +152,48 @@ export const financialFact = sqliteTable(
   }),
 );
 
+/**
+ * Industry-level time series — cost factors (NBR latex), output prices
+ * (MARGMA glove ASP), capacity/utilisation benchmarks. These are the
+ * cycle-signal inputs for a sector: an industry's fortunes turn on the spread
+ * between its output price and input cost. One flexible series table keyed by
+ * `metricKey` (a dedicated commodity table can split off later if needed).
+ */
+export const industryMetric = sqliteTable(
+  "industry_metric",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    industryId: text("industry_id")
+      .notNull()
+      .references(() => industry.id, { onDelete: "cascade" }),
+    /** Stable series key, e.g. "asp_my", "nbr_latex". */
+    metricKey: text("metric_key").notNull(),
+    label: text("label").notNull(),
+    /** 'cost' | 'price' | 'capacity' | 'utilisation' — how to read the series. */
+    kind: text("kind").notNull().default("price"),
+    observationDate: text("observation_date").notNull(),
+    value: real("value").notNull(),
+    unit: text("unit").notNull(),
+    note: text("note"),
+    sourceId: text("source_id").references(() => source.id),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    seriesDateUnq: uniqueIndex("industry_metric_series_date_unq").on(
+      t.industryId,
+      t.metricKey,
+      t.observationDate,
+    ),
+    industryKeyIdx: index("industry_metric_industry_key_idx").on(
+      t.industryId,
+      t.metricKey,
+    ),
+  }),
+);
+
 export type Source = typeof source.$inferSelect;
 export type Industry = typeof industry.$inferSelect;
 export type Company = typeof company.$inferSelect;
 export type FinancialPeriod = typeof financialPeriod.$inferSelect;
 export type FinancialFact = typeof financialFact.$inferSelect;
+export type IndustryMetric = typeof industryMetric.$inferSelect;

@@ -75,6 +75,44 @@ export interface TrendsPayload {
   freeCashFlow: SeriesPoint[];
 }
 
+/** A point in an industry metric or cycle-signal series. */
+export interface IndustrySeriesPoint {
+  date: string;
+  value: number;
+  note?: string;
+}
+
+/** One industry-level series (cost / price / capacity), with cycle stats. */
+export interface MetricSeries {
+  key: string;
+  label: string;
+  kind: string;
+  unit: string;
+  points: IndustrySeriesPoint[];
+  latest: number | null;
+  latestDate: string | null;
+  changeYoYPct: number | null;
+}
+
+export interface CycleSignal {
+  label: string;
+  unit: string;
+  points: IndustrySeriesPoint[];
+  latest: number | null;
+  changeYoYPct: number | null;
+}
+
+/** GET /v1/industries/:id — industry workspace payload. */
+export interface IndustryDetail {
+  id: string;
+  name: string;
+  sector: string;
+  description: string | null;
+  companies: CompanySummary[];
+  series: MetricSeries[];
+  cycleSignal: CycleSignal | null;
+}
+
 /** GET /v1/companies/:id/financials — the whole workspace in one call. */
 export interface CompanyFinancials {
   company: { id: string; name: string; ticker: string };

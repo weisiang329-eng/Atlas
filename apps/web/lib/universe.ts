@@ -36,3 +36,20 @@ export const STATIC_UNIVERSE: CompanySummary[] = [
 export function getStaticCompany(id: string): CompanySummary | undefined {
   return STATIC_UNIVERSE.find((c) => c.id === id);
 }
+
+/** Static industry snapshot — generateStaticParams for /industries/[id]. */
+export interface StaticIndustry {
+  id: string;
+  name: string;
+  sector: string;
+}
+
+export const STATIC_INDUSTRIES: StaticIndustry[] = [
+  { id: "semis-accelerators", name: "AI Accelerators & GPUs", sector: "Semiconductors" },
+  { id: "semis-foundry", name: "Foundry & IDM", sector: "Semiconductors" },
+  { id: "semis-memory", name: "Memory (HBM / DRAM / NAND)", sector: "Semiconductors" },
+  { id: "semis-equipment", name: "Semiconductor Equipment", sector: "Semiconductors" },
+  { id: "networking", name: "Networking & Custom ASIC", sector: "AI Infrastructure" },
+  { id: "dc-power-cooling", name: "Data Center Power & Cooling", sector: "AI Infrastructure" },
+  { id: "rubber-gloves", name: "Rubber & Medical Gloves", sector: "Healthcare Manufacturing" },
+];
