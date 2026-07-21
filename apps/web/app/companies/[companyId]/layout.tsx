@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { Badge } from "@/components/ui/badge";
 import { companyTabs } from "@/lib/nav";
@@ -48,6 +49,12 @@ export default async function CompanyLayout({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href={`/reports/company/${companyId}`}
+            className="inline-flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-2 text-sm text-muted transition-colors hover:text-fg"
+          >
+            Report
+          </Link>
           <WatchlistButton companyId={companyId} />
           <div className="rounded border border-border bg-surface px-3 py-2 text-right">
             <p className="eyebrow">Atlas Score</p>
