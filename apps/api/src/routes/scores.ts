@@ -1,0 +1,45 @@
+/**
+ * /v1/scores — the Atlas Score leaderboard across the coverage universe.
+ *
+ * Scores every company from its annual facts and returns them ranked. N+1
+ * over the universe is fine at this scale (tens of companies); if coverage
+ * grows large this becomes a single windowed query.
+ */
+import { Hono } from "hono";
+import type { Env } from "../index";
+import { createDb, getPeriodsWithFacts, listCompanies } from "../db/repo";
+import { computeScore } from "../domain/scoring";
+
+type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
+
+export const scores = new Hono<AppEnv>();
+
+scores.get("/", async (c) => {
+  const db = c.get("db");
+  const companies = await listCompanies(db);
+
+  const rows = await Promise.all(
+    companies.map(async (co) => {
+      const annual = await getPeriodsWithFacts(db, co.id, "annual", 4);
+      const latest = annual[annual.length - 1]?.period.periodLabel ?? null;
+      const result = computeScore(annual.map((p) => p.facts), latest);
+      return {
+        id: co.id,
+        name: co.name,
+        ticker: co.ticker,
+        segment: co.segment,
+        country: co.country,
+        atlasScore: result.atlasScore,
+        grade: result.grade,
+        asOf: result.asOf,
+        factors: Object.fromEntries(
+          result.factors.map((f) => [f.key, f.score === null ? null : Math.round(f.score)]),
+        ),
+      };
+    }),
+  );
+
+  // Ranked: scored companies first (desc), then unscored.
+  rows.sort((a, b) => (b.atlasScore ?? -1) - (a.atlasScore ?? -1));
+  return c.json(rows);
+});

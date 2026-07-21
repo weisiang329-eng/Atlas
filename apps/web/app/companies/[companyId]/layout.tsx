@@ -1,12 +1,15 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { Badge } from "@/components/ui/badge";
 import { companyTabs } from "@/lib/nav";
-import { getMockCompany, MOCK_COMPANIES } from "@/lib/mock/companies";
+import { HeaderScore } from "@/components/company/header-score";
+import { WatchlistButton } from "@/components/company/watchlist-button";
+import { getStaticCompany, STATIC_UNIVERSE } from "@/lib/universe";
 
 // Static export: pre-render every company in the sample universe.
 export function generateStaticParams() {
-  return MOCK_COMPANIES.map((c) => ({ companyId: c.id }));
+  return STATIC_UNIVERSE.map((c) => ({ companyId: c.id }));
 }
 
 export default async function CompanyLayout({
@@ -17,7 +20,7 @@ export default async function CompanyLayout({
   params: Promise<{ companyId: string }>;
 }) {
   const { companyId } = await params;
-  const company = getMockCompany(companyId);
+  const company = getStaticCompany(companyId);
   const name = company?.name ?? "Unknown company";
   const monogram = (company?.ticker ?? companyId).slice(0, 2).toUpperCase();
 
@@ -46,12 +49,16 @@ export default async function CompanyLayout({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="inline-flex cursor-not-allowed items-center rounded border border-border bg-surface px-3 py-2 text-sm text-faint">
-            ☆ Watchlist
-          </span>
+          <Link
+            href={`/reports/company/${companyId}`}
+            className="inline-flex items-center gap-1.5 rounded border border-border bg-surface px-3 py-2 text-sm text-muted transition-colors hover:text-fg"
+          >
+            Report
+          </Link>
+          <WatchlistButton companyId={companyId} />
           <div className="rounded border border-border bg-surface px-3 py-2 text-right">
             <p className="eyebrow">Atlas Score</p>
-            <p className="font-mono text-sm text-faint">—</p>
+            <HeaderScore companyId={companyId} />
           </div>
         </div>
       </div>

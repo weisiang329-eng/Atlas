@@ -1,28 +1,30 @@
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
-import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
-import { KpiCard } from "@/components/ui/kpi-card";
-import { ActivityFeed } from "@/components/ui/activity-feed";
 import { Badge } from "@/components/ui/badge";
 import { DashboardGrid, Widget } from "@/components/dashboard/dashboard-grid";
-import { HOME_KPIS, ACTIVITY } from "@/lib/mock/activity";
+import { HomeDashboard } from "@/components/home/home-dashboard";
 
 const WORKSPACES = [
   {
+    href: "/scores",
+    title: "Rankings",
+    body: "Atlas Score leaderboard — systematic multi-factor scores across the coverage universe.",
+  },
+  {
     href: "/companies",
     title: "Companies",
-    body: "Profiles, products, management, financials, valuation and documents for the coverage universe.",
+    body: "Profiles, financials, statements, metrics, ratios and Atlas Score for every covered company.",
   },
   {
-    href: "/research",
-    title: "Research",
-    body: "Evidence-first notes, versioned reports, hypotheses and a decision journal.",
+    href: "/industries",
+    title: "Industries",
+    body: "Cost factors, output prices and the margin cycle signal per industry.",
   },
   {
-    href: "/financials",
-    title: "Financials",
-    body: "Statements, metrics, historical trends and quarterly / annual results.",
+    href: "/knowledge",
+    title: "Knowledge graph",
+    body: "Supplier, customer and competitor relationships across the coverage universe.",
   },
 ];
 
@@ -31,19 +33,15 @@ export default function HomePage() {
     <AppShell title="Home">
       <PageHeader
         eyebrow="Decision Intelligence Platform"
-        title="Company Intelligence workspace"
-        description="Atlas turns market change into evidence-backed decisions. Every workspace is composed from one shared component system — clearly-labelled sample data throughout."
+        title="Atlas Invest"
+        description="Market change into evidence-backed decisions. Live coverage across AI infrastructure and rubber gloves — every figure sourced, every score reproducible, nothing fabricated."
       />
 
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {HOME_KPIS.map((k) => (
-          <KpiCard key={k.label} {...k} />
-        ))}
-      </div>
+      <HomeDashboard />
 
       <DashboardGrid>
         {WORKSPACES.map((w) => (
-          <Widget key={w.href} span={4}>
+          <Widget key={w.href} span={3}>
             <Link
               href={w.href}
               className="group flex h-full flex-col rounded-panel border border-border bg-surface p-5 shadow-panel transition-colors hover:border-accent-dim hover:bg-surface-2"
@@ -65,42 +63,6 @@ export default function HomePage() {
             </Link>
           </Widget>
         ))}
-
-        <Widget span={8}>
-          <Panel>
-            <PanelHeader
-              eyebrow="Feed"
-              title="Recent activity"
-              action={<Badge tone="accent">Sample</Badge>}
-            />
-            <PanelBody>
-              <ActivityFeed items={ACTIVITY} />
-            </PanelBody>
-          </Panel>
-        </Widget>
-
-        <Widget span={4}>
-          <Panel>
-            <PanelHeader eyebrow="Platform" title="Not built yet" />
-            <PanelBody>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  "AI chat",
-                  "Portfolio",
-                  "Authentication",
-                  "OCR",
-                  "ERP integration",
-                  "Payments",
-                  "Live data APIs",
-                ].map((tag) => (
-                  <Badge key={tag} tone="neutral">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </PanelBody>
-          </Panel>
-        </Widget>
       </DashboardGrid>
     </AppShell>
   );

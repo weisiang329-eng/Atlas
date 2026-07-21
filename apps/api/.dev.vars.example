@@ -1,0 +1,13 @@
+# Local secrets for `wrangler dev`. Copy to `.dev.vars` (gitignored) and fill in.
+# In production these are Worker secrets, set with `wrangler secret put <NAME>`.
+
+# Supabase Postgres connection string — use the TRANSACTION pooler (port 6543).
+# Supabase dashboard → Project → Settings → Database → Connection string →
+# "Transaction" (the port-6543 one). Never commit the real value.
+DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres
+
+# Anthropic (Claude) API key for the /v1/agent research analyst.
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Optional: override the Claude model the agent uses (default claude-sonnet-5).
+# AGENT_MODEL=claude-sonnet-5

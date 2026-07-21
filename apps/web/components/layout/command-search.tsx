@@ -6,7 +6,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { SearchInput } from "@/components/ui/search-input";
 import { NAV_GROUPS, FINANCIAL_TABS, RESEARCH_TABS } from "@/lib/nav";
 import { REPORT_INDEX } from "@/lib/mock/reports";
-import { MOCK_COMPANIES } from "@/lib/mock/companies";
+import { STATIC_UNIVERSE } from "@/lib/universe";
 import { cn } from "@/lib/cn";
 
 interface Command {
@@ -20,7 +20,7 @@ function buildIndex(): Command[] {
   const nav: Command[] = NAV_GROUPS.flatMap((g) =>
     g.items.map((it) => ({ label: it.label, href: it.href, group: g.title })),
   );
-  const companies: Command[] = MOCK_COMPANIES.map((c) => ({
+  const companies: Command[] = STATIC_UNIVERSE.map((c) => ({
     label: c.name,
     sub: c.ticker,
     href: `/companies/${c.id}/overview`,

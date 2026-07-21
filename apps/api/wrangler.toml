@@ -1,0 +1,19 @@
+# Atlas API — Cloudflare Worker
+#
+# The Worker runs Hono and connects to Supabase Postgres over the Transaction
+# pooler. The connection string is a Worker secret (never in this file):
+#
+#   wrangler secret put DATABASE_URL       # the Supabase pooler URL (port 6543)
+#   wrangler secret put ANTHROPIC_API_KEY  # the Claude key for the agent
+#   wrangler deploy
+#
+# `nodejs_compat` is required for postgres.js to use Cloudflare's TCP sockets.
+
+name = "atlas-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pretty JSON + observability in the dashboard.
+[observability]
+enabled = true

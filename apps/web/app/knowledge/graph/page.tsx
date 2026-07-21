@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Panel, PanelBody } from "@/components/ui/panel";
-import { KnowledgeGraph } from "@/components/viz/knowledge-graph";
-import { GRAPH_NODES, GRAPH_EDGES } from "@/lib/mock/knowledge";
+import { GraphLive } from "@/components/knowledge/graph-live";
 
 export const metadata: Metadata = { title: "Relationship Graph" };
 
@@ -11,17 +9,9 @@ export default function KnowledgeGraphPage() {
     <>
       <SectionHeading
         title="Relationship graph"
-        description="Suppliers, customers, competitors and sector for the subject entity. Colour encodes entity kind."
+        description="Suppliers, customers and competitors for the selected company. Colour encodes relationship kind; edges are source-linked industry structure."
       />
-      <Panel>
-        <PanelBody>
-          <KnowledgeGraph
-            nodes={GRAPH_NODES}
-            edges={GRAPH_EDGES}
-            ariaLabel="Knowledge graph of entity relationships"
-          />
-        </PanelBody>
-      </Panel>
+      <GraphLive initialSubject="nvidia" />
     </>
   );
 }
