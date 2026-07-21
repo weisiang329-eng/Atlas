@@ -23,7 +23,8 @@ export default function AgentsPage() {
     <WorkspaceLayout title="Agents" eyebrow="P020 · Agent Runtime" description="研究任务 → 工具调用 → 产出。产出永远是草稿，人审后才成为事实（硬门禁）。">
       <SectionHeading title="任务运行台" description="只读工具集起步；越权工具调用被拒并记日志。" />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
-        <DataTable columns={cols} rows={AGENT_TASKS} getRowId={(t) => t.id} caption="Agent tasks" />
+        <DataTable
+        mobileCards columns={cols} rows={AGENT_TASKS} getRowId={(t) => t.id} caption="Agent tasks" />
       </div>
     </WorkspaceLayout>
   );

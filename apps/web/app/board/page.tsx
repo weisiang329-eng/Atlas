@@ -53,6 +53,7 @@ export default function BoardPage() {
 
       <ChartContainer title="风险登记册" subtitle="按评分排序，评分 = 可能性 × 影响">
         <DataTable
+        mobileCards
           columns={riskCols}
           rows={[...RISK_REGISTER].sort((a, b) => b.likelihood * b.impact - a.likelihood * a.impact)}
           getRowId={(r) => r.id}

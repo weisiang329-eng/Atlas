@@ -130,6 +130,7 @@ export function QuotesPanel() {
 
       <div className="rounded-panel border border-border bg-surface shadow-panel">
         <DataTable
+        mobileCards
           columns={columns}
           rows={quotes}
           getRowId={(q) => q.ticker}

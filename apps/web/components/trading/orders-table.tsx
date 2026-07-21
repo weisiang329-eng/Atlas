@@ -47,5 +47,6 @@ const columns: Column<MockOrder>[] = [
 ];
 
 export function OrdersTable() {
-  return <DataTable columns={columns} rows={MOCK_ORDERS} getRowId={(o) => o.id} caption="Orders" />;
+  return <DataTable
+        mobileCards columns={columns} rows={MOCK_ORDERS} getRowId={(o) => o.id} caption="Orders" />;
 }

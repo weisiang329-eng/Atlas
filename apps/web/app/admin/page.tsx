@@ -29,7 +29,8 @@ export default function AdminPage() {
       <SectionHeading title="平台管理" description="权限双层校验、审计 append-only、每日 D1 备份至 R2。" />
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartContainer title="用户与角色" subtitle="owner / analyst / viewer">
-          <DataTable columns={userCols} rows={USERS} getRowId={(u) => u.id} caption="Users" />
+          <DataTable
+        mobileCards columns={userCols} rows={USERS} getRowId={(u) => u.id} caption="Users" />
         </ChartContainer>
         <ChartContainer title="审计日志" subtitle="登录 / 写操作 / 导出（append-only）">
           <DataTable columns={auditCols} rows={AUDIT_LOG} getRowId={(a) => a.id} searchable searchPlaceholder="Search audit…" caption="Audit log" />

@@ -74,6 +74,7 @@ export function RankingsLive() {
     <DataState status={r.status}>
       <Panel className="overflow-hidden">
         <DataTable
+        mobileCards
           columns={columns}
           rows={r.data ?? []}
           getRowId={(row) => row.id}

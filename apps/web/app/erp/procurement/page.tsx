@@ -32,7 +32,8 @@ export default function ProcurementPage() {
         </p>
       </div>
       <ChartContainer title="供应商" subtitle="份额 / 准时率 / 风险标记">
-        <DataTable columns={cols} rows={SUPPLIERS} getRowId={(r) => r.id} caption="Suppliers" />
+        <DataTable
+        mobileCards columns={cols} rows={SUPPLIERS} getRowId={(r) => r.id} caption="Suppliers" />
       </ChartContainer>
     </>
   );

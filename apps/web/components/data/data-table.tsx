@@ -31,6 +31,13 @@ interface DataTableProps<T> {
   /** Show a built-in search box that filters rows across all column values. */
   searchable?: boolean;
   searchPlaceholder?: string;
+  /**
+   * Below `sm`, render rows as stacked cards instead of a horizontally
+   * scrolling table. Use on primary lists (holdings, watchlist, orders);
+   * leave off for dense reference tables (financial statements) where
+   * side-by-side period comparison is the point.
+   */
+  mobileCards?: boolean;
 }
 
 /**
@@ -49,6 +56,7 @@ export function DataTable<T>({
   onRowClick,
   searchable = false,
   searchPlaceholder = "Search",
+  mobileCards = false,
 }: DataTableProps<T>) {
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
@@ -129,7 +137,66 @@ export function DataTable<T>({
           />
         </div>
       ) : null}
-      <div className="overflow-x-auto">
+      {mobileCards ? (
+        <ul className="flex flex-col gap-2 p-3 sm:hidden">
+          {visible.map((row) => {
+            const [primary, ...rest] = columns;
+            const cell = (c: Column<T>) =>
+              c.render
+                ? c.render(row)
+                : String((row as Record<string, unknown>)[c.key] ?? "");
+            return (
+              <li key={getRowId(row)}>
+                <div
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  role={onRowClick ? "button" : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            onRowClick(row);
+                          }
+                        }
+                      : undefined
+                  }
+                  className={cn(
+                    "rounded-panel border border-border bg-surface p-3 shadow-panel transition-colors",
+                    onRowClick &&
+                      "cursor-pointer hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent",
+                  )}
+                >
+                  {primary ? (
+                    <div className="mb-2 text-sm font-semibold text-fg">
+                      {cell(primary)}
+                    </div>
+                  ) : null}
+                  <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+                    {rest.map((c) => (
+                      <div key={c.key} className="flex flex-col gap-0.5">
+                        <dt className="font-mono text-2xs uppercase tracking-[0.08em] text-faint">
+                          {c.header}
+                        </dt>
+                        <dd
+                          className={cn(
+                            "text-fg",
+                            c.numeric && "num tabular-nums",
+                          )}
+                        >
+                          {cell(c)}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+
+      <div className={cn("overflow-x-auto", mobileCards && "hidden sm:block")}>
         <table className="w-full border-collapse text-left text-sm">
           {caption ? (
             <caption className="sr-only">{caption}</caption>

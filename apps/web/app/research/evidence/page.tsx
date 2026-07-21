@@ -19,7 +19,8 @@ export default function ResearchEvidencePage() {
     <>
       <SectionHeading title="证据表" description="每条论断 → 来源 → 置信度。这张表是可审计研究（含 AI 生成）的契约（sample data）。" />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
-        <DataTable columns={cols} rows={SAMPLE_EVIDENCE} getRowId={(e) => e.id} searchable searchPlaceholder="Search claims…" caption="Evidence" />
+        <DataTable
+        mobileCards columns={cols} rows={SAMPLE_EVIDENCE} getRowId={(e) => e.id} searchable searchPlaceholder="Search claims…" caption="Evidence" />
       </div>
     </>
   );

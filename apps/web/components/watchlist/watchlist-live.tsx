@@ -97,6 +97,7 @@ export function WatchlistLive() {
       <DataState status={live ? r.status : "ready"}>
         <Panel className="overflow-hidden">
           <DataTable
+        mobileCards
             columns={columns}
             rows={rows}
             getRowId={(row) => row.id}

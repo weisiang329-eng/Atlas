@@ -60,7 +60,8 @@ export default function ErpFurniturePage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartContainer title="客户集中度" subtitle={`Top ${ERP_CUSTOMERS.length} · 合计 ${formatCompact(totalRev)}`}>
-          <DataTable columns={customerCols} rows={ERP_CUSTOMERS} getRowId={(r) => r.id} caption="Customer concentration" />
+          <DataTable
+        mobileCards columns={customerCols} rows={ERP_CUSTOMERS} getRowId={(r) => r.id} caption="Customer concentration" />
         </ChartContainer>
         <ChartContainer title="SKU 毛利" subtitle="按收入排序，毛利率 <20% 标红">
           <DataTable columns={skuCols} rows={ERP_SKUS} getRowId={(r) => r.id} searchable searchPlaceholder="Search SKU…" caption="SKU margin" />
