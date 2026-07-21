@@ -270,6 +270,8 @@ export const pmsAccount = pgTable("pms_account", {
   name: text("name").notNull(),
   broker: text("broker").notNull(),
   accountType: text("account_type").notNull().default("cash"),
+  /** fifo | lifo | hifo | strict — see domain/matching.ts. */
+  bookingMethod: text("booking_method").notNull().default("fifo"),
   baseCurrency: text("base_currency").notNull().default("MYR"),
   externalId: text("external_id"),
   createdAt: createdAt(),
@@ -382,6 +384,8 @@ export const pmsLot = pgTable(
     feesTotal: doublePrecision("fees_total").notNull().default(0),
     currency: text("currency").notNull(),
     fxRate: doublePrecision("fx_rate").notNull().default(1),
+    /** Human label — the foolproof handle for specific-lot selling. */
+    label: text("label"),
   },
   (t) => ({
     tradeUnq: uniqueIndex("pms_lot_trade_unq").on(t.tradeId),
