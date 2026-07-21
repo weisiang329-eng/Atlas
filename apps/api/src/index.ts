@@ -12,6 +12,7 @@ import { createDb } from "./db/repo";
 import { companies } from "./routes/companies";
 import { industries } from "./routes/industries";
 import { scores } from "./routes/scores";
+import { graph } from "./routes/graph";
 
 export interface Env {
   DB: D1Database;
@@ -38,6 +39,7 @@ app.get("/health", (c) =>
 app.route("/v1/companies", companies);
 app.route("/v1/industries", industries);
 app.route("/v1/scores", scores);
+app.route("/v1/graph", graph);
 
 app.notFound((c) =>
   c.json({ error: "The requested resource was not found." }, 404),

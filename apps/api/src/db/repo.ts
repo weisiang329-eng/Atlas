@@ -2,7 +2,7 @@
  * Data access — thin, typed queries over D1 via Drizzle. Routes call these;
  * nothing here formats or computes (that's src/domain).
  */
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, or } from "drizzle-orm";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import type { FactMap } from "../domain/concepts";
 import * as schema from "./schema";
@@ -54,6 +54,28 @@ export async function listCompaniesByIndustry(
     .from(schema.company)
     .where(eq(schema.company.industryId, industryId))
     .orderBy(asc(schema.company.name));
+}
+
+/** All relationships touching a company (either endpoint). */
+export async function listRelationshipsFor(
+  db: Db,
+  companyId: string,
+): Promise<schema.Relationship[]> {
+  return db
+    .select()
+    .from(schema.relationship)
+    .where(
+      or(
+        eq(schema.relationship.fromId, companyId),
+        eq(schema.relationship.toId, companyId),
+      ),
+    );
+}
+
+export async function listAllRelationships(
+  db: Db,
+): Promise<schema.Relationship[]> {
+  return db.select().from(schema.relationship);
 }
 
 /** Industry-level metric series (cost/price/capacity), oldest -> newest. */

@@ -191,9 +191,48 @@ export const industryMetric = sqliteTable(
   }),
 );
 
+/**
+ * Directed relationship between two companies (the knowledge-graph edge set,
+ * P007). `relationType` is directional:
+ *   - "supplies"       from → to  (from is a supplier of to; to is a customer)
+ *   - "competes_with"  symmetric
+ * The ego-graph builder derives the correct node kind + edge label for either
+ * endpoint, so one row serves both companies' views. Every edge is sourced.
+ */
+export const relationship = sqliteTable(
+  "relationship",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    fromId: text("from_id")
+      .notNull()
+      .references(() => company.id, { onDelete: "cascade" }),
+    toId: text("to_id")
+      .notNull()
+      .references(() => company.id, { onDelete: "cascade" }),
+    relationType: text("relation_type")
+      .$type<"supplies" | "competes_with">()
+      .notNull(),
+    /** Short qualifier shown on the edge, e.g. "foundry", "HBM". */
+    label: text("label"),
+    note: text("note"),
+    sourceId: text("source_id").references(() => source.id),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    edgeUnq: uniqueIndex("relationship_edge_unq").on(
+      t.fromId,
+      t.toId,
+      t.relationType,
+    ),
+    fromIdx: index("relationship_from_idx").on(t.fromId),
+    toIdx: index("relationship_to_idx").on(t.toId),
+  }),
+);
+
 export type Source = typeof source.$inferSelect;
 export type Industry = typeof industry.$inferSelect;
 export type Company = typeof company.$inferSelect;
 export type FinancialPeriod = typeof financialPeriod.$inferSelect;
 export type FinancialFact = typeof financialFact.$inferSelect;
 export type IndustryMetric = typeof industryMetric.$inferSelect;
+export type Relationship = typeof relationship.$inferSelect;
