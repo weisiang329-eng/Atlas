@@ -26,23 +26,39 @@ export interface Env {
   ANTHROPIC_API_KEY?: string;
   /** Optional Claude model override for the agent. */
   AGENT_MODEL?: string;
+  /**
+   * Comma-separated list of allowed CORS origins (e.g. the Pages domain).
+   * Unset ⇒ "*" so local dev and pre-config deploys keep working.
+   */
+  ALLOWED_ORIGINS?: string;
+  /** Max /v1/agent/ask calls per IP per day (default 50). */
+  AGENT_DAILY_LIMIT?: string;
 }
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
 const app = new Hono<AppEnv>();
 
-// The web app is a static Cloudflare Pages site on a different origin; the API
-// is public read-only data, so a permissive CORS policy is acceptable for now.
-// Revisit when write endpoints or auth land.
-app.use(
-  "*",
-  cors({
-    origin: "*",
+// The web app is a static Cloudflare Pages site on a different origin. In
+// production set ALLOWED_ORIGINS (comma-separated) to the Pages domain(s);
+// when unset (local dev, pre-config deploys) the policy stays permissive.
+app.use("*", async (c, next) => {
+  const allowed = c.env.ALLOWED_ORIGINS;
+  const handler = cors({
+    origin: allowed
+      ? (origin) =>
+          allowed
+            .split(",")
+            .map((s) => s.trim())
+            .includes(origin)
+            ? origin
+            : undefined
+      : "*",
     allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: ["content-type"],
-  }),
-);
+  });
+  return handler(c, next);
+});
 
 // One Postgres connection per request over the Supabase transaction pooler.
 // `prepare: false` is required for transaction-pooling mode; the connection is
