@@ -499,3 +499,60 @@ export const agentControl = pgTable("agent_control", {
 
 export type AgentRun = typeof agentRun.$inferSelect;
 export type AgentControl = typeof agentControl.$inferSelect;
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * Industry knowledge (Atlas OS V1 Book 2)
+ * Twenty mandated sections per industry, each record carrying its own
+ * provenance. Conflicting values are stored with attribution, never resolved
+ * silently — the disagreement is itself information.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+export const industryKnowledge = pgTable(
+  "industry_knowledge",
+  {
+    id: serial("id").primaryKey(),
+    industryId: text("industry_id")
+      .notNull()
+      .references(() => industry.id, { onDelete: "cascade" }),
+    section: text("section").notNull(),
+    content: text("content").notNull(),
+    kind: text("kind").$type<"fact" | "assumption">().notNull().default("fact"),
+    sourceId: text("source_id").references(() => source.id),
+    sourceUrl: text("source_url"),
+    confidence: doublePrecision("confidence").notNull().default(1),
+    asOf: date("as_of"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    idx: index("industry_knowledge_idx").on(t.industryId, t.section),
+  }),
+);
+
+export const industryKpi = pgTable(
+  "industry_kpi",
+  {
+    id: serial("id").primaryKey(),
+    industryId: text("industry_id")
+      .notNull()
+      .references(() => industry.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    name: text("name").notNull(),
+    definition: text("definition").notNull(),
+    whyItMatters: text("why_it_matters").notNull(),
+    unit: text("unit"),
+    signalType: text("signal_type").$type<"leading" | "lagging">().notNull().default("lagging"),
+    updateFrequency: text("update_frequency"),
+    sourceName: text("source_name"),
+    sourceUrl: text("source_url"),
+    affectedCompanies: text("affected_companies"),
+    affectedProducts: text("affected_products"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    unq: uniqueIndex("industry_kpi_unq").on(t.industryId, t.key),
+  }),
+);
+
+export type IndustryKnowledge = typeof industryKnowledge.$inferSelect;
+export type IndustryKpi = typeof industryKpi.$inferSelect;

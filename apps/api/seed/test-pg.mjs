@@ -16,6 +16,8 @@ const migrations = [
   "drizzle/0000_init_postgres.sql",
   "drizzle/0001_agent_usage.sql",
   "drizzle/0002_pms.sql",
+  "drizzle/0003_agent_console.sql",
+  "drizzle/0004_industry_knowledge.sql",
 ];
 const seeds = [
   "seed/seed.sql",
@@ -23,6 +25,7 @@ const seeds = [
   "seed/glove/glove-seed.sql",
   "seed/glove/industry-metrics.sql",
   "seed/graph/graph-seed.sql",
+  "seed/industry/industry-seed.sql",
 ];
 
 let failures = 0;
