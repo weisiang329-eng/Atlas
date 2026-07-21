@@ -297,3 +297,45 @@ graph, `/reports/company/[id]`, Agent. **Still not real:**
 - [ ] Remove the superseded `tasks/handoff-2026-07-21.md` once everyone uses this file.
 - [ ] No CD — consider a GitHub Action to deploy on merge to `main` (after secrets are set in the CF/GH integration).
 - [ ] Nav still tags `alerts`/`admin` as `soon` — correct until built.
+
+### 13.8 Bilingual (zh default / en peer) — foundation done, copy migration open
+Architecture is final (`lib/i18n/*`, PR #52); what remains is moving literal
+strings into the dictionary. `Dict` is derived from the zh dictionary, so a
+missing English key fails the build — the guard is automatic.
+- [x] Foundation: dictionaries, `LocaleProvider`/`useT`, pre-paint locale script, Settings switcher.
+- [x] Shell: sidebar/drawer nav, bottom tab bar, topbar.
+- [x] Page headers: Home, Companies, Rankings, Watchlist, Portfolio; Home cockpit body.
+- [ ] Live page bodies: Companies list/detail tabs, all `/financials/*`, Industries, Value Chain, Knowledge, Research, Reports, Agent.
+- [ ] Adopted module pages (ERP, CEO, Board, Trading, Markets, News, Alerts, Admin, Agent Ops, Memory, Learning) — most already ship Chinese copy from the design handoff; move it into the dictionary so English works too.
+- [ ] Shared UI: `DataTable` pagination/search, `DataState` messages, `EmptyState`/`PlannedModule` defaults, toast text, `CommandSearch`.
+- [ ] Company sub-tab labels (keys exist in `COMPANY_TAB_KEYS`, not yet consumed by `companyTabs()`).
+- [ ] Decide whether `<title>`/metadata should localise (currently English only; would need per-locale routes or client-side title updates).
+
+### 13.9 UI layout rebuild (the design handoff was only half-applied)
+The Aurora token layer and the NEW module pages came from the handoff, but the
+already-live pages kept their Sprint-000 **layout** and only had utility classes
+swapped — new paint on old bones. That is why the app still looked dated.
+- [x] Home — rebuilt on the handoff's composition (KPI strip → wide/narrow pair → even pair), wired to real data, marketing card grid removed.
+- [ ] Companies list — adopt the handoff's browse composition.
+- [ ] Company detail — masthead + tab layout per the handoff.
+- [ ] Rankings/Scores — leaderboard composition.
+- [ ] Watchlist / Portfolio — card+table composition.
+- [ ] Financials family — statement layout.
+- [ ] Industries / Value Chain / Knowledge — workspace compositions.
+- [ ] **Visual verification is unresolved:** the automation browser reports
+  `innerWidth = 0` and CDP screenshots time out, so rendered appearance cannot
+  be checked from the agent session. Structure, data and computed CSS are
+  verifiable; *looks* are not. Until that is fixed, a human must eyeball each
+  rebuilt page on a preview deployment.
+
+### 13.10 Portfolio accounting / trade book (PMS)
+Model: `docs/PORTFOLIO-ACCOUNTING.md`. Foundation merged in PR #53.
+- [x] Schema (0002), FIFO matcher, fee schedules per market, FX P&L split, 33 engine assertions in CI.
+- [x] Decisions locked: base currency **MYR**, **FIFO**, fee schedule with per-trade override, FX anchored to **BNM mid-rate with the dealing spread booked separately as `fx_spread`**.
+- [ ] API routes: trades CRUD, positions, closures, cash movements, reconciliation.
+- [ ] BNM rate ingestion (public API) into `pms_fx_rate`, plus the spread capture on conversions.
+- [ ] Trade ledger UI: entry form, 总仓 (position) view, 按订单 (by-lot) view with per-closure P&L.
+- [ ] Fund statements: P&L, balance sheet, cash flow; monthly fee totals.
+- [ ] Moomoo daily sync — **blocked**: OpenD gateway needs an always-on host (Cloudflare Workers cannot run it). Manual entry stays first-class regardless.
+- [ ] Corporate actions (splits, dividends affecting cost basis) — not yet modelled.
+- [ ] Short positions — deliberately rejected today (oversell is reported, not silently shorted); needs an explicit design.

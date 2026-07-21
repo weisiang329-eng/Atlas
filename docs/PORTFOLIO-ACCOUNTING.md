@@ -136,6 +136,23 @@ Each trade stores its **own** FX rate to base at trade date (`fx_rate`), so
 historical P&L never shifts when today's rate moves. Rates are a sourced fact
 like any other, in `fx_rate(date, from, to, rate, source)`.
 
+**Which rate — the anchor (decided 2026-07-21).** Bookkeeping uses the **Bank
+Negara Malaysia (BNM) mid-rate** for the trade date: objective, auditable,
+published, and free. The broker's actual dealing rate is worse than mid by a
+spread, and that difference is **not** hidden inside the FX P&L — it is booked
+separately as an `fx_spread` fee on the conversion.
+
+This is the institutional treatment and it keeps two different questions apart:
+
+- *"Did the ringgit move for me or against me?"* → the FX P&L component, at an
+  objective reference rate.
+- *"What did the broker charge me to convert?"* → an explicit `fx_spread` cost,
+  which can then be totalled per month like any other fee.
+
+Booking conversions at the dealing rate instead would silently fold the
+broker's margin into currency performance, and the owner would never see how
+much conversion actually costs.
+
 ## 6. Fees — the fee schedule
 
 The broker API returns no fees, so Atlas models them per market and lets the
