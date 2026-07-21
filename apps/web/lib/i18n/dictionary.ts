@@ -68,6 +68,7 @@ export const zh = {
   "common.source": "数据来源",
   "common.asOf": "截至",
   "common.language": "语言",
+  "common.open": "打开",
 
   // ── Financial vocabulary (see INVESTMENT-METHODOLOGY §3) ──────────────
   "fin.revenue": "营业收入",
@@ -136,6 +137,17 @@ export const zh = {
   "home.companies": "家公司",
   "home.sectors": "个行业",
   "home.facts": "条财务数据",
+  "home.cycle": "手套周期信号",
+  "home.cycleHint": "指数化 · 100 = 2019",
+  "home.cycleTitle": "行业周期 · 橡胶手套",
+  "home.cycleSub": "售价与成本的利润信号",
+  "home.topRanked": "评分领先公司",
+  "home.allRankings": "全部排名",
+  "home.watchlist": "我的自选",
+  "home.watchlistEmpty": "还没有自选 — 在公司页点星标加入",
+  "home.decisions": "决策日志",
+  "home.decisionsSub": "最近记录的投资决策",
+  "home.decisionsEmpty": "还没有记录决策",
 
   // ── Page headers (eyebrow / title / description per route) ────────────
   "page.home.eyebrow": "决策智能平台",
@@ -216,6 +228,7 @@ export const en: Dict = {
   "common.source": "Source",
   "common.asOf": "As of",
   "common.language": "Language",
+  "common.open": "Open",
 
   "fin.revenue": "Revenue",
   "fin.grossProfit": "Gross profit",
@@ -280,6 +293,17 @@ export const en: Dict = {
   "home.companies": "companies",
   "home.sectors": "sectors",
   "home.facts": "sourced facts",
+  "home.cycle": "Glove margin cycle",
+  "home.cycleHint": "indexed · 100 = 2019",
+  "home.cycleTitle": "Industry cycle · Rubber gloves",
+  "home.cycleSub": "Selling-price vs. cost margin signal",
+  "home.topRanked": "Top ranked",
+  "home.allRankings": "All rankings",
+  "home.watchlist": "My watchlist",
+  "home.watchlistEmpty": "Nothing followed yet — star a company to add it",
+  "home.decisions": "Decision journal",
+  "home.decisionsSub": "Recently recorded decisions",
+  "home.decisionsEmpty": "No decisions recorded yet",
 
   "page.home.eyebrow": "Decision Intelligence Platform",
   "page.home.title": "Atlas Invest",
