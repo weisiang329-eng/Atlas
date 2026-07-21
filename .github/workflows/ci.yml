@@ -17,8 +17,8 @@ jobs:
       - run: npm ci
       - name: Typecheck API
         run: npm run typecheck -w @atlas/api
-      - name: Regenerate seed (must be deterministic)
-        run: node seed/generate.mjs
+      - name: Regenerate seeds (must be deterministic)
+        run: node seed/generate.mjs && node seed/glove/generate.mjs
         working-directory: apps/api
       - name: Lint web
         run: npm run lint -w @atlas/web

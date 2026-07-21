@@ -29,3 +29,6 @@ Thumbs.db
 
 # Test / coverage
 coverage/
+
+# Local agent tooling (absolute paths)
+.claude/

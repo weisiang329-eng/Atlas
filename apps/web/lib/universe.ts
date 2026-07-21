@@ -23,6 +23,14 @@ export const STATIC_UNIVERSE: CompanySummary[] = [
   { id: "intel", name: "Intel Corporation", ticker: "INTC", exchange: "NASDAQ", segment: "CPU / Foundry", country: "United States" },
   { id: "arista", name: "Arista Networks", ticker: "ANET", exchange: "NYSE", segment: "Data Center Networking", country: "United States" },
   { id: "vertiv", name: "Vertiv Holdings", ticker: "VRT", exchange: "NYSE", segment: "Data Center Power / Cooling", country: "United States" },
+  // Rubber & medical gloves (P026 glove-tracker merge, Phase 1).
+  { id: "top-glove", name: "Top Glove Corporation", ticker: "TOPGLOV", exchange: "Bursa Malaysia", segment: "Rubber Gloves", country: "Malaysia" },
+  { id: "hartalega", name: "Hartalega Holdings", ticker: "HARTA", exchange: "Bursa Malaysia", segment: "Rubber Gloves", country: "Malaysia" },
+  { id: "kossan", name: "Kossan Rubber Industries", ticker: "KOSSAN", exchange: "Bursa Malaysia", segment: "Rubber Gloves", country: "Malaysia" },
+  { id: "supermax", name: "Supermax Corporation", ticker: "SUPERMX", exchange: "Bursa Malaysia", segment: "Rubber Gloves", country: "Malaysia" },
+  { id: "careplus", name: "Careplus Group", ticker: "CAREPLS", exchange: "Bursa Malaysia", segment: "Rubber Gloves", country: "Malaysia" },
+  { id: "comfort-gloves", name: "Comfort Gloves", ticker: "COMFORT", exchange: "Bursa Malaysia", segment: "Rubber Gloves", country: "Malaysia" },
+  { id: "hextar-healthcare", name: "Hextar Healthcare", ticker: "HEXCARE", exchange: "Bursa Malaysia", segment: "Rubber Gloves", country: "Malaysia" },
 ];
 
 export function getStaticCompany(id: string): CompanySummary | undefined {
