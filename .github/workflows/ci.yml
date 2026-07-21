@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck API
+        run: npm run typecheck -w @atlas/api
+      - name: Regenerate seed (must be deterministic)
+        run: node seed/generate.mjs
+        working-directory: apps/api
+      - name: Lint web
+        run: npm run lint -w @atlas/web
+      - name: Typecheck web
+        run: npm run typecheck -w @atlas/web
+      - name: Build web (static export)
+        run: npm run build -w @atlas/web

@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Builds
+.next/
+dist/
+out/
+build/
+
+# Cloudflare / Wrangler
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs & OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Test / coverage
+coverage/

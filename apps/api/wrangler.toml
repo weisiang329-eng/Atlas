@@ -1,0 +1,28 @@
+# Atlas API — Cloudflare Worker
+#
+# Deploy target for the Atlas backend. The Worker runs Hono and binds a D1
+# (SQLite) database. `database_id` is filled in once the D1 instance is created
+# against the owner's Cloudflare account:
+#
+#   wrangler d1 create atlas-db      # prints the database_id -> paste below
+#   wrangler d1 migrations apply atlas-db --local    # local dev DB
+#   wrangler deploy                                   # ship the Worker
+#   wrangler d1 migrations apply atlas-db --remote    # migrate prod DB
+#
+# Local `wrangler dev` uses a local SQLite file under .wrangler/ regardless of
+# database_id, so development needs no Cloudflare account.
+
+name = "atlas-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pretty JSON + observability in the dashboard.
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "atlas-db"
+database_id = "PLACEHOLDER_CREATE_WITH_wrangler_d1_create"
+migrations_dir = "drizzle"
