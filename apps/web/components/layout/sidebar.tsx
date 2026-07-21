@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { NavGroups } from "@/components/layout/nav-groups";
+import { NavTree } from "@/components/layout/nav-tree";
 
 /**
  * Left navigation rail. Client component so it can highlight the active route.
@@ -26,7 +26,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4 pr-3" aria-label="Primary">
-        <NavGroups pathname={pathname} />
+        <NavTree pathname={pathname} />
       </nav>
 
       {/* The footer used to advertise "Milestone 1", which stopped being true

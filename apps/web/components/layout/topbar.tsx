@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { CommandSearch } from "@/components/layout/command-search";
+import { LocaleSwitch } from "@/components/layout/locale-switch";
 import { useT } from "@/lib/i18n/use-locale";
 import { NAV_ITEM_KEYS } from "@/lib/nav";
 import { usePathname } from "next/navigation";
@@ -32,8 +33,9 @@ export function Topbar({ title }: { title: string }) {
         </h1>
       </div>
 
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <CommandSearch />
+        <LocaleSwitch />
         <Badge tone="positive">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-positive" />
           {t("common.live")}

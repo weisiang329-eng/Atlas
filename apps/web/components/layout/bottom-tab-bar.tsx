@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Drawer } from "@/components/ui/drawer";
-import { NavGroups } from "@/components/layout/nav-groups";
+import { NavTree } from "@/components/layout/nav-tree";
 import { useT } from "@/lib/i18n/use-locale";
 import type { Dict } from "@/lib/i18n/dictionary";
 import { cn } from "@/lib/cn";
@@ -112,7 +112,7 @@ export function BottomTabBar() {
         }
       >
         <nav aria-label={t("nav.allSections")} className="px-3 py-4">
-          <NavGroups pathname={pathname} />
+          <NavTree pathname={pathname} />
         </nav>
       </Drawer>
     </>

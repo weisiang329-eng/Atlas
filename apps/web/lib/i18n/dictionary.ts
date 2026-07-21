@@ -17,6 +17,21 @@
 
 export const zh = {
   // ── Shell / navigation ────────────────────────────────────────────────
+  "nav.metrics": "关键指标",
+  "nav.ratios": "财务比率",
+  "nav.trends": "历史趋势",
+  "nav.graph": "关系图",
+  "nav.heatmap": "敞口热力图",
+  "nav.memory": "记忆库",
+  "nav.decisions": "决策日志",
+  "nav.evidence": "证据链",
+  "nav.hypotheses": "假设验证",
+  "nav.manufacturing": "生产制造",
+  "nav.procurement": "采购",
+  "nav.warehouse": "仓储",
+  "nav.furniture": "家具业务",
+  "nav.ingest": "数据接入",
+  "nav.automation": "自动化",
   "nav.daily": "每日",
   "nav.researchGroup": "研究分析",
   "nav.execution": "交易执行",
@@ -240,6 +255,21 @@ export const zh = {
 export type Dict = Record<keyof typeof zh, string>;
 
 export const en: Dict = {
+  "nav.metrics": "Metrics",
+  "nav.ratios": "Ratios",
+  "nav.trends": "Trends",
+  "nav.graph": "Graph",
+  "nav.heatmap": "Heatmap",
+  "nav.memory": "Memory",
+  "nav.decisions": "Decision journal",
+  "nav.evidence": "Evidence",
+  "nav.hypotheses": "Hypotheses",
+  "nav.manufacturing": "Manufacturing",
+  "nav.procurement": "Procurement",
+  "nav.warehouse": "Warehouse",
+  "nav.furniture": "Furniture",
+  "nav.ingest": "Ingestion",
+  "nav.automation": "Automation",
   "nav.daily": "Daily",
   "nav.researchGroup": "Research",
   "nav.execution": "Execution",
