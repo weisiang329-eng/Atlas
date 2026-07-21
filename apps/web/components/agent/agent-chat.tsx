@@ -169,7 +169,7 @@ wrangler deploy                          # redeploy the Worker`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask the research analyst…"
-          className="flex-1 rounded border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
+          className="flex-1 rounded border border-border-soft bg-surface-3 px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
           disabled={busy}
         />
         <button

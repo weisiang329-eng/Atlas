@@ -23,7 +23,7 @@ function tone(score: number | null): "positive" | "warning" | "negative" | "neut
 }
 
 const factorCell = (v: number | null) =>
-  v === null ? <span className="text-faint">—</span> : <span className="font-mono">{v}</span>;
+  v === null ? <span className="text-faint">—</span> : <span className="num">{v}</span>;
 
 const columns: Column<ScoreRow>[] = [
   {

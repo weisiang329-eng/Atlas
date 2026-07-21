@@ -10,7 +10,7 @@ export function Topbar({ title }: { title: string }) {
   const env = process.env.NEXT_PUBLIC_APP_ENV ?? "local";
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b border-border bg-bg/85 px-4 backdrop-blur sm:px-6 print:hidden">
+    <header className="glass sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b border-border px-4 sm:px-6 print:hidden">
       <div className="flex min-w-0 items-center gap-3">
         <MobileNav />
         <span className="font-mono text-2xs text-faint">atlas /</span>

@@ -15,7 +15,7 @@ export function Stat({ label, value, hint, className }: StatProps) {
   return (
     <div className={cn("flex flex-col gap-1", className)}>
       <span className="eyebrow">{label}</span>
-      <span className="font-mono text-xl font-medium tabular-nums text-fg">
+      <span className="num text-xl font-medium tabular-nums text-fg">
         {value}
       </span>
       {hint ? <span className="text-xs text-muted">{hint}</span> : null}

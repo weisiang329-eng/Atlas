@@ -128,7 +128,7 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
                 <PanelBody>
                   <div className="flex items-baseline justify-between">
                     <span className="text-sm text-muted">{f.label}</span>
-                    <span className="font-mono text-lg font-semibold text-fg">
+                    <span className="num text-lg font-semibold text-fg">
                       {f.score === null ? "—" : Math.round(f.score)}
                     </span>
                   </div>
@@ -137,7 +137,7 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
                     {f.metrics.map((m) => (
                       <div key={m.label} className="flex justify-between text-xs">
                         <dt className="text-muted">{m.label}</dt>
-                        <dd className="font-mono text-fg">
+                        <dd className="num text-fg">
                           {m.value}
                           <span className="ml-1 text-faint">({m.score})</span>
                         </dd>

@@ -44,7 +44,7 @@ export function FilterBar({
       />
       {filters && filters.length > 0 ? (
         <div
-          className="flex rounded border border-border bg-bg p-0.5"
+          className="flex rounded border border-border-soft bg-surface-3 p-0.5"
           role="group"
           aria-label="Filter"
         >

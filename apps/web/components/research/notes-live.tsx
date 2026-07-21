@@ -44,12 +44,12 @@ export function NotesLive() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Note title"
-                className="flex-1 rounded border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
+                className="flex-1 rounded border border-border-soft bg-surface-3 px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
               />
               <select
                 value={companyId}
                 onChange={(e) => setCompanyId(e.target.value)}
-                className="rounded border border-border bg-surface px-2 py-2 text-sm text-fg outline-none"
+                className="rounded border border-border-soft bg-surface-3 px-2 py-2 text-sm text-fg outline-none"
               >
                 <option value="">No company</option>
                 {STATIC_UNIVERSE.map((c) => (
@@ -64,7 +64,7 @@ export function NotesLive() {
               onChange={(e) => setBody(e.target.value)}
               placeholder="What did you observe, and what does it imply?"
               rows={3}
-              className="rounded border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
+              className="rounded border border-border-soft bg-surface-3 px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
             />
             <div>
               <button type="submit" className="rounded border border-accent-dim bg-surface-2 px-4 py-2 text-sm text-accent">

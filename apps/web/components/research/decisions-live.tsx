@@ -51,12 +51,12 @@ export function DecisionsLive() {
                 value={decision}
                 onChange={(e) => setDecision(e.target.value)}
                 placeholder="The decision (e.g. 'Add to NVDA', 'Avoid gloves')"
-                className="flex-1 rounded border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
+                className="flex-1 rounded border border-border-soft bg-surface-3 px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
               />
               <select
                 value={conviction}
                 onChange={(e) => setConviction(e.target.value as Decision["conviction"])}
-                className="rounded border border-border bg-surface px-2 py-2 text-sm text-fg outline-none"
+                className="rounded border border-border-soft bg-surface-3 px-2 py-2 text-sm text-fg outline-none"
               >
                 <option value="low">Low conviction</option>
                 <option value="medium">Medium conviction</option>
@@ -65,7 +65,7 @@ export function DecisionsLive() {
               <select
                 value={companyId}
                 onChange={(e) => setCompanyId(e.target.value)}
-                className="rounded border border-border bg-surface px-2 py-2 text-sm text-fg outline-none"
+                className="rounded border border-border-soft bg-surface-3 px-2 py-2 text-sm text-fg outline-none"
               >
                 <option value="">No company</option>
                 {STATIC_UNIVERSE.map((c) => (
@@ -80,7 +80,7 @@ export function DecisionsLive() {
               onChange={(e) => setRationale(e.target.value)}
               placeholder="Why? What has to be true for this to be right?"
               rows={3}
-              className="rounded border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
+              className="rounded border border-border-soft bg-surface-3 px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
             />
             <div>
               <button type="submit" className="rounded border border-accent-dim bg-surface-2 px-4 py-2 text-sm text-accent">

@@ -20,7 +20,7 @@ export function KeyFindingsList({ findings }: { findings: Finding[] }) {
           key={f.title}
           className="flex gap-3 rounded-panel border border-border bg-surface p-4"
         >
-          <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-border font-mono text-2xs text-faint">
+          <span className="num mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-border text-2xs text-faint">
             {i + 1}
           </span>
           <div className="min-w-0 flex-1">

@@ -12,8 +12,8 @@ const KIND_FILL: Record<DecisionTreeNode["kind"], string> = {
   outcome: "var(--surface-2)",
 };
 const KIND_TEXT: Record<DecisionTreeNode["kind"], string> = {
-  decision: "#0a0a0a",
-  option: "#0a0a0a",
+  decision: "var(--bg)",
+  option: "var(--bg)",
   outcome: "var(--fg)",
 };
 
