@@ -27,6 +27,12 @@ Answer using the tools, which return the platform's real, sourced data. Rules:
 export interface AgentConfig {
   apiKey: string;
   model?: string;
+  /**
+   * Overrides the default analyst prompt. The research department passes each
+   * analyst its own mandate here, so one runtime serves five roles without
+   * five copies of the tool loop.
+   */
+  system?: string;
 }
 
 export interface AgentTrace {
@@ -69,7 +75,7 @@ async function callClaude(
     body: JSON.stringify({
       model: cfg.model ?? DEFAULT_MODEL,
       max_tokens: MAX_TOKENS,
-      system: SYSTEM_PROMPT,
+      system: cfg.system ?? SYSTEM_PROMPT,
       tools: TOOLS.map((t) => ({
         name: t.name,
         description: t.description,

@@ -13,6 +13,7 @@
  */
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   date,
   doublePrecision,
   index,
@@ -21,6 +22,7 @@ import {
   primaryKey,
   serial,
   text,
+  timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
@@ -460,3 +462,40 @@ export type PmsTradeFee = typeof pmsTradeFee.$inferSelect;
 export type PmsLot = typeof pmsLot.$inferSelect;
 export type PmsLotClosure = typeof pmsLotClosure.$inferSelect;
 export type PmsCashMovement = typeof pmsCashMovement.$inferSelect;
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * Agent Console — runtime + governance
+ * Ported from the Hookka ERP agent console. `phase` is the autonomy dial:
+ * 1 propose · 2 auto-tune · 3 full-auto. Autonomy is granted, never assumed.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+export const agentRun = pgTable(
+  "agent_run",
+  {
+    id: text("id").primaryKey(),
+    agent: text("agent").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    status: text("status").$type<"running" | "ok" | "error">().notNull().default("running"),
+    request: text("request"),
+    summary: text("summary"),
+    output: text("output"),
+    tokensIn: integer("tokens_in").notNull().default(0),
+    tokensOut: integer("tokens_out").notNull().default(0),
+    error: text("error"),
+  },
+  (t) => ({
+    agentIdx: index("agent_run_agent_idx").on(t.agent, t.startedAt),
+  }),
+);
+
+export const agentControl = pgTable("agent_control", {
+  agent: text("agent").primaryKey(),
+  paused: boolean("paused").notNull().default(false),
+  /** 1 propose · 2 auto-tune · 3 full-auto. */
+  phase: integer("phase").notNull().default(1),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type AgentRun = typeof agentRun.$inferSelect;
+export type AgentControl = typeof agentControl.$inferSelect;

@@ -14,6 +14,7 @@ const MIGRATIONS = [
   { id: "0000_init_postgres", sql: read("drizzle/0000_init_postgres.sql"), sentinel: "company" },
   { id: "0001_agent_usage", sql: read("drizzle/0001_agent_usage.sql"), sentinel: "agent_usage" },
   { id: "0002_pms", sql: read("drizzle/0002_pms.sql"), sentinel: "pms_trade" },
+  { id: "0003_agent_console", sql: read("drizzle/0003_agent_console.sql"), sentinel: "agent_run" },
 ];
 
 let failures = 0;
@@ -51,7 +52,7 @@ console.log("--- fresh database: everything applies ---");
 {
   const db = new PGlite();
   const r = await migrate(db);
-  check("all three applied", r.applied, ["0000_init_postgres", "0001_agent_usage", "0002_pms"]);
+  check("all migrations applied", r.applied, ["0000_init_postgres", "0001_agent_usage", "0002_pms", "0003_agent_console"]);
   check("nothing baselined", r.baselined, []);
   check("pms tables exist",
     (await db.query("SELECT count(*)::int n FROM information_schema.tables WHERE table_name LIKE 'pms_%'")).rows[0].n,
@@ -67,7 +68,7 @@ console.log("\n--- second run is a no-op (INVARIANT) ---");
   check("nothing applied again", r.applied, []);
   check("nothing baselined again", r.baselined, []);
   check("no duplicate migration rows",
-    (await db.query("SELECT count(*)::int n FROM schema_migrations")).rows[0].n, 3);
+    (await db.query("SELECT count(*)::int n FROM schema_migrations")).rows[0].n, 4);
   await db.close();
 }
 
@@ -83,7 +84,7 @@ console.log("\n--- ADOPTING a hand-provisioned database (Atlas's real case) ---"
 
   const r = await migrate(db);
   check("existing schema is BASELINED, not re-run", r.baselined, ["0000_init_postgres", "0001_agent_usage"]);
-  check("only the genuinely new migration runs", r.applied, ["0002_pms"]);
+  check("only the genuinely new migrations run", r.applied, ["0002_pms", "0003_agent_console"]);
   check("existing data survives untouched",
     (await db.query("SELECT count(*)::int n FROM company")).rows[0].n, 0);
   check("new pms tables now exist",

@@ -191,6 +191,9 @@ export const zh = {
     "你的持仓，按成本加权的敞口与 Atlas 评分质量。目前仅按成本计价 —— 市值与盈亏需接入实时行情（P027）。不构成投资建议。",
   "page.settings.eyebrow": "系统",
   "page.settings.title": "设置",
+  "page.agents.eyebrow": "研究部门",
+  "page.agents.title": "Agent 控制台",
+  "page.agents.desc": "四位研究分析师与知识协调官。每位只负责自己的知识层，绝不越界、绝不编造、绝不给投资建议 —— V1 只建知识，不做投资决策。每次运行都留痕，可随时暂停或全局急停。",
   "page.ledger.eyebrow": "交易账本",
   "page.ledger.title": "持仓与交易记录",
   "page.ledger.desc":
@@ -425,6 +428,9 @@ export const en: Dict = {
     "Your holdings with cost-weighted exposure and Atlas Score quality. Cost basis only — market value and P&L arrive with live prices (P027). Not investment advice.",
   "page.settings.eyebrow": "System",
   "page.settings.title": "Settings",
+  "page.agents.eyebrow": "Research Department",
+  "page.agents.title": "Agent Console",
+  "page.agents.desc": "Four research analysts and their coordinator. Each owns one layer of knowledge and never strays outside it, never fabricates, and never recommends — V1 builds knowledge, not investment decisions. Every run is logged; any analyst can be paused, or all of them halted at once.",
   "page.ledger.eyebrow": "Trade Ledger",
   "page.ledger.title": "Positions & trade record",
   "page.ledger.desc":
