@@ -21,7 +21,7 @@ export function SearchInput({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 rounded border border-border bg-surface px-2.5 focus-within:border-accent-dim",
+        "flex items-center gap-2 rounded border border-border-soft bg-surface-3 px-2.5 focus-within:border-accent-dim",
         className,
       )}
     >

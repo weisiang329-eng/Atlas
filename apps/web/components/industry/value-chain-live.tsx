@@ -44,7 +44,7 @@ export function ValueChainLive() {
             {chain.stages.map((stage, i) => (
               <div key={stage.industryId} className="flex items-stretch gap-3">
                 <div className="flex w-8 shrink-0 flex-col items-center">
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-border bg-surface font-mono text-xs text-muted">
+                  <span className="num grid h-8 w-8 place-items-center rounded-full border border-border bg-surface text-xs text-muted">
                     {stage.order}
                   </span>
                   {i < chain.stages.length - 1 ? (

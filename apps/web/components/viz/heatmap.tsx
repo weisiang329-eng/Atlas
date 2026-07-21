@@ -54,7 +54,7 @@ export function Heatmap({ rows, cols, values, ariaLabel }: HeatmapProps) {
                 return (
                   <td
                     key={c}
-                    className={`rounded text-center font-mono text-2xs tabular-nums ${tone(v)}`}
+                    className={`num rounded text-center text-2xs tabular-nums ${tone(v)}`}
                     style={{ height: "2.25rem" }}
                     title={`${row} · ${cols[c]}: ${v}`}
                   >

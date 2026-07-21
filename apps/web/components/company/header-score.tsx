@@ -16,7 +16,7 @@ export function HeaderScore({ companyId }: { companyId: string }) {
   const value =
     s?.atlasScore === null || s?.atlasScore === undefined ? "—" : String(s.atlasScore);
   return (
-    <span className="font-mono text-sm text-fg">
+    <span className="num text-sm text-fg">
       {value}
       {s?.grade && s.grade !== "—" ? (
         <span className="ml-1 text-faint">{s.grade}</span>

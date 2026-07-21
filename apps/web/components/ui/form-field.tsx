@@ -63,7 +63,7 @@ export function FormField({
 }
 
 const controlClass =
-  "rounded border border-border bg-surface px-2.5 py-1.5 text-sm text-fg placeholder:text-faint transition-colors focus:border-accent-dim focus:outline-none aria-[invalid=true]:border-negative";
+  "rounded border border-border-soft bg-surface-3 px-2.5 py-1.5 text-sm text-fg placeholder:text-faint transition-colors focus:border-accent-dim focus:outline-none aria-[invalid=true]:border-negative";
 
 /** Styled text input primitive. */
 export function TextInput({

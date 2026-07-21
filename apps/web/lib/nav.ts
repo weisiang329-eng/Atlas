@@ -1,10 +1,16 @@
 /**
- * Navigation model for the Atlas shell (Milestone 1).
+ * Navigation model for the Atlas shell (Milestone 1 + Aurora module adoption).
  *
  * Every entry is a real, routable link — `soon: true` only tags a module whose
  * page is an intentional placeholder, it does not disable the link. Company and
  * research sub-navigation is derived from the same model so the shell stays
  * data-driven and scalable.
+ *
+ * CHANGE (Aurora Phase 2b): added Markets, News, Trading, an Enterprise group
+ * (CEO Dashboard, ERP, Board, Agent Ops), and removed the `soon` flag from
+ * Alerts and Admin now that they are real (sample-data) workspaces. "Agent Ops"
+ * (`/agents`) is the P020 agent-runtime queue view — distinct from "Analyst"
+ * (`/agent`), the live Claude research chat.
  */
 export interface NavItem {
   label: string;
@@ -36,6 +42,18 @@ export const NAV_GROUPS: NavGroup[] = [
         href: "/companies",
         glyph: "CO",
         description: "Company intelligence workspace.",
+      },
+      {
+        label: "Markets",
+        href: "/markets",
+        glyph: "MK",
+        description: "Live-simulated quotes, intraday and candlestick charts (sample data).",
+      },
+      {
+        label: "News",
+        href: "/news",
+        glyph: "NW",
+        description: "News intelligence feed, tagged and prioritized (sample data).",
       },
       {
         label: "Industries",
@@ -106,8 +124,42 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Alerts",
         href: "/alerts",
         glyph: "AL",
-        soon: true,
-        description: "Signal and event alerts (planned).",
+        description: "Rule-triggered alert feed (sample data).",
+      },
+      {
+        label: "Trading",
+        href: "/trading",
+        glyph: "TR",
+        description: "Paper order execution, manual-confirm only (sample data).",
+      },
+    ],
+  },
+  {
+    title: "Enterprise",
+    items: [
+      {
+        label: "CEO Dashboard",
+        href: "/ceo",
+        glyph: "CE",
+        description: "Cross-company KPI roll-up (sample data).",
+      },
+      {
+        label: "ERP",
+        href: "/erp",
+        glyph: "ER",
+        description: "ERP intelligence — revenue/SKU/customers (sample data).",
+      },
+      {
+        label: "Board",
+        href: "/board",
+        glyph: "BD",
+        description: "Risk matrix, register and board packs (sample data).",
+      },
+      {
+        label: "Agent Ops",
+        href: "/agents",
+        glyph: "AG",
+        description: "Agent runtime task queue — distinct from Analyst (sample data).",
       },
     ],
   },
@@ -124,8 +176,7 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Admin",
         href: "/admin",
         glyph: "AD",
-        soon: true,
-        description: "Workspace administration (planned).",
+        description: "Workspace administration — users, audit log (sample data).",
       },
       {
         label: "Settings",
@@ -165,6 +216,7 @@ export const KNOWLEDGE_TABS: SubTab[] = [
   { label: "Relationship Graph", href: "/knowledge/graph" },
   { label: "Heatmap", href: "/knowledge/heatmap" },
   { label: "Decision Tree", href: "/knowledge/decision-tree" },
+  { label: "Memory", href: "/knowledge/memory" },
 ];
 
 /** Financial workspace sub-navigation. */
@@ -189,4 +241,8 @@ export const RESEARCH_TABS: SubTab[] = [
   { label: "Versions", href: "/research/versions" },
   { label: "Hypotheses", href: "/research/hypotheses" },
   { label: "Decision Journal", href: "/research/decision-journal" },
+  { label: "Learning", href: "/research/learning" },
 ];
+
+/** Markets workspace sub-navigation (sample data). */
+export const MARKETS_TABS: SubTab[] = [{ label: "Watchlist", href: "/markets" }];
