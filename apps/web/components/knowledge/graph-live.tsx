@@ -40,10 +40,17 @@ const relTone = (kind: string): "info" | "positive" | "warning" | "neutral" => {
   return "neutral";
 };
 
-export function GraphLive({ initialSubject = "nvidia" }: { initialSubject?: string }) {
+export function GraphLive({
+  initialSubject = "nvidia",
+  lockSubject = false,
+}: {
+  initialSubject?: string;
+  /** When true, render the fixed subject's graph with no company selector. */
+  lockSubject?: boolean;
+}) {
   const live = isApiConfigured();
   const companiesR = useApiResource<CompanySummary[]>(
-    live ? "/v1/companies" : null,
+    live && !lockSubject ? "/v1/companies" : null,
     ready(STATIC_UNIVERSE),
   );
   const companies = companiesR.data ?? STATIC_UNIVERSE;
@@ -63,22 +70,24 @@ export function GraphLive({ initialSubject = "nvidia" }: { initialSubject?: stri
 
   return (
     <>
-      <div className="mb-4 flex items-center gap-2 rounded border border-border bg-surface px-3 py-2">
-        <span className="text-2xs uppercase tracking-wide text-faint">Subject</span>
-        <label className="sr-only" htmlFor="graph-subject">Graph subject</label>
-        <select
-          id="graph-subject"
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          className="bg-transparent text-sm font-medium text-fg outline-none"
-        >
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name} ({c.ticker})
-            </option>
-          ))}
-        </select>
-      </div>
+      {lockSubject ? null : (
+        <div className="mb-4 flex items-center gap-2 rounded border border-border bg-surface px-3 py-2">
+          <span className="text-2xs uppercase tracking-wide text-faint">Subject</span>
+          <label className="sr-only" htmlFor="graph-subject">Graph subject</label>
+          <select
+            id="graph-subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="bg-transparent text-sm font-medium text-fg outline-none"
+          >
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.ticker})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <DataState
         status={r.status}

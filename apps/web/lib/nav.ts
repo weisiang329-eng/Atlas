@@ -151,6 +151,7 @@ export function companyTabs(companyId: string): SubTab[] {
     { label: "Products", href: `${base}/products` },
     { label: "Management", href: `${base}/management` },
     { label: "Financials", href: `${base}/financials` },
+    { label: "Relations", href: `${base}/relations` },
     { label: "Research", href: `${base}/research` },
     { label: "Valuation", href: `${base}/valuation` },
     { label: "Documents", href: `${base}/documents` },
