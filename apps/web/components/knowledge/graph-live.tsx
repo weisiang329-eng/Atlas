@@ -71,7 +71,7 @@ export function GraphLive({
   return (
     <>
       {lockSubject ? null : (
-        <div className="mb-4 flex items-center gap-2 rounded border border-border bg-surface px-3 py-2">
+        <div className="mb-4 flex items-center gap-2 rounded border border-border-soft bg-surface-3 px-3 py-2">
           <span className="text-2xs uppercase tracking-wide text-faint">Subject</span>
           <label className="sr-only" htmlFor="graph-subject">Graph subject</label>
           <select

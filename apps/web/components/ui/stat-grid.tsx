@@ -22,7 +22,7 @@ export function StatGrid({
   return (
     <div
       className={cn(
-        "grid gap-px overflow-hidden rounded-panel border border-border bg-border",
+        "grid gap-px overflow-hidden rounded-panel border border-border bg-border shadow-panel",
         columns === 4 && "grid-cols-2 lg:grid-cols-4",
         columns === 3 && "grid-cols-1 sm:grid-cols-3",
         columns === 2 && "grid-cols-1 sm:grid-cols-2",

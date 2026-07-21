@@ -10,7 +10,7 @@ import type { ReportModel } from "@/lib/mock/reports";
  */
 export function ExportToolbar({ report }: { report: ReportModel }) {
   return (
-    <div className="sticky top-14 z-[5] mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border bg-bg/85 py-3 backdrop-blur print:hidden">
+    <div className="glass sticky top-14 z-[5] mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border py-3 print:hidden">
       <div className="flex items-center gap-2 font-mono text-2xs text-faint">
         <span>{report.type}</span>
         <span aria-hidden>·</span>

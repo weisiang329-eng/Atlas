@@ -89,7 +89,7 @@ export function HomeDashboard() {
                       href={`/companies/${r.id}/overview`}
                       className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-2"
                     >
-                      <span className="w-5 text-right font-mono text-xs text-faint">{i + 1}</span>
+                      <span className="num w-5 text-right text-xs text-faint">{i + 1}</span>
                       <Badge tone={scoreTone(r.atlasScore)}>{r.atlasScore ?? "—"}</Badge>
                       <span className="flex-1 text-sm text-fg">{r.name}</span>
                       <span className="font-mono text-xs text-muted">{r.ticker}</span>
@@ -120,7 +120,7 @@ export function HomeDashboard() {
                     <div key={s.key} className="flex items-baseline justify-between">
                       <dt className="text-sm text-muted">{s.label}</dt>
                       <dd className="text-right">
-                        <span className="font-mono text-sm text-fg">
+                        <span className="num text-sm text-fg">
                           {s.latest?.toLocaleString("en-US") ?? "—"}
                         </span>
                         <span className="ml-1 text-2xs text-faint">{s.unit}</span>
@@ -130,7 +130,7 @@ export function HomeDashboard() {
                   {cycle ? (
                     <div className="flex items-baseline justify-between border-t border-border pt-3">
                       <dt className="text-sm text-muted">Margin cycle</dt>
-                      <dd className="font-mono text-sm text-fg">
+                      <dd className="num text-sm text-fg">
                         {cycle.latest}
                         <span className="ml-1 text-2xs text-faint">
                           idx {cycle.changeYoYPct != null ? `(${cycle.changeYoYPct >= 0 ? "+" : ""}${cycle.changeYoYPct}% YoY)` : ""}

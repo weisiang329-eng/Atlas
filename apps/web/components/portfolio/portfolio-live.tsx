@@ -65,7 +65,7 @@ function AddHoldingForm({
         <select
           value={id}
           onChange={(e) => setId(e.target.value)}
-          className="rounded border border-border bg-surface px-2 py-1.5 text-sm text-fg outline-none"
+          className="rounded border border-border-soft bg-surface-3 px-2 py-1.5 text-sm text-fg outline-none"
         >
           {companies.map((c) => (
             <option key={c.id} value={c.id}>
@@ -81,7 +81,7 @@ function AddHoldingForm({
           onChange={(e) => setShares(e.target.value)}
           inputMode="decimal"
           placeholder="0"
-          className="w-28 rounded border border-border bg-surface px-2 py-1.5 text-sm text-fg outline-none"
+          className="w-28 rounded border border-border-soft bg-surface-3 px-2 py-1.5 text-sm text-fg outline-none"
         />
       </label>
       <label className="flex flex-col gap-1 text-xs text-muted">
@@ -91,7 +91,7 @@ function AddHoldingForm({
           onChange={(e) => setCost(e.target.value)}
           inputMode="decimal"
           placeholder="0.00"
-          className="w-32 rounded border border-border bg-surface px-2 py-1.5 text-sm text-fg outline-none"
+          className="w-32 rounded border border-border-soft bg-surface-3 px-2 py-1.5 text-sm text-fg outline-none"
         />
       </label>
       <button
@@ -228,7 +228,7 @@ export function PortfolioLive() {
                     <div className="h-2 flex-1 overflow-hidden rounded bg-surface-2">
                       <div className="h-full bg-accent" style={{ width: `${Math.min(100, w)}%` }} />
                     </div>
-                    <span className="w-12 text-right font-mono text-xs text-fg">{w.toFixed(0)}%</span>
+                    <span className="num w-12 text-right text-xs text-fg">{w.toFixed(0)}%</span>
                   </div>
                 ))}
               </div>

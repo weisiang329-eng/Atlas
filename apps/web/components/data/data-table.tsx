@@ -200,7 +200,7 @@ export function DataTable<T>({
                     key={c.key}
                     className={cn(
                       "whitespace-nowrap px-3 py-[var(--cell-py)] text-fg",
-                      c.numeric && "font-mono tabular-nums",
+                      c.numeric && "num tabular-nums",
                       alignClass(c),
                       c.className,
                     )}
@@ -218,7 +218,7 @@ export function DataTable<T>({
 
       {paginated ? (
         <div className="flex items-center justify-between gap-4 border-t border-border px-3 py-2 text-xs text-muted">
-          <span className="tabular-nums">
+          <span className="num tabular-nums">
             {current * pageSize! + 1}–
             {Math.min((current + 1) * pageSize!, sortedRows.length)} of{" "}
             {sortedRows.length}
@@ -233,7 +233,7 @@ export function DataTable<T>({
             >
               Prev
             </button>
-            <span className="px-1 tabular-nums">
+            <span className="num px-1 tabular-nums">
               {current + 1} / {pageCount}
             </span>
             <button

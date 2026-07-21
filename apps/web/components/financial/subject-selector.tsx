@@ -12,7 +12,7 @@ export function SubjectSelector() {
   const { subject, companies, setSubjectId, isSample } = useFinancialSubject();
 
   return (
-    <div className="flex items-center gap-2 rounded border border-border bg-surface px-3 py-2">
+    <div className="flex items-center gap-2 rounded border border-border-soft bg-surface-3 px-3 py-2">
       <span className="text-2xs uppercase tracking-wide text-faint">
         Subject
       </span>

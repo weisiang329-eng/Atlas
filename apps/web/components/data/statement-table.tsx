@@ -106,7 +106,7 @@ export function StatementTable({
                   <td
                     key={vi}
                     className={cn(
-                      "whitespace-nowrap px-3 py-[var(--cell-py)] text-right font-mono tabular-nums",
+                      "whitespace-nowrap px-3 py-[var(--cell-py)] text-right num tabular-nums",
                       isTotal ? "font-semibold text-fg" : "text-fg",
                       v !== null && v < 0 && "text-negative",
                     )}
