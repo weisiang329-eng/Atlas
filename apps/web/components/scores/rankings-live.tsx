@@ -75,6 +75,7 @@ export function RankingsLive() {
       <Panel className="overflow-hidden">
         <DataTable
         mobileCards
+        columnPickerId="scores"
           columns={columns}
           rows={r.data ?? []}
           getRowId={(row) => row.id}

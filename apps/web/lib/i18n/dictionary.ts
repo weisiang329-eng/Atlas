@@ -221,6 +221,14 @@ export const zh = {
   "ledger.willBook": "将记入",
   "ledger.record": "记录这笔交易",
   "ledger.delete": "删除",
+
+  // ── Table controls (DESIGN-SYSTEM §4) ─────────────────────────────────
+  "table.columns": "列",
+  "table.locked": "固定",
+  "table.showAll": "显示全部列",
+  "table.sortAsc": "升序排列",
+  "table.sortDesc": "降序排列",
+  "table.sortClear": "取消排序",
 } as const;
 
 /** The dictionary shape — English must satisfy exactly these keys. */
@@ -426,6 +434,13 @@ export const en: Dict = {
   "ledger.willBook": "Will book",
   "ledger.record": "Record trade",
   "ledger.delete": "Delete",
+
+  "table.columns": "Cols",
+  "table.locked": "fixed",
+  "table.showAll": "Show all columns",
+  "table.sortAsc": "Sort ascending",
+  "table.sortDesc": "Sort descending",
+  "table.sortClear": "Clear sort",
 };
 
 export const DICTIONARIES = { zh, en } as const;

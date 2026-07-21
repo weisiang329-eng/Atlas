@@ -98,6 +98,7 @@ export function WatchlistLive() {
         <Panel className="overflow-hidden">
           <DataTable
         mobileCards
+        columnPickerId="watchlist"
             columns={columns}
             rows={rows}
             getRowId={(row) => row.id}

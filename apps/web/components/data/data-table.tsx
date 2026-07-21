@@ -2,6 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { FilterBar } from "@/components/ui/filter-bar";
+import {
+  ColumnPicker,
+  useColumnVisibility,
+} from "@/components/data/column-picker";
+import { useT } from "@/lib/i18n/use-locale";
 import { cn } from "@/lib/cn";
 
 export interface Column<T> {
@@ -38,6 +43,11 @@ interface DataTableProps<T> {
    * side-by-side period comparison is the point.
    */
   mobileCards?: boolean;
+  /**
+   * Enable the column picker. The value is the persistence key, so a user's
+   * choice sticks per table rather than per session (DESIGN-SYSTEM §4).
+   */
+  columnPickerId?: string;
 }
 
 /**
@@ -57,11 +67,31 @@ export function DataTable<T>({
   searchable = false,
   searchPlaceholder = "Search",
   mobileCards = false,
+  columnPickerId,
 }: DataTableProps<T>) {
+  const t = useT();
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<{ key: string; dir: "asc" | "desc" } | null>(
     null,
+  );
+
+  // Column visibility. The first column is the row's identity and is locked.
+  // Search still runs over ALL columns, hidden ones included, so a user can
+  // find a row by a value the table is not currently showing.
+  const columnOptions = useMemo(
+    () =>
+      columns.map((c, i) => ({ key: c.key, header: c.header, locked: i === 0 })),
+    [columns],
+  );
+  const { hidden, toggle, reset } = useColumnVisibility(
+    columnPickerId ?? "default",
+    columnOptions,
+  );
+  const visibleColumns = useMemo(
+    () =>
+      columnPickerId ? columns.filter((c) => !hidden.includes(c.key)) : columns,
+    [columns, hidden, columnPickerId],
   );
 
   const filteredRows = useMemo(() => {
@@ -87,10 +117,20 @@ export function DataTable<T>({
     copy.sort((a, b) => {
       const av = accessor(a);
       const bv = accessor(b);
+
+      // Missing values always sort LAST, in both directions
+      // (DESIGN-SYSTEM §4). A blank climbing to the top of a descending sort
+      // is the classic table bug: it reads as "the highest value".
+      const aMissing = av === null || av === undefined || av === "";
+      const bMissing = bv === null || bv === undefined || bv === "";
+      if (aMissing && bMissing) return 0;
+      if (aMissing) return 1;
+      if (bMissing) return -1;
+
       const cmp =
         typeof av === "number" && typeof bv === "number"
           ? av - bv
-          : String(av ?? "").localeCompare(String(bv ?? ""));
+          : String(av).localeCompare(String(bv));
       return sort.dir === "asc" ? cmp : -cmp;
     });
     return copy;
@@ -124,23 +164,37 @@ export function DataTable<T>({
 
   return (
     <div className="flex flex-col">
-      {searchable ? (
-        <div className="px-3 pt-3">
-          <FilterBar
-            search={query}
-            onSearch={(v) => {
-              setQuery(v);
-              setPage(0);
-            }}
-            placeholder={searchPlaceholder}
-            right={`${sortedRows.length} / ${rows.length}`}
-          />
+      {searchable || columnPickerId ? (
+        <div className="flex items-center gap-2 px-3 pt-3">
+          {searchable ? (
+            <div className="min-w-0 flex-1">
+              <FilterBar
+                search={query}
+                onSearch={(v) => {
+                  setQuery(v);
+                  setPage(0);
+                }}
+                placeholder={searchPlaceholder}
+                right={`${sortedRows.length} / ${rows.length}`}
+              />
+            </div>
+          ) : (
+            <div className="flex-1" />
+          )}
+          {columnPickerId ? (
+            <ColumnPicker
+              columns={columnOptions}
+              hidden={hidden}
+              onToggle={toggle}
+              onReset={reset}
+            />
+          ) : null}
         </div>
       ) : null}
       {mobileCards ? (
         <ul className="flex flex-col gap-2 p-3 sm:hidden">
           {visible.map((row) => {
-            const [primary, ...rest] = columns;
+            const [primary, ...rest] = visibleColumns;
             const cell = (c: Column<T>) =>
               c.render
                 ? c.render(row)
@@ -207,7 +261,7 @@ export function DataTable<T>({
             )}
           >
             <tr className="border-b border-border">
-              {columns.map((c) => {
+              {visibleColumns.map((c) => {
                 const isSorted = sort?.key === c.key;
                 const ariaSort: "ascending" | "descending" | "none" | undefined =
                   c.sortable
@@ -232,6 +286,22 @@ export function DataTable<T>({
                       <button
                         type="button"
                         onClick={() => toggleSort(c.key)}
+                        // Announce what the NEXT click does, following the
+                        // asc -> desc -> unsorted cycle (DESIGN-SYSTEM §4).
+                        title={
+                          !isSorted
+                            ? t("table.sortAsc")
+                            : sort!.dir === "asc"
+                              ? t("table.sortDesc")
+                              : t("table.sortClear")
+                        }
+                        aria-label={`${c.header} — ${
+                          !isSorted
+                            ? t("table.sortAsc")
+                            : sort!.dir === "asc"
+                              ? t("table.sortDesc")
+                              : t("table.sortClear")
+                        }`}
                         className={cn(
                           "inline-flex items-center gap-1 uppercase tracking-[0.08em] transition-colors hover:text-fg focus-visible:outline focus-visible:outline-2 -outline-offset-2 focus-visible:outline-accent",
                           isSorted && "text-fg",
@@ -262,7 +332,7 @@ export function DataTable<T>({
                     : "hover:bg-surface-2/60",
                 )}
               >
-                {columns.map((c) => (
+                {visibleColumns.map((c) => (
                   <td
                     key={c.key}
                     className={cn(

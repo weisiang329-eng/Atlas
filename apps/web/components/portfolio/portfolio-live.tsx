@@ -216,7 +216,7 @@ export function PortfolioLive() {
 
           <Panel className="overflow-hidden">
             <DataTable
-        mobileCards columns={columns} rows={rows} getRowId={(r) => r.id} caption="Holdings" />
+        mobileCards columnPickerId="portfolio" columns={columns} rows={rows} getRowId={(r) => r.id} caption="Holdings" />
           </Panel>
 
           <Panel>
