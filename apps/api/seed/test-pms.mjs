@@ -144,6 +144,39 @@ console.log("\n--- Matching is idempotent / deterministic (§9.5) ---");
   check("same inputs produce identical closures", a === b, true);
 }
 
+console.log("\n--- Booking methods: strict refuses to guess (Beancount's model) ---");
+{
+  const lots = () => [
+    { id: 1, openedAt: "2026-01-01T00:00:00Z", originalQty: 10, remainingQty: 10, costPrice: 8, feesTotal: 0, currency: "MYR", fxRate: 1, label: "jan" },
+    { id: 2, openedAt: "2026-02-01T00:00:00Z", originalQty: 10, remainingQty: 10, costPrice: 12, feesTotal: 0, currency: "MYR", fxRate: 1, label: "feb" },
+  ];
+  const sell = { tradeId: 700, closedAt: "2026-03-01T00:00:00Z", quantity: 10, price: 15, currency: "MYR", fxRate: 1, feesTotal: 0 };
+
+  const strict = matchSell(lots(), sell, "strict");
+  check("strict refuses an ambiguous sell", strict.closures.length, 0);
+  check("strict reports the ambiguity", Boolean(strict.ambiguous), true);
+  check("strict lists the candidates", strict.ambiguous.candidateLotIds.join(","), "1,2");
+  check("strict leaves the quantity unmatched", strict.unmatchedQty, 10);
+
+  // Naming the lot resolves it — and picks the cost the caller intended.
+  const named = matchSell(lots(), { ...sell, lotIds: [2] }, "strict");
+  check("named lot is closed", named.closures[0].lotId, 2);
+  check("named lot P&L uses ITS cost (15-12)", named.closures[0].grossPlLocal, 30);
+
+  // The rules pick different lots — proving the strategy actually varies.
+  check("fifo picks the oldest", matchSell(lots(), sell, "fifo").closures[0].lotId, 1);
+  check("lifo picks the newest", matchSell(lots(), sell, "lifo").closures[0].lotId, 2);
+  check("hifo picks the priciest", matchSell(lots(), sell, "hifo").closures[0].lotId, 2);
+  check("hifo minimises the gain", matchSell(lots(), sell, "hifo").closures[0].grossPlLocal, 30);
+  check("fifo realises more gain than hifo here",
+    matchSell(lots(), sell, "fifo").closures[0].grossPlLocal >
+    matchSell(lots(), sell, "hifo").closures[0].grossPlLocal, true);
+
+  // A single unambiguous lot needs no naming, even under strict.
+  const one = [lots()[0]];
+  check("strict allows the unambiguous case", matchSell(one, sell, "strict").closures.length, 1);
+}
+
 console.log("\n--- Fee schedule per market (§6) ---");
 {
   const my = estimateFees({ market: "MY", side: "buy", quantity: 1000, price: 5, tradedAt: "2026-07-01" });

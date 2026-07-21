@@ -109,6 +109,13 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "Positions",
     items: [
       {
+        label: "Trade Ledger",
+        href: "/ledger",
+        glyph: "LG",
+        description:
+          "The book of record: trades, lots, average price and per-order realised P&L.",
+      },
+      {
         label: "Portfolio",
         href: "/portfolio",
         glyph: "PF",
@@ -274,6 +281,7 @@ export const NAV_ITEM_KEYS: Record<string, keyof Dict> = {
   "/financials": "fin.incomeStatement",
   "/reports": "nav.reports",
   "/knowledge": "nav.knowledge",
+  "/ledger": "nav.ledger",
   "/portfolio": "nav.portfolio",
   "/watchlist": "nav.watchlist",
   "/alerts": "nav.alerts",

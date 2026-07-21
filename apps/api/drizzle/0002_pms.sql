@@ -132,3 +132,13 @@ CREATE TABLE IF NOT EXISTS pms_cash_movement (
   created_at    text NOT NULL DEFAULT (now())::text
 );
 CREATE INDEX IF NOT EXISTS pms_cash_acct_idx ON pms_cash_movement (account_id, occurred_on);
+
+-- Booking method per account (Beancount's lesson: one book may want FIFO while
+-- another wants STRICT). 'strict' refuses to guess which lot a sell closes.
+ALTER TABLE pms_account
+  ADD COLUMN IF NOT EXISTS booking_method text NOT NULL DEFAULT 'fifo';
+
+-- Optional lot label — the only foolproof way to point at one specific lot when
+-- cost and date are both ambiguous.
+ALTER TABLE pms_lot
+  ADD COLUMN IF NOT EXISTS label text;
