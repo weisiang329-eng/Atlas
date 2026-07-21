@@ -50,6 +50,12 @@ export const NAV_GROUPS: NavGroup[] = [
         description: "Atlas Score leaderboard across the coverage universe.",
       },
       {
+        label: "Analyst",
+        href: "/agent",
+        glyph: "AI",
+        description: "AI research analyst — ask questions about the data.",
+      },
+      {
         label: "Research",
         href: "/research",
         glyph: "RS",

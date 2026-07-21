@@ -1,0 +1,10 @@
+# Local agent secrets for `wrangler dev`. Copy to `.dev.vars` (gitignored) and
+# fill in. In production these are Worker secrets, set with:
+#   wrangler secret put ANTHROPIC_API_KEY
+#
+# The Anthropic (Claude) API key powers the /v1/agent research analyst.
+# Get one at https://console.anthropic.com/. Never commit the real value.
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Optional: override the Claude model the agent uses (default claude-sonnet-5).
+# AGENT_MODEL=claude-sonnet-5

@@ -75,6 +75,26 @@ export interface TrendsPayload {
   freeCashFlow: SeriesPoint[];
 }
 
+// --- Agent (P020) -----------------------------------------------------------
+
+export interface AgentTrace {
+  tool: string;
+  input: unknown;
+}
+
+/** POST /v1/agent/ask response. */
+export interface AgentResult {
+  answer: string;
+  trace: AgentTrace[];
+  steps: number;
+  stopReason: string;
+}
+
+export interface AgentStatus {
+  configured: boolean;
+  model: string;
+}
+
 // --- Atlas Score (P010) -----------------------------------------------------
 
 export interface ScoreMetric {
