@@ -12,7 +12,10 @@ const here = dirname(fileURLToPath(import.meta.url));
 const api = join(here, "..");
 const read = (p) => readFileSync(join(api, p), "utf8");
 
-const migration = read("drizzle/0000_init_postgres.sql");
+const migrations = [
+  "drizzle/0000_init_postgres.sql",
+  "drizzle/0001_agent_usage.sql",
+];
 const seeds = [
   "seed/seed.sql",
   "seed/edgar/edgar-seed.sql",
@@ -29,8 +32,8 @@ const check = (label, actual, expected) => {
 };
 
 const db = new PGlite();
-console.log("applying migration...");
-await db.exec(migration);
+console.log("applying migrations...");
+for (const m of migrations) await db.exec(read(m));
 
 for (const s of seeds) {
   process.stdout.write(`applying ${s}... `);
@@ -79,6 +82,21 @@ check(
   "TOPGLOV quarterly periods",
   (await one("SELECT count(*)::int n FROM financial_period WHERE company_id='top-glove' AND period_type='quarter'")).n,
   (v) => v === 93,
+);
+
+// Agent usage metering (0001): upsert increments per (ip, day).
+await db.exec(
+  `INSERT INTO agent_usage (ip, count) VALUES ('203.0.113.7', 1)
+   ON CONFLICT (ip, day) DO UPDATE SET count = agent_usage.count + 1`,
+);
+await db.exec(
+  `INSERT INTO agent_usage (ip, count) VALUES ('203.0.113.7', 1)
+   ON CONFLICT (ip, day) DO UPDATE SET count = agent_usage.count + 1`,
+);
+check(
+  "agent_usage upsert increments",
+  (await one("SELECT count FROM agent_usage WHERE ip='203.0.113.7'")).count,
+  (v) => v === 2,
 );
 
 await db.close();

@@ -11,6 +11,7 @@ import { Hono } from "hono";
 import type { Env } from "../index";
 import { createDb } from "../db/repo";
 import { isAgentConfigured, runAgent } from "../agent/runtime";
+import { recordAgentUse } from "../db/repo";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
@@ -36,6 +37,23 @@ agent.post("/ask", async (c) => {
   const question = typeof body.question === "string" ? body.question.trim() : "";
   if (!question) return c.json({ error: "Ask a question." }, 400);
   if (question.length > 2000) return c.json({ error: "Question is too long." }, 400);
+
+  // Launch hardening: per-IP daily quota, enforced BEFORE spending Claude
+  // tokens. Cloudflare sets cf-connecting-ip on every request.
+  const ip = c.req.header("cf-connecting-ip") ?? "unknown";
+  const limit = Number(c.env.AGENT_DAILY_LIMIT ?? 50);
+  try {
+    const used = await recordAgentUse(c.get("db"), ip);
+    if (used > limit) {
+      return c.json(
+        { error: "Daily agent limit reached. Try again tomorrow." },
+        429,
+      );
+    }
+  } catch (err) {
+    // Metering must never take the agent down; log and continue.
+    console.error("Agent usage metering error:", err);
+  }
 
   try {
     const result = await runAgent(c.get("db"), {

@@ -13,10 +13,12 @@
  */
 import { sql } from "drizzle-orm";
 import {
+  date,
   doublePrecision,
   index,
   integer,
   pgTable,
+  primaryKey,
   serial,
   text,
   uniqueIndex,
@@ -227,6 +229,24 @@ export const relationship = pgTable(
     ),
     fromIdx: index("relationship_from_idx").on(t.fromId),
     toIdx: index("relationship_to_idx").on(t.toId),
+  }),
+);
+
+/**
+ * Agent usage metering (launch hardening): one row per caller IP per day.
+ * /v1/agent/ask increments and enforces the daily limit before calling Claude.
+ */
+export const agentUsage = pgTable(
+  "agent_usage",
+  {
+    ip: text("ip").notNull(),
+    day: date("day")
+      .notNull()
+      .default(sql`CURRENT_DATE`),
+    count: integer("count").notNull().default(0),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.ip, t.day] }),
   }),
 );
 

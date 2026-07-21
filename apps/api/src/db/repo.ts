@@ -5,7 +5,7 @@
  * The query builder is driver-agnostic, so these functions run unchanged on
  * postgres-js (production, over the Supabase pooler) and on PGlite (tests).
  */
-import { and, asc, eq, inArray, or } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type { Sql } from "postgres";
 import type { FactMap } from "../domain/concepts";
@@ -153,4 +153,21 @@ export async function getPeriodsWithFacts(
     period,
     facts: byPeriod.get(period.id) ?? {},
   }));
+}
+
+/**
+ * Launch hardening: count an agent call for (ip, today) and return the new
+ * total. The route compares it against the daily limit BEFORE calling Claude,
+ * so over-limit requests never spend tokens.
+ */
+export async function recordAgentUse(db: Db, ip: string): Promise<number> {
+  const rows = await db
+    .insert(schema.agentUsage)
+    .values({ ip, count: 1 })
+    .onConflictDoUpdate({
+      target: [schema.agentUsage.ip, schema.agentUsage.day],
+      set: { count: sql`${schema.agentUsage.count} + 1` },
+    })
+    .returning({ count: schema.agentUsage.count });
+  return rows[0]?.count ?? 1;
 }

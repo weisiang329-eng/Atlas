@@ -20,6 +20,7 @@ You already created the project (`fsbcltowqpfniodzaslo`). Load the schema + data
 1. Open **Supabase dashboard → your Atlas project → SQL Editor → New query**.
 2. Run these files **in order** (open each in `apps/api`, paste, Run):
    1. `apps/api/drizzle/0000_init_postgres.sql`   ← creates all tables
+   2. `apps/api/drizzle/0001_agent_usage.sql`     ← agent rate-limit table
    2. `apps/api/seed/seed.sql`                     ← AI-infra companies
    3. `apps/api/seed/edgar/edgar-seed.sql`         ← SEC EDGAR facts
    4. `apps/api/seed/glove/glove-seed.sql`         ← glove quarterlies
@@ -42,6 +43,20 @@ wrangler secret put DATABASE_URL         # paste the Transaction pooler URL from
 wrangler secret put ANTHROPIC_API_KEY    # paste your Claude key (console.anthropic.com)
 # optional: wrangler secret put AGENT_MODEL   (default claude-sonnet-5)
 ```
+
+Hardening vars (plain vars, can also go in `wrangler.toml` `[vars]`):
+
+```bash
+# Lock CORS to the web app once the Pages domain exists (comma-separated):
+wrangler secret put ALLOWED_ORIGINS      # e.g. https://atlas-web.pages.dev
+# Agent quota per IP per day (default 50):
+wrangler secret put AGENT_DAILY_LIMIT    # e.g. 50
+```
+
+**Login (decided 2026-07-21 — Option A):** after the Pages deploy, enable
+**Cloudflare Access** on the Pages domain: dashboard → Zero Trust → Access →
+Applications → Add → Self-hosted → domain = the Pages URL → policy = allow
+your email (One-time PIN). Phone browsers included; no code change.
 
 > Security: because the DB password was shared in chat, rotate it after setup
 > (Supabase → Settings → Database → Reset database password), then re-run
