@@ -20,7 +20,7 @@ export default function ResearchHypothesesPage() {
     <>
       <SectionHeading title="假设追踪" description="每个判断背后的可验证假设，与决策日志（P008）联动，到期比对实际（P023，sample data）。" />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
-        <DataTable
+        <DataTable columnPickerId="research-hypotheses"
         mobileCards columns={cols} rows={SAMPLE_HYPOTHESES} getRowId={(h) => h.id} caption="Hypotheses" />
       </div>
     </>

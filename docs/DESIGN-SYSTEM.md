@@ -176,6 +176,12 @@ it once.
   always be identifiable.
 - Hidden columns still participate in search (a user searching a value they
   cannot see should still find the row).
+- **Not used on statement tables** whose columns are fiscal periods
+  (`company-financials-live`, `live-sections`, `results-table`). Their column
+  set changes as new periods are filed, so a persisted "hidden" list would
+  silently start hiding the wrong years. Period selection there belongs to a
+  period control, not a column picker — a deliberate exclusion, not an
+  oversight.
 
 ### Density and responsive behaviour
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { fmtNumber } from "@/lib/format";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { StatGrid } from "@/components/ui/stat-grid";
 import { ChartContainer } from "@/components/chart/chart-container";
@@ -16,7 +17,7 @@ export default function ManufacturingPage() {
             { label: "稼动率 Utilization", value: `${MFG_KPIS.utilization}%` },
             { label: "良率 Yield", value: `${MFG_KPIS.yield}%` },
             { label: "交期达成 OTD", value: `${MFG_KPIS.otd}%` },
-            { label: "本月产量", value: MFG_KPIS.output.toLocaleString("en-US") },
+            { label: "本月产量", value: fmtNumber(MFG_KPIS.output) },
           ]}
         />
       </div>

@@ -16,23 +16,21 @@ import { TradeEntryForm } from "@/components/ledger/trade-entry-form";
 import { useBook, type BookPosition } from "@/lib/loaders/use-book";
 import { DataState } from "@/components/ui/data-state";
 import { useT } from "@/lib/i18n/use-locale";
+import { fmtChange, fmtDate, fmtNumber, toneClass } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
-const num = (v: number, dp = 2) =>
-  v.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
+/** Local alias so the call sites stay short; the formatting itself is shared. */
+const num = (v: number, dp = 2) => fmtNumber(v, dp);
 
-/** Sign-aware money: green for gains, red for losses, neutral for flat. */
-function Money({ v, dp = 2, prefix = "" }: { v: number; dp?: number; prefix?: string }) {
+/**
+ * A signed figure with its direction in the colour — the only place colour is
+ * allowed to mean anything (DESIGN-SYSTEM §2). Sign, decimals and tone all come
+ * from `lib/format`, so this reads identically to every other figure in Atlas.
+ */
+function Money({ v, dp = 2 }: { v: number; dp?: number }) {
   return (
-    <span
-      className={cn(
-        "num tabular-nums",
-        v > 0 ? "text-positive" : v < 0 ? "text-negative" : "text-fg",
-      )}
-    >
-      {v > 0 ? "+" : ""}
-      {prefix}
-      {num(v, dp)}
+    <span className={cn("num tabular-nums", toneClass(v))}>
+      {fmtChange(v, dp, "")}
     </span>
   );
 }
@@ -104,7 +102,7 @@ function PositionCard({ p, expanded, onToggle }: {
                       <span className="num text-sm text-fg">
                         {num(lot.originalQty, 0)} @ {num(lot.costPrice, 4)}
                       </span>
-                      <span className="text-2xs text-faint">{lot.openedAt.slice(0, 10)}</span>
+                      <span className="text-2xs text-faint">{fmtDate(lot.openedAt)}</span>
                     </div>
                     <div className="flex items-center gap-4 text-2xs text-faint">
                       <span>{t("ledger.sold")} <span className="num text-fg">{num(soldQty, 0)}</span></span>
@@ -131,7 +129,7 @@ function PositionCard({ p, expanded, onToggle }: {
                       <tbody>
                         {lotClosures.map((c, i) => (
                           <tr key={`${c.sellTradeId}-${i}`} className="border-t border-border-soft">
-                            <td className="py-1 text-muted">{c.closedAt.slice(0, 10)}</td>
+                            <td className="py-1 text-muted">{fmtDate(c.closedAt)}</td>
                             <td className="num py-1 text-right text-fg">{num(c.quantity, 0)}</td>
                             <td className="num py-1 text-right text-fg">{num(c.sellPrice, 4)}</td>
                             <td className="num py-1 text-right text-muted">{num(c.feesLocal, 2)}</td>
@@ -219,7 +217,7 @@ export function LedgerWorkspace() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-mono text-xs text-fg">{tr.instrumentId.split(":")[1] ?? tr.instrumentId}</p>
                         <p className="num text-2xs text-faint">
-                          {num(tr.quantity, 0)} @ {num(tr.price, 4)} · {tr.tradedAt.slice(0, 10)}
+                          {num(tr.quantity, 0)} @ {num(tr.price, 4)} · {fmtDate(tr.tradedAt)}
                         </p>
                       </div>
                       <button

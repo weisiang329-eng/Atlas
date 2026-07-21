@@ -6,6 +6,7 @@
  * value / P&L are intentionally absent (they need prices — P027); every figure
  * here is on a cost basis and labelled as such.
  */
+import { fmtNumber } from "@/lib/format";
 import { useState } from "react";
 import Link from "next/link";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -32,7 +33,7 @@ interface Row extends Holding {
   weight: number;
 }
 
-const money = (v: number) => v.toLocaleString("en-US", { maximumFractionDigits: 0 });
+const money = (v: number) => fmtNumber(v, 0);
 const scoreTone = (s: number | null): "positive" | "warning" | "negative" | "neutral" =>
   s === null ? "neutral" : s >= 65 ? "positive" : s >= 40 ? "warning" : "negative";
 
@@ -123,7 +124,7 @@ export function PortfolioLive() {
     },
     { key: "ticker", header: "Ticker", sortable: true },
     { key: "shares", header: "Shares", numeric: true, sortable: true, render: (r) => money(r.shares) },
-    { key: "avgCost", header: "Avg cost", numeric: true, render: (r) => r.avgCost.toLocaleString("en-US") },
+    { key: "avgCost", header: "Avg cost", numeric: true, render: (r) => fmtNumber(r.avgCost, 2) },
     { key: "costValue", header: "Cost basis", numeric: true, sortable: true, render: (r) => money(r.costValue) },
     { key: "weight", header: "Weight", numeric: true, sortable: true, render: (r) => `${r.weight.toFixed(1)}%` },
     {

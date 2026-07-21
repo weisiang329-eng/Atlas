@@ -5,6 +5,7 @@
  * case is one less thing to type, but the field stays editable — the actual
  * charge from a contract note always wins (PORTFOLIO-ACCOUNTING §6).
  */
+import { fmtNumber } from "@/lib/format";
 import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -261,12 +262,12 @@ export function TradeEntryForm({
         <p className="rounded bg-surface-3 px-2.5 py-2 text-2xs text-muted">
           {t("ledger.willBook")}{" "}
           <span className="num text-fg">
-            {(qty * px).toLocaleString(undefined, { maximumFractionDigits: 2 })} {currency}
+            {fmtNumber(qty * px, 2)} {currency}
           </span>{" "}
           + <span className="num text-fg">{fees} {currency}</span>{" "}
           {t("ledger.feesShort")} ≈{" "}
           <span className="num text-fg">
-            RM {((qty * px + (side === "buy" ? fees : -fees)) * fx).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            RM {fmtNumber((qty * px + (side === "buy" ? fees : -fees)) * fx, 2)}
           </span>
         </p>
       ) : null}

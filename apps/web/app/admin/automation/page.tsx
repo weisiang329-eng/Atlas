@@ -20,7 +20,7 @@ export default function AutomationPage() {
     <WorkspaceLayout title="Automation" eyebrow="P024 · Automation Engine" description="全平台定时任务的统一调度视图与数据质量巡检。交易自动化不在此——见 P028 铁律。">
       <SectionHeading title="调度总览" description={failing === 0 ? "所有系统正常" : `${failing} 个任务失败，需处理`} />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
-        <DataTable
+        <DataTable columnPickerId="admin-automation"
         mobileCards columns={cols} rows={AUTOMATION_JOBS} getRowId={(j) => j.id} caption="Automation jobs" />
       </div>
     </WorkspaceLayout>

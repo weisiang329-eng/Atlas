@@ -1,3 +1,4 @@
+import { fmtNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 
 export type StatementRowKind = "section" | "line" | "total";
@@ -21,7 +22,7 @@ interface StatementTableProps {
 function formatValue(v: number | null): string {
   if (v === null) return "—";
   const abs = Math.abs(v);
-  const formatted = abs.toLocaleString("en-US");
+  const formatted = fmtNumber(abs);
   return v < 0 ? `(${formatted})` : formatted;
 }
 

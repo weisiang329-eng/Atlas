@@ -25,7 +25,7 @@ export function NotesTable({ rows }: { rows: NoteRow[] }) {
     { key: "author", header: "Author" },
     { key: "updated", header: "Updated" },
   ];
-  return <DataTable columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Research notes" />;
+  return <DataTable columnPickerId="research-notes" columns={columns} rows={rows} searchable getRowId={(r) => r.id} caption="Research notes" />;
 }
 
 export function ReportsTable({ rows }: { rows: ReportRow[] }) {

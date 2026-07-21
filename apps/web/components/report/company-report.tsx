@@ -7,6 +7,7 @@
  * report section rhythm. Print-friendly. Every figure is sourced; nothing is
  * written by hand, so the report can never drift from the data.
  */
+import { fmtNumber } from "@/lib/format";
 import Link from "next/link";
 import { ReportSection } from "@/components/report/report-section";
 import { StatGrid } from "@/components/ui/stat-grid";
@@ -110,9 +111,9 @@ export function CompanyReport({ companyId }: { companyId: string }) {
                   <div className="mb-4">
                     <StatGrid
                       items={[
-                        { label: `Revenue (${f.periods.at(-1)})`, value: latest(f.trends.revenue)?.value.toLocaleString("en-US") ?? "—", hint: f.unit },
-                        { label: "Net income", value: latest(f.trends.netIncome)?.value.toLocaleString("en-US") ?? "—", hint: f.unit },
-                        { label: "Free cash flow", value: latest(f.trends.freeCashFlow)?.value.toLocaleString("en-US") ?? "—", hint: f.unit },
+                        { label: `Revenue (${f.periods.at(-1)})`, value: fmtNumber(latest(f.trends.revenue)?.value), hint: f.unit },
+                        { label: "Net income", value: fmtNumber(latest(f.trends.netIncome)?.value), hint: f.unit },
+                        { label: "Free cash flow", value: fmtNumber(latest(f.trends.freeCashFlow)?.value), hint: f.unit },
                         { label: "Coverage", value: `${f.periods.length} yrs`, hint: f.periods[0] },
                       ]}
                     />

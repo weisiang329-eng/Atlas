@@ -20,7 +20,7 @@ export default function IngestPage() {
     <WorkspaceLayout title="Ingest" eyebrow="P022 · Continuous Research" description="季度 YTD-diff、IFRS 映射、新闻/公告与 Cron 全自动摄取的运行监控。">
       <SectionHeading title="摄取管道" description="每个数值可回查原文；失败管道红色高亮，可重跑。" />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
-        <DataTable
+        <DataTable columnPickerId="admin-ingest"
         mobileCards columns={cols} rows={INGEST_PIPELINES} getRowId={(p) => p.id} caption="Ingest pipelines" />
       </div>
     </WorkspaceLayout>
