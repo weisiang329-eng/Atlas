@@ -17,6 +17,11 @@
 
 export const zh = {
   // ── Shell / navigation ────────────────────────────────────────────────
+  "nav.daily": "每日",
+  "nav.researchGroup": "研究分析",
+  "nav.execution": "交易执行",
+  "nav.financials": "财务",
+  "nav.notes": "研究笔记",
   "nav.workspace": "工作区",
   "nav.home": "首页",
   "nav.companies": "公司",
@@ -235,6 +240,11 @@ export const zh = {
 export type Dict = Record<keyof typeof zh, string>;
 
 export const en: Dict = {
+  "nav.daily": "Daily",
+  "nav.researchGroup": "Research",
+  "nav.execution": "Execution",
+  "nav.financials": "Financials",
+  "nav.notes": "Notes",
   "nav.workspace": "Workspace",
   "nav.home": "Home",
   "nav.companies": "Companies",
