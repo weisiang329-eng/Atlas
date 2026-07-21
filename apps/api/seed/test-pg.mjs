@@ -15,6 +15,7 @@ const read = (p) => readFileSync(join(api, p), "utf8");
 const migrations = [
   "drizzle/0000_init_postgres.sql",
   "drizzle/0001_agent_usage.sql",
+  "drizzle/0002_pms.sql",
 ];
 const seeds = [
   "seed/seed.sql",
