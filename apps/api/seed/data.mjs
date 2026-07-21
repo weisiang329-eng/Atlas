@@ -12,13 +12,15 @@
  * `currency`); DilutedShares always in millions of shares.
  */
 
+// chainOrder places each industry on the AI-hardware value chain (1 = most
+// upstream): equipment -> foundry -> memory -> accelerators -> networking -> power.
 export const INDUSTRIES = [
-  { id: "semis-accelerators", name: "AI Accelerators & GPUs", sector: "Semiconductors" },
-  { id: "semis-foundry", name: "Foundry & IDM", sector: "Semiconductors" },
-  { id: "semis-memory", name: "Memory (HBM / DRAM / NAND)", sector: "Semiconductors" },
-  { id: "semis-equipment", name: "Semiconductor Equipment", sector: "Semiconductors" },
-  { id: "networking", name: "Networking & Custom ASIC", sector: "AI Infrastructure" },
-  { id: "dc-power-cooling", name: "Data Center Power & Cooling", sector: "AI Infrastructure" },
+  { id: "semis-equipment", name: "Semiconductor Equipment", sector: "Semiconductors", chainOrder: 1 },
+  { id: "semis-foundry", name: "Foundry & IDM", sector: "Semiconductors", chainOrder: 2 },
+  { id: "semis-memory", name: "Memory (HBM / DRAM / NAND)", sector: "Semiconductors", chainOrder: 3 },
+  { id: "semis-accelerators", name: "AI Accelerators & GPUs", sector: "Semiconductors", chainOrder: 4 },
+  { id: "networking", name: "Networking & Custom ASIC", sector: "AI Infrastructure", chainOrder: 5 },
+  { id: "dc-power-cooling", name: "Data Center Power & Cooling", sector: "AI Infrastructure", chainOrder: 6 },
 ];
 
 /**

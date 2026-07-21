@@ -53,6 +53,11 @@ export const industry = sqliteTable("industry", {
   name: text("name").notNull(),
   sector: text("sector").notNull(),
   description: text("description"),
+  /**
+   * Position in the sector's value chain (1 = upstream). Industries sharing a
+   * chain are ordered by this; null = not placed on a chain (single-stage).
+   */
+  chainOrder: integer("chain_order"),
   createdAt: createdAt(),
 });
 

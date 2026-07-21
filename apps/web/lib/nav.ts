@@ -44,6 +44,12 @@ export const NAV_GROUPS: NavGroup[] = [
         description: "Industry and supply-chain intelligence.",
       },
       {
+        label: "Value Chain",
+        href: "/value-chain",
+        glyph: "VC",
+        description: "The AI-hardware stack and its supply links.",
+      },
+      {
         label: "Rankings",
         href: "/scores",
         glyph: "AS",

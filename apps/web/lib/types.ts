@@ -161,6 +161,30 @@ export interface CycleSignal {
   changeYoYPct: number | null;
 }
 
+// --- Value chain (P006) -----------------------------------------------------
+
+export interface ChainStage {
+  industryId: string;
+  name: string;
+  sector: string;
+  order: number;
+  companies: { id: string; name: string; ticker: string }[];
+}
+
+export interface ChainEdge {
+  fromStage: string;
+  toStage: string;
+  fromCompany: string;
+  toCompany: string;
+  label: string | null;
+}
+
+/** GET /v1/industries/value-chain */
+export interface ValueChain {
+  stages: ChainStage[];
+  edges: ChainEdge[];
+}
+
 /** GET /v1/industries/:id — industry workspace payload. */
 export interface IndustryDetail {
   id: string;

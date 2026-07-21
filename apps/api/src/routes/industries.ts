@@ -11,11 +11,14 @@ import type { Env } from "../index";
 import {
   createDb,
   getIndustry,
+  listAllRelationships,
+  listCompanies,
   listCompaniesByIndustry,
   listIndustries,
   listIndustryMetrics,
 } from "../db/repo";
 import { buildCycleSignal, buildMetricSeries } from "../domain/industry";
+import { buildValueChain } from "../domain/valuechain";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
@@ -24,6 +27,18 @@ export const industries = new Hono<AppEnv>();
 industries.get("/", async (c) => {
   const rows = await listIndustries(c.get("db"));
   return c.json(rows);
+});
+
+// The value chain across staged industries (upstream -> downstream). Placed
+// before /:id so "value-chain" is not read as an industry id.
+industries.get("/value-chain", async (c) => {
+  const db = c.get("db");
+  const [inds, companies, rels] = await Promise.all([
+    listIndustries(db),
+    listCompanies(db),
+    listAllRelationships(db),
+  ]);
+  return c.json(buildValueChain(inds, companies, rels));
 });
 
 industries.get("/:id", async (c) => {

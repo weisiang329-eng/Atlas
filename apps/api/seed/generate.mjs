@@ -42,8 +42,8 @@ for (const c of COMPANIES) {
 
 for (const i of INDUSTRIES) {
   lines.push(
-    `INSERT OR REPLACE INTO industry (id, name, sector, description) VALUES (` +
-      [q(i.id), q(i.name), q(i.sector), q(i.description)].join(", ") +
+    `INSERT OR REPLACE INTO industry (id, name, sector, description, chain_order) VALUES (` +
+      [q(i.id), q(i.name), q(i.sector), q(i.description), n(i.chainOrder)].join(", ") +
       `);`,
   );
 }

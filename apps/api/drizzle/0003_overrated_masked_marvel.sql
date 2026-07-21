@@ -1,0 +1,1 @@
+ALTER TABLE `industry` ADD `chain_order` integer;
