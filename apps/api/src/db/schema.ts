@@ -257,3 +257,202 @@ export type FinancialPeriod = typeof financialPeriod.$inferSelect;
 export type FinancialFact = typeof financialFact.$inferSelect;
 export type IndustryMetric = typeof industryMetric.$inferSelect;
 export type Relationship = typeof relationship.$inferSelect;
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * Portfolio accounting / trade book (PMS)
+ * Model: docs/PORTFOLIO-ACCOUNTING.md
+ * Trades are immutable events; lots carry cost; closures record per-order
+ * realized P&L; positions are derived on read, never stored.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+export const pmsAccount = pgTable("pms_account", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  broker: text("broker").notNull(),
+  accountType: text("account_type").notNull().default("cash"),
+  baseCurrency: text("base_currency").notNull().default("MYR"),
+  externalId: text("external_id"),
+  createdAt: createdAt(),
+});
+
+export const pmsInstrument = pgTable(
+  "pms_instrument",
+  {
+    id: text("id").primaryKey(),
+    symbol: text("symbol").notNull(),
+    market: text("market").$type<"US" | "MY" | "HK" | "SG">().notNull(),
+    currency: text("currency").notNull(),
+    name: text("name").notNull(),
+    companyId: text("company_id").references(() => company.id),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    symbolMarketUnq: uniqueIndex("pms_instrument_symbol_market_unq").on(
+      t.symbol,
+      t.market,
+    ),
+  }),
+);
+
+export const pmsFxRate = pgTable(
+  "pms_fx_rate",
+  {
+    rateDate: date("rate_date").notNull(),
+    fromCurrency: text("from_currency").notNull(),
+    toCurrency: text("to_currency").notNull(),
+    rate: doublePrecision("rate").notNull(),
+    sourceId: text("source_id").references(() => source.id),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.rateDate, t.fromCurrency, t.toCurrency] }),
+  }),
+);
+
+export const pmsTrade = pgTable(
+  "pms_trade",
+  {
+    id: serial("id").primaryKey(),
+    accountId: text("account_id")
+      .notNull()
+      .references(() => pmsAccount.id, { onDelete: "cascade" }),
+    instrumentId: text("instrument_id")
+      .notNull()
+      .references(() => pmsInstrument.id),
+    side: text("side").$type<"buy" | "sell">().notNull(),
+    quantity: doublePrecision("quantity").notNull(),
+    price: doublePrecision("price").notNull(),
+    currency: text("currency").notNull(),
+    /** Trade currency -> account base currency, at trade date. */
+    fxRate: doublePrecision("fx_rate").notNull().default(1),
+    tradedAt: text("traded_at").notNull(),
+    settledOn: date("settled_on"),
+    note: text("note"),
+    sourceKind: text("source_kind").notNull().default("manual"),
+    externalOrderId: text("external_order_id"),
+    /** Broker deal id — the idempotency key for imports. */
+    externalDealId: text("external_deal_id"),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    dealUnq: uniqueIndex("pms_trade_deal_unq").on(t.accountId, t.externalDealId),
+    acctInstIdx: index("pms_trade_acct_inst_idx").on(
+      t.accountId,
+      t.instrumentId,
+      t.tradedAt,
+    ),
+  }),
+);
+
+export const pmsTradeFee = pgTable(
+  "pms_trade_fee",
+  {
+    id: serial("id").primaryKey(),
+    tradeId: integer("trade_id")
+      .notNull()
+      .references(() => pmsTrade.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    amount: doublePrecision("amount").notNull(),
+    currency: text("currency").notNull(),
+    /** 'estimated' from the schedule, or 'actual' once reconciled. */
+    basis: text("basis").notNull().default("estimated"),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    tradeIdx: index("pms_trade_fee_trade_idx").on(t.tradeId),
+  }),
+);
+
+export const pmsLot = pgTable(
+  "pms_lot",
+  {
+    id: serial("id").primaryKey(),
+    accountId: text("account_id")
+      .notNull()
+      .references(() => pmsAccount.id, { onDelete: "cascade" }),
+    instrumentId: text("instrument_id")
+      .notNull()
+      .references(() => pmsInstrument.id),
+    tradeId: integer("trade_id")
+      .notNull()
+      .references(() => pmsTrade.id, { onDelete: "cascade" }),
+    openedAt: text("opened_at").notNull(),
+    originalQty: doublePrecision("original_qty").notNull(),
+    remainingQty: doublePrecision("remaining_qty").notNull(),
+    costPrice: doublePrecision("cost_price").notNull(),
+    feesTotal: doublePrecision("fees_total").notNull().default(0),
+    currency: text("currency").notNull(),
+    fxRate: doublePrecision("fx_rate").notNull().default(1),
+  },
+  (t) => ({
+    tradeUnq: uniqueIndex("pms_lot_trade_unq").on(t.tradeId),
+    openIdx: index("pms_lot_open_idx").on(
+      t.accountId,
+      t.instrumentId,
+      t.openedAt,
+    ),
+  }),
+);
+
+export const pmsLotClosure = pgTable(
+  "pms_lot_closure",
+  {
+    id: serial("id").primaryKey(),
+    lotId: integer("lot_id")
+      .notNull()
+      .references(() => pmsLot.id, { onDelete: "cascade" }),
+    sellTradeId: integer("sell_trade_id")
+      .notNull()
+      .references(() => pmsTrade.id, { onDelete: "cascade" }),
+    closedAt: text("closed_at").notNull(),
+    quantity: doublePrecision("quantity").notNull(),
+    costPrice: doublePrecision("cost_price").notNull(),
+    sellPrice: doublePrecision("sell_price").notNull(),
+    feesLocal: doublePrecision("fees_local").notNull().default(0),
+    grossPlLocal: doublePrecision("gross_pl_local").notNull(),
+    netPlLocal: doublePrecision("net_pl_local").notNull(),
+    currency: text("currency").notNull(),
+    buyFxRate: doublePrecision("buy_fx_rate").notNull(),
+    sellFxRate: doublePrecision("sell_fx_rate").notNull(),
+    totalPlBase: doublePrecision("total_pl_base").notNull(),
+    pricePlBase: doublePrecision("price_pl_base").notNull(),
+    fxPlBase: doublePrecision("fx_pl_base").notNull(),
+    netPlBase: doublePrecision("net_pl_base").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    closureUnq: uniqueIndex("pms_closure_unq").on(t.lotId, t.sellTradeId),
+    sellIdx: index("pms_closure_sell_idx").on(t.sellTradeId),
+  }),
+);
+
+export const pmsCashMovement = pgTable(
+  "pms_cash_movement",
+  {
+    id: serial("id").primaryKey(),
+    accountId: text("account_id")
+      .notNull()
+      .references(() => pmsAccount.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    /** Signed: positive is money in, negative is money out. */
+    amount: doublePrecision("amount").notNull(),
+    currency: text("currency").notNull(),
+    fxRate: doublePrecision("fx_rate").notNull().default(1),
+    occurredOn: date("occurred_on").notNull(),
+    instrumentId: text("instrument_id").references(() => pmsInstrument.id),
+    note: text("note"),
+    sourceKind: text("source_kind").notNull().default("manual"),
+    externalId: text("external_id"),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    acctIdx: index("pms_cash_acct_idx").on(t.accountId, t.occurredOn),
+  }),
+);
+
+export type PmsAccount = typeof pmsAccount.$inferSelect;
+export type PmsInstrument = typeof pmsInstrument.$inferSelect;
+export type PmsTrade = typeof pmsTrade.$inferSelect;
+export type PmsTradeFee = typeof pmsTradeFee.$inferSelect;
+export type PmsLot = typeof pmsLot.$inferSelect;
+export type PmsLotClosure = typeof pmsLotClosure.$inferSelect;
+export type PmsCashMovement = typeof pmsCashMovement.$inferSelect;
