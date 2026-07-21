@@ -13,7 +13,8 @@ import { ChartContainer } from "@/components/chart/chart-container";
 import { StatGrid } from "@/components/ui/stat-grid";
 import { Badge } from "@/components/ui/badge";
 import { TradeEntryForm } from "@/components/ledger/trade-entry-form";
-import { useLedger, type LedgerPosition } from "@/lib/loaders/use-ledger";
+import { useBook, type BookPosition } from "@/lib/loaders/use-book";
+import { DataState } from "@/components/ui/data-state";
 import { useT } from "@/lib/i18n/use-locale";
 import { cn } from "@/lib/cn";
 
@@ -37,7 +38,7 @@ function Money({ v, dp = 2, prefix = "" }: { v: number; dp?: number; prefix?: st
 }
 
 function PositionCard({ p, expanded, onToggle }: {
-  p: LedgerPosition;
+  p: BookPosition;
   expanded: boolean;
   onToggle: () => void;
 }) {
@@ -87,7 +88,7 @@ function PositionCard({ p, expanded, onToggle }: {
           </p>
           <ul className="flex flex-col gap-2">
             {p.lots.map((lot) => {
-              const lotClosures = closures.filter((c) => c.lotTradeId === lot.tradeId);
+              const lotClosures = closures.filter((c) => c.lotId === lot.id);
               const soldQty = lotClosures.reduce((a, c) => a + c.quantity, 0);
               const lotNet = lotClosures.reduce((a, c) => a + c.netPlBase, 0);
               return (
@@ -154,27 +155,29 @@ function PositionCard({ p, expanded, onToggle }: {
 
 export function LedgerWorkspace() {
   const t = useT();
-  const { trades, positions, add, remove } = useLedger();
+  const { book, status, error, add, remove } = useBook();
+  const { trades, positions, summary } = book;
   const [open, setOpen] = useState<string | null>(null);
 
-  const totalCostBase = positions.reduce((a, p) => a + p.costTotalBase, 0);
-  const totalRealized = positions.reduce((a, p) => a + p.realizedNetBase, 0);
-  const totalFees = trades.reduce((a, tr) => a + tr.fees * tr.fxRate, 0);
-  const openCount = positions.filter((p) => p.quantity > 0).length;
+  // Totals come from the server, which owns every calculation. The UI adds
+  // nothing up itself — the same rule the rest of Atlas follows.
+  const { costBasisBase, realizedNetBase, totalFeesBase, openPositions } =
+    summary;
 
   return (
     <>
       <div className="mb-6">
         <StatGrid
           items={[
-            { label: t("ledger.openPositions"), value: String(openCount), hint: `${trades.length} ${t("ledger.trades")}` },
-            { label: t("ledger.costBasis"), value: `RM ${num(totalCostBase, 0)}`, hint: t("ledger.atCost") },
-            { label: t("ledger.realizedNet"), value: `RM ${num(totalRealized, 0)}`, hint: t("ledger.afterFees") },
-            { label: t("ledger.totalFees"), value: `RM ${num(totalFees, 0)}`, hint: t("ledger.allTime") },
+            { label: t("ledger.openPositions"), value: String(openPositions), hint: `${trades.length} ${t("ledger.trades")}` },
+            { label: t("ledger.costBasis"), value: `RM ${num(costBasisBase, 0)}`, hint: t("ledger.atCost") },
+            { label: t("ledger.realizedNet"), value: `RM ${num(realizedNetBase, 0)}`, hint: t("ledger.afterFees") },
+            { label: t("ledger.totalFees"), value: `RM ${num(totalFeesBase, 0)}`, hint: t("ledger.allTime") },
           ]}
         />
       </div>
 
+      <DataState status={status} error={error ?? undefined}>
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <ChartContainer title={t("ledger.positions")} subtitle={t("ledger.positionsSub")}>
           {positions.length === 0 ? (
@@ -214,7 +217,7 @@ export function LedgerWorkspace() {
                         {tr.side === "buy" ? t("ledger.buy") : t("ledger.sell")}
                       </Badge>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-mono text-xs text-fg">{tr.symbol}</p>
+                        <p className="truncate font-mono text-xs text-fg">{tr.instrumentId.split(":")[1] ?? tr.instrumentId}</p>
                         <p className="num text-2xs text-faint">
                           {num(tr.quantity, 0)} @ {num(tr.price, 4)} · {tr.tradedAt.slice(0, 10)}
                         </p>
@@ -234,6 +237,7 @@ export function LedgerWorkspace() {
           </ChartContainer>
         </div>
       </div>
+      </DataState>
     </>
   );
 }

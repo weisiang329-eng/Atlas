@@ -10,11 +10,13 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import postgres from "postgres";
 import { createDb } from "./db/repo";
+import { ensureSchema, MIGRATION_IDS } from "./db/migrate";
 import { companies } from "./routes/companies";
 import { industries } from "./routes/industries";
 import { scores } from "./routes/scores";
 import { graph } from "./routes/graph";
 import { agent } from "./routes/agent";
+import { pms } from "./routes/pms";
 
 export interface Env {
   /**
@@ -71,6 +73,9 @@ app.use("*", async (c, next) => {
     fetch_types: false,
   });
   c.set("db", createDb(client));
+  // Bring the schema up to date before serving. Runs once per Worker
+  // instance; a new table never needs anyone to paste SQL into a dashboard.
+  await ensureSchema(client);
   try {
     await next();
   } finally {
@@ -86,7 +91,14 @@ app.use("*", async (c, next) => {
 });
 
 app.get("/health", (c) =>
-  c.json({ status: "ok", service: "atlas-api", version: "0.1.0" }),
+  c.json({
+    status: "ok",
+    service: "atlas-api",
+    version: "0.1.0",
+    // Which migrations this build knows about — makes "is the deployed schema
+    // current?" answerable without opening the database.
+    migrations: MIGRATION_IDS,
+  }),
 );
 
 app.route("/v1/companies", companies);
@@ -94,6 +106,7 @@ app.route("/v1/industries", industries);
 app.route("/v1/scores", scores);
 app.route("/v1/graph", graph);
 app.route("/v1/agent", agent);
+app.route("/v1/pms", pms);
 
 app.notFound((c) =>
   c.json({ error: "The requested resource was not found." }, 404),

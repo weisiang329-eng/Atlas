@@ -336,6 +336,9 @@ Model: `docs/PORTFOLIO-ACCOUNTING.md`. Foundation merged in PR #53.
 - [ ] BNM rate ingestion (public API) into `pms_fx_rate`, plus the spread capture on conversions.
 - [ ] Trade ledger UI: entry form, 总仓 (position) view, 按订单 (by-lot) view with per-closure P&L.
 - [ ] Fund statements: P&L, balance sheet, cash flow; monthly fee totals.
-- [ ] Moomoo daily sync — **blocked**: OpenD gateway needs an always-on host (Cloudflare Workers cannot run it). Manual entry stays first-class regardless.
+- [x] **API + database persistence** — `/v1/pms/book`, `POST /v1/pms/trades`, `DELETE /v1/pms/trades/:id`, `/v1/pms/fees/estimate`. The ledger UI was on localStorage, which is wrong for a book of record (one browser only, lost on cache clear) and impossible for the broker sync to write to.
+- [x] **Schema now applies itself.** The Worker holds DATABASE_URL, so it runs pending migrations on a cold start (`src/db/migrate.ts`) — no more pasting SQL into the Supabase dashboard. Existing hand-provisioned schemas are BASELINED, not re-run.
+- [ ] Moomoo daily sync — **unblocked in principle: the owner confirmed (2026-07-22) an always-on host will be available.** Still to build: the OpenD-side sync job, `POST /v1/pms/import` keyed on Moomoo's `deal_id`, and reconciliation. Manual entry stays first-class regardless.
+- [ ] BNM mid-rate ingestion into `pms_fx_rate` (the FX anchor, PORTFOLIO-ACCOUNTING §5); the entry form currently uses indicative defaults the user can override.
 - [ ] Corporate actions (splits, dividends affecting cost basis) — not yet modelled.
 - [ ] Short positions — deliberately rejected today (oversell is reported, not silently shorted); needs an explicit design.
