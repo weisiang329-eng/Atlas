@@ -1,7 +1,10 @@
 # Atlas — repo rules for anyone (human or agent) working here
 
-Read this first. Then `tasks/HANDOFF.md` for current state, and
-`docs/CODEBASE-MAP.md` for where everything lives.
+Read this first. Then `tasks/HANDOFF.md` for current state,
+`docs/CODEBASE-MAP.md` for where everything lives, and
+**`docs/INVESTMENT-METHODOLOGY.md` for the analytical model** — the latter is
+the core intellectual asset of this platform and constrains what the code is
+allowed to do.
 
 The global rules in `~/.claude/CLAUDE.md` also apply — most importantly:
 **every task gets its own git worktree, and a fresh worktree needs
@@ -42,9 +45,15 @@ research agents.
 
 ## Non-negotiable conventions
 
+0. **The model comes first.** `docs/INVESTMENT-METHODOLOGY.md` defines what
+   Atlas measures and claims. Code and that document must always agree — change
+   a weight, threshold or definition and you change the doc in the same PR.
+   Never tune a threshold to move a particular company's rank.
 1. **Never fabricate a number for a real company.** Every value traces to a
    `source` row. Missing data renders `—`, never a guess. Sample/mock data is
    allowed only for clearly fictional entities and must be visibly labelled.
+   For a module whose data does not exist yet, use `<PlannedModule>` — state
+   the shape and the blocker; never render a fake table.
 2. **All computation server-side**, in `apps/api/src/domain/*`. The UI renders;
    it never computes a financial figure.
 3. **Facts are magnitudes**; presentation applies the sign.

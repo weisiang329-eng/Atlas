@@ -9,8 +9,9 @@ API [atlas-api.weisiang329.workers.dev](https://atlas-api.weisiang329.workers.de
 > | --- | --- | --- |
 > | 1 | [`CLAUDE.md`](CLAUDE.md) | The rules: stack, conventions, commands |
 > | 2 | [`tasks/HANDOFF.md`](tasks/HANDOFF.md) | Current state, what's next, full backlog |
-> | 3 | [`docs/CODEBASE-MAP.md`](docs/CODEBASE-MAP.md) | Where everything lives and why |
-> | 4 | [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) | How we work: worktree → PR → merge → deploy |
+> | 3 | [`docs/INVESTMENT-METHODOLOGY.md`](docs/INVESTMENT-METHODOLOGY.md) | **The analytical model** — what Atlas measures, claims, and cannot do |
+> | 4 | [`docs/CODEBASE-MAP.md`](docs/CODEBASE-MAP.md) | Where everything lives and why |
+> | 5 | [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) | How we work: worktree → PR → merge → deploy |
 >
 > Together they are self-contained — you need no prior chat context to take
 > over this project.

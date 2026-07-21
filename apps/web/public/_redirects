@@ -1,5 +1,5 @@
 # Cloudflare Pages redirects (static export drops Next.js runtime redirects()).
-# Legacy Sprint 000 routes:
+# Legacy routes kept alive from the original prototype:
 /dashboard              /              302
 /company                /companies     302
 # Bare company route → its overview tab:
