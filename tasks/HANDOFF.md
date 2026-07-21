@@ -190,5 +190,68 @@ Full detail + v1 designs + unblock requirements:
 2. Get the owner's **login choice** (§8) — if B, build Supabase Auth.
 3. Run the **deploy runbook** (§7) with the owner's Cloudflare + Supabase auth.
 4. Verify live (`/v1/scores`, Home shows 17 companies, `/agent` answers).
-5. Then pick up the **buildable-next** queue (§9) or unblock P027/Stage 3 once
-   the owner supplies the resource.
+5. Then work the backlog below (§13).
+
+## 13. Complete remaining-work backlog
+
+Everything not yet done, exhaustively, by priority. Tick as you go.
+
+### 13.1 To go live (must-do, owner-gated)
+- [ ] Merge PR #43 (code) + PR #26 (docs) → `main`; close Codex PR #4.
+- [ ] Owner picks login: **A** Cloudflare Access (no code) or **B** Supabase Auth (build it, §8).
+- [ ] Deploy per `management/deployment/production-runbook.md`: Supabase SQL (migration + 5 seeds) → `wrangler secret put DATABASE_URL` + `ANTHROPIC_API_KEY` → `wrangler deploy` → set `NEXT_PUBLIC_API_BASE_URL` on Pages → `wrangler pages deploy out`.
+- [ ] **Rotate the Supabase DB password** (it was shared in chat once), then re-set the `DATABASE_URL` secret.
+- [ ] Smoke-test live: `/v1/scores`, `/v1/companies/nvidia/financials`, Home, `/agent`.
+
+### 13.2 Production hardening (do before/at launch)
+- [ ] **CORS**: `apps/api/src/index.ts` currently allows `origin: "*"`. Restrict to the Pages domain.
+- [ ] **Agent rate-limiting**: `/v1/agent/ask` calls Claude (costs money) with no limit. Add per-IP/day limiting (Cloudflare rate-limit rule or KV counter) before public exposure.
+- [ ] **Observability**: enable `wrangler tail` review / an error sink; Supabase has logs.
+- [ ] **Secrets hygiene**: confirm no secret is in git; `.dev.vars` is gitignored.
+- [ ] Consider Cloudflare **Access** even if login = B, to gate staging.
+
+### 13.3 Frontend — pages still on MOCK or placeholder (wire to real data)
+Live already: Home, Companies list + overview/profile/financials/relations, all
+`/financials/*`, Industries + `/industries/[id]`, Value Chain, Rankings,
+Watchlist, Portfolio, Research overview + notes + decision-journal, Knowledge +
+graph, `/reports/company/[id]`, Agent. **Still not real:**
+- [ ] `companies/[companyId]/products` — needs a `company_product` table + data (P005 v2).
+- [ ] `companies/[companyId]/management` — needs `company_management` table + data (P005 v2).
+- [ ] `companies/[companyId]/valuation` — needs valuation multiples (needs price → P027) (P010 v2).
+- [ ] `companies/[companyId]/documents` — mock; needs filings in R2 + a documents table.
+- [ ] `companies/[companyId]/timeline` — mock; needs an events table.
+- [ ] `research/reports`, `research/evidence`, `research/versions`, `research/hypotheses` — mock; part of P008 v2 (source-linked, versioned, needs write-auth).
+- [ ] `reports/` (library) + `reports/[reportId]` — mock library; make it list the real per-company reports (`/reports/company/[id]`) + saved reports.
+- [ ] `knowledge/heatmap`, `knowledge/decision-tree` — mock viz; wire heatmap to real exposure, decision-tree to P008 decisions.
+- [ ] `alerts/` — placeholder (ComingSoon); needs P011 alerts (price/metric/news rules) → depends on P027 prices.
+- [ ] `admin/` — placeholder; build if/when multi-user (depends on login B).
+- [ ] After wiring each, delete the corresponding `apps/web/lib/mock/*` entry.
+
+### 13.4 Buildable next — no external blocker (server-side value)
+- [ ] **P022 v2** — quarterly EDGAR ingestion (US names) via YTD-differencing; makes the quarterly results/charts live for NVDA/AMD/etc. (Today only glove names have quarters.)
+- [ ] **P022 v2** — IFRS ingestion for ASML & TSMC (20-F); they're on manual seed now.
+- [ ] **P010 v2** — cross-sectional percentile factor scores; persist `score_history` (versioning); valuation multiples once price lands.
+- [ ] **P021** — agent long-term memory: Supabase **pgvector** over research notes / entity profiles; semantic search tool for the agent.
+- [ ] **P023** — decision-outcome tracking: add outcome fields to the decision journal + a review view (feeds learning).
+- [ ] **P013 v2** — PDF export of company reports; industry & portfolio reports.
+- [ ] **P006 v2** — glove value chain (raw-material → manufacturing → distribution) once upstream suppliers are added; interactive flow diagram.
+- [ ] **P026 Phase 2 v2 / Phase 3** — per-company capacity/utilisation metrics; brent/gas/FX daily series (git-clone glove-tracker for the big `_*_max.sql` dumps); port the cron scrapers to Workers Cron; cycle-signal inferences.
+- [ ] **P024** — automation: scheduled report generation + data-quality checks via Workers Cron (needs deploy).
+- [ ] **Tests** — unit tests for the engines (`domain/ratios`, `scoring`, `statements`, `valuechain`); today only `db:test` + typecheck + build gate CI.
+
+### 13.5 Blocked — needs an owner-supplied resource
+- [ ] **P027 real-time markets** — market-data API key (`MARKET_DATA_KEY`, Polygon/Finnhub). US equities only; no Bursa retail feed. Then: quotes adapter, price history, WebSocket/Durable-Objects fan-out, candle charts, watchlist/alerts go live.
+- [ ] **P028 trading execution** — a broker API account (moomoo OpenAPI / IBKR / Alpaca) **and** an always-on `trading-bridge` host (not Cloudflare). Manual-confirm only, paper-first, full audit log — never auto-trade.
+- [ ] **Stage 3 — ERP intelligence (P014–P019)** — read access to the owner's ERP data (API / nightly export to R2 / shared DB). Then: sales/SKU/customer/inventory/capacity ingestion, CEO dashboard, board pack.
+- [ ] **Stage 4 — P025 Atlas 1.0** — integration/verification pass (unified nav, permissions, audit log, performance budget) once the above land.
+
+### 13.6 Data quality / coverage gaps
+- [ ] Coverage is 17 companies — expand the universe (add to `apps/api/seed/data.mjs` + `apps/web/lib/universe.ts`, keep them in sync).
+- [ ] Sparse rows: SK hynix and the glove names are income-statement-only — add balance-sheet/cash-flow where available (their liquidity/leverage/cash factors are currently "—").
+- [ ] EDGAR caveats (documented in `management/programs/P022-ingestion-edgar.md`): pre-split diluted-share counts for old years (EPS only split-consistent recently) → add a split-adjustment table; combined-SG&A filers render the total on the G&A row.
+
+### 13.7 Tech-debt / cleanup
+- [ ] `apps/web/lib/mock/*` — delete each module as its page is wired (§13.3).
+- [ ] Remove the superseded `tasks/handoff-2026-07-21.md` once everyone uses this file.
+- [ ] No CD — consider a GitHub Action to deploy on merge to `main` (after secrets are set in the CF/GH integration).
+- [ ] Nav still tags `alerts`/`admin` as `soon` — correct until built.
