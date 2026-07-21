@@ -1,6 +1,13 @@
 # Atlas — Take-Over Handoff
 
-**Read this first.** It is the single self-contained guide to take over Atlas.
+**This file = current state and what's next.** For the rest of the picture:
+
+| File | What it gives you |
+| --- | --- |
+| [`CLAUDE.md`](../CLAUDE.md) | Rules: stack, conventions, commands, definition of done |
+| [`docs/CODEBASE-MAP.md`](../docs/CODEBASE-MAP.md) | Where everything lives and why |
+| [`docs/METHODOLOGY.md`](../docs/METHODOLOGY.md) | How we work: worktree → PR → review → merge → deploy |
+
 You do not need any prior chat context. Last updated 2026-07-21.
 
 ---
@@ -204,8 +211,17 @@ Full detail + v1 designs + unblock requirements:
    Supabase DB password + the Anthropic API key (both were shared in chat
    during setup) — do this once the frontend/mobile work below is stable, not
    before. See §7.
-6. Then work the backlog below (§13) — Aurora frontend refresh + mobile in
-   progress, see `management/plans/2026-07-21-aurora-frontend-mobile.md`.
+6. ~~Aurora frontend refresh + mobile.~~ **DONE 2026-07-21** (PRs #46, #49 and
+   the mobile commit): Aurora Glass tokens + chart grammar, 15 new module
+   pages (markets, trading, ERP + children, CEO, board, agent ops, admin +
+   children, news, memory, learning, research evidence/hypotheses/versions),
+   live pages restyled with wiring untouched, and the mobile overhaul (bottom
+   tab bar, card lists, phone-first chrome). **254 static pages** (was 195),
+   deployed and verified live at 375×812. Plan:
+   `management/plans/2026-07-21-aurora-frontend-mobile.md`.
+7. Remaining: the exhaustive UI sweep (§13.3) — every page not covered by the
+   design handoff still needs the Aurora grammar applied and, where it is a
+   placeholder, real sample UI. Then the backlog below (§13).
 
 ## 13. Complete remaining-work backlog
 
@@ -227,6 +243,15 @@ Everything not yet done, exhaustively, by priority. Tick as you go.
 - [ ] Consider Cloudflare **Access** even if login = B, to gate staging.
 
 ### 13.3 Frontend — pages still on MOCK or placeholder (wire to real data)
+
+> **Visual status (2026-07-21):** the Aurora Glass system, 15 new module pages
+> and the mobile experience have all landed — see §12.6. The pages below are
+> about **data**, not looks: they render real UI on labelled sample data and
+> still need wiring to the backend. Separately, the **exhaustive UI sweep** of
+> every remaining route (Aurora grammar on pages the design handoff never
+> covered, plus real UI for anything still a `ComingSoon` stub) is the one
+> visual item outstanding — branch `feat/aurora-sweep`.
+
 Live already: Home, Companies list + overview/profile/financials/relations, all
 `/financials/*`, Industries + `/industries/[id]`, Value Chain, Rankings,
 Watchlist, Portfolio, Research overview + notes + decision-journal, Knowledge +
