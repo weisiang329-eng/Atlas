@@ -23,6 +23,7 @@ import type { Sql } from "postgres";
 import init0000 from "../../drizzle/0000_init_postgres.sql";
 import agentUsage0001 from "../../drizzle/0001_agent_usage.sql";
 import pms0002 from "../../drizzle/0002_pms.sql";
+import agents0003 from "../../drizzle/0003_agent_console.sql";
 
 /**
  * Ordered. Never renumber or edit a shipped migration — append a new one.
@@ -40,6 +41,7 @@ const MIGRATIONS: { id: string; sql: string; sentinel: string }[] = [
   { id: "0000_init_postgres", sql: init0000, sentinel: "company" },
   { id: "0001_agent_usage", sql: agentUsage0001, sentinel: "agent_usage" },
   { id: "0002_pms", sql: pms0002, sentinel: "pms_trade" },
+  { id: "0003_agent_console", sql: agents0003, sentinel: "agent_run" },
 ];
 
 /** Arbitrary but fixed — the lock key every Atlas Worker agrees on. */
