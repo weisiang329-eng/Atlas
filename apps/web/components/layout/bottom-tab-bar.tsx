@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Drawer } from "@/components/ui/drawer";
 import { NavGroups } from "@/components/layout/nav-groups";
+import { useT } from "@/lib/i18n/use-locale";
+import type { Dict } from "@/lib/i18n/dictionary";
 import { cn } from "@/lib/cn";
 
 /**
@@ -16,16 +18,16 @@ import { cn } from "@/lib/cn";
  */
 
 interface Tab {
-  label: string;
+  key: keyof Dict;
   href: string;
   glyph: string;
 }
 
 const TABS: Tab[] = [
-  { label: "Home", href: "/", glyph: "HM" },
-  { label: "Companies", href: "/companies", glyph: "CO" },
-  { label: "Markets", href: "/markets", glyph: "MK" },
-  { label: "Watchlist", href: "/watchlist", glyph: "WL" },
+  { key: "nav.home", href: "/", glyph: "HM" },
+  { key: "nav.companies", href: "/companies", glyph: "CO" },
+  { key: "nav.markets", href: "/markets", glyph: "MK" },
+  { key: "nav.watchlist", href: "/watchlist", glyph: "WL" },
 ];
 
 function isActive(pathname: string, href: string): boolean {
@@ -41,12 +43,13 @@ export function BottomTabBar() {
     setOpen(false);
   }, [pathname]);
 
-  const moreActive = !TABS.some((t) => isActive(pathname, t.href));
+  const t = useT();
+  const moreActive = !TABS.some((tab) => isActive(pathname, tab.href));
 
   return (
     <>
       <nav
-        aria-label="Primary mobile"
+        aria-label={t("nav.primaryMobile")}
         className="glass fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
       >
         {TABS.map((tab) => {
@@ -66,7 +69,7 @@ export function BottomTabBar() {
               <span aria-hidden className="font-mono text-xs font-semibold">
                 {tab.glyph}
               </span>
-              <span className="leading-none">{tab.label}</span>
+              <span className="leading-none">{t(tab.key)}</span>
             </Link>
           );
         })}
@@ -74,7 +77,7 @@ export function BottomTabBar() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="More navigation"
+          aria-label={t("nav.more")}
           aria-expanded={open}
           className={cn(
             "flex min-h-[3.25rem] flex-col items-center justify-center gap-0.5 px-1 text-[0.6875rem] transition-colors",
@@ -86,7 +89,7 @@ export function BottomTabBar() {
           <span aria-hidden className="font-mono text-xs font-semibold">
             &#8943;
           </span>
-          <span className="leading-none">More</span>
+          <span className="leading-none">{t("nav.more")}</span>
         </button>
       </nav>
 
@@ -105,7 +108,7 @@ export function BottomTabBar() {
           </div>
         }
       >
-        <nav aria-label="All sections" className="px-3 py-4">
+        <nav aria-label={t("nav.allSections")} className="px-3 py-4">
           <NavGroups pathname={pathname} />
         </nav>
       </Drawer>

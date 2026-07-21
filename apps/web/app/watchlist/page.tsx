@@ -9,9 +9,9 @@ export default function WatchlistPage() {
   return (
     <AppShell title="Watchlist">
       <PageHeader
-        eyebrow="Positions"
-        title="Watchlist"
-        description="Companies you follow, with their Atlas Score at a glance. Stored locally in your browser."
+        eyebrowKey="page.watchlist.eyebrow"
+        titleKey="page.watchlist.title"
+        descriptionKey="page.watchlist.desc"
       />
       <WatchlistLive />
     </AppShell>

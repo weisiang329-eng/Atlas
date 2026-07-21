@@ -9,9 +9,9 @@ export default function PortfolioPage() {
   return (
     <AppShell title="Portfolio">
       <PageHeader
-        eyebrow="Positions"
-        title="Portfolio"
-        description="Your holdings with cost-weighted exposure and Atlas Score quality. Cost basis only — market value and P&L arrive with live prices (P027). Not investment advice."
+        eyebrowKey="page.portfolio.eyebrow"
+        titleKey="page.portfolio.title"
+        descriptionKey="page.portfolio.desc"
       />
       <PortfolioLive />
     </AppShell>
