@@ -7,19 +7,28 @@
  * Dark is the primary, institutional-terminal theme; the light theme is a full
  * override toggled via the `.light` class on <html>, so the app is dark-mode
  * ready without any hardcoded palette. Documented in
- * docs/00-foundation/design-tokens.md.
+ * docs/00-foundation/design-tokens.md and docs/design/00-visual-refresh.md.
+ *
+ * VISUAL REFRESH v0.2 (Aurora Glass) — ADDITIVE ONLY. Core surface/text/brand/
+ * semantic hues are unchanged; this adds a 4th depth (surface-3), two border
+ * tiers, refined radius/shadow, an accent glow, and skeleton/flash tokens.
  *
  * Groups:
- *   Surfaces   bg / surface / surface-2 / border
+ *   Surfaces   bg / surface / surface-2 / surface-3 / border(+soft/strong)
  *   Text       fg / muted / faint
  *   Brand      accent / accent-dim
  *   Semantic   positive / negative / warning / info  (state, NOT the accent)
+ *   Form       radius / radius-panel / shadow-panel / shadow-pop / glow-accent
+ *   Async      skeleton-base / skeleton-sheen
  */
 :root {
   --bg: #080b11;
   --surface: #0e131c;
   --surface-2: #131a26;
+  --surface-3: #171f2e;
   --border: #202a3a;
+  --border-soft: #182231;
+  --border-strong: #2c3a50;
   --fg: #e7ebf2;
   --muted: #8c96a8;
   --faint: #5b657a;
@@ -30,6 +39,19 @@
   --warning: #e0a63a;
   --info: #5aa9e6;
   --grid-line: rgba(255, 255, 255, 0.022);
+
+  /* Form — Aurora Glass: generous panels, soft ambient elevation, accent glow. */
+  --radius: 0.5rem;
+  --radius-panel: 0.75rem;
+  --shadow-panel: 0 1px 0 0 rgba(255, 255, 255, 0.02) inset,
+    0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.55);
+  --shadow-pop: 0 12px 40px -12px rgba(0, 0, 0, 0.7);
+  --glow-accent: 0 0 0 1px rgba(242, 177, 61, 0.25),
+    0 0 18px -4px rgba(242, 177, 61, 0.45);
+
+  /* Async — DataState skeleton shimmer. */
+  --skeleton-base: var(--surface-2);
+  --skeleton-sheen: var(--surface-3);
 
   /* Density — vertical rhythm for dense surfaces (tables). Compact overrides below. */
   --cell-py: 0.625rem;
@@ -44,7 +66,10 @@
   --bg: #f4f5f7;
   --surface: #ffffff;
   --surface-2: #f0f2f5;
+  --surface-3: #e5e9f0;
   --border: #d9dee6;
+  --border-soft: #e4e8ee;
+  --border-strong: #c4ccd8;
   --fg: #15202e;
   --muted: #5b6675;
   --faint: #97a0ad;
@@ -55,6 +80,11 @@
   --warning: #b7791f;
   --info: #2b6cb0;
   --grid-line: rgba(15, 30, 55, 0.03);
+  --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.06),
+    0 8px 24px -14px rgba(0, 0, 0, 0.14);
+  --shadow-pop: 0 12px 40px -12px rgba(0, 0, 0, 0.18);
+  --glow-accent: 0 0 0 1px rgba(183, 121, 31, 0.25),
+    0 0 18px -6px rgba(183, 121, 31, 0.35);
 }
 
 @layer base {
@@ -78,10 +108,20 @@
     text-rendering: optimizeLegibility;
   }
 
+  /*
+   * Numeric glyph rule (boss requirement): figures use a PLAIN zero — no dot,
+   * no slash. IBM Plex Mono ships a dotted zero, so numeric/figure text uses
+   * the .num utility (Plex Sans + tabular-nums, clean zero, still aligned).
+   * Plex Mono stays for tickers / eyebrow labels / code where zeros are rare.
+   */
+  .num {
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
   /* Faint blueprint grid — subtle terminal texture behind the workspace. */
   .atlas-grid {
-    background-image:
-      linear-gradient(var(--grid-line) 1px, transparent 1px),
+    background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 44px 44px;
   }
@@ -110,6 +150,71 @@
   .eyebrow {
     @apply font-mono text-2xs uppercase tracking-[0.16em] text-faint;
   }
+
+  /* Aurora glass — translucent floating surfaces (drawers, popovers, sticky bars). */
+  .glass {
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: blur(12px) saturate(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  }
+
+  /* Skeleton loading block — matches the shape of the real element. */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--skeleton-base) 25%,
+      var(--skeleton-sheen) 37%,
+      var(--skeleton-base) 63%
+    );
+    background-size: 200% 100%;
+    animation: atlas-shimmer 1.4s ease infinite;
+    border-radius: var(--radius);
+  }
+
+  /* Price flash — pulse a cell/row on quote change, then fade (P027 quotes). */
+  .flash-up {
+    animation: atlas-flash-up 0.6s ease;
+  }
+  .flash-down {
+    animation: atlas-flash-down 0.6s ease;
+  }
+}
+
+@keyframes atlas-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+@keyframes atlas-flash-up {
+  0% {
+    background-color: color-mix(in srgb, var(--positive) 22%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+@keyframes atlas-flash-down {
+  0% {
+    background-color: color-mix(in srgb, var(--negative) 22%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Respect reduced-motion: no shimmer, no flash animation. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--skeleton-base);
+  }
+  .flash-up,
+  .flash-down {
+    animation: none;
+  }
 }
 
 /*
@@ -121,7 +226,10 @@
     --bg: #ffffff;
     --surface: #ffffff;
     --surface-2: #f3f4f6;
+    --surface-3: #eceef2;
     --border: #d0d5dd;
+    --border-soft: #e4e7ec;
+    --border-strong: #b0b7c3;
     --fg: #111418;
     --muted: #333a44;
     --faint: #5b6675;
@@ -132,6 +240,9 @@
     --warning: #8a5a12;
     --info: #245a99;
     --grid-line: transparent;
+    --shadow-panel: none;
+    --shadow-pop: none;
+    --glow-accent: none;
   }
   html {
     color-scheme: light;
@@ -141,6 +252,10 @@
   }
   .atlas-grid {
     background-image: none !important;
+  }
+  .glass {
+    background: #ffffff;
+    backdrop-filter: none;
   }
   main {
     padding: 0 !important;

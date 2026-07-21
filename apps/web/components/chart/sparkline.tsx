@@ -3,6 +3,12 @@ interface SparklineProps {
   width?: number;
   height?: number;
   ariaLabel?: string;
+  /**
+   * VISUAL REFRESH v0.2: sparkline colour follows series direction by default
+   * (up = positive, down = negative, flat = accent), per the chart grammar in
+   * docs/design/00-visual-refresh.md. Pass "accent" to keep the old behaviour.
+   */
+  tone?: "auto" | "accent" | "positive" | "negative";
 }
 
 /**
@@ -13,6 +19,7 @@ export function Sparkline({
   width = 96,
   height = 28,
   ariaLabel,
+  tone = "auto",
 }: SparklineProps) {
   if (values.length < 2) return null;
 
@@ -31,6 +38,21 @@ export function Sparkline({
     .join(" ");
   const last = pts[pts.length - 1]!;
 
+  const first = values[0]!;
+  const end = values[values.length - 1]!;
+  const stroke =
+    tone === "accent"
+      ? "var(--accent)"
+      : tone === "positive"
+        ? "var(--positive)"
+        : tone === "negative"
+          ? "var(--negative)"
+          : end > first
+            ? "var(--positive)"
+            : end < first
+              ? "var(--negative)"
+              : "var(--accent)";
+
   return (
     <svg
       width={width}
@@ -43,12 +65,12 @@ export function Sparkline({
       <path
         d={line}
         fill="none"
-        stroke="var(--accent)"
+        stroke={stroke}
         strokeWidth={1.5}
         strokeLinejoin="round"
         strokeLinecap="round"
       />
-      <circle cx={last.x} cy={last.y} r={1.8} fill="var(--accent)" />
+      <circle cx={last.x} cy={last.y} r={1.8} fill={stroke} />
     </svg>
   );
 }

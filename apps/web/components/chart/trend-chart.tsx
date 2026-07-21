@@ -7,14 +7,27 @@ interface TrendChartProps {
   data: SeriesPoint[];
   height?: number;
   ariaLabel: string;
+  /** Aurora Glass: soft glow on the primary line. Default on; off for print-dense contexts. */
+  glow?: boolean;
+  /** Unique gradient id when several charts share a page. */
+  gradientId?: string;
 }
 
 /**
  * Lightweight area + line trend chart. Pure SVG (no dependencies, no runtime
- * JS) so it renders on the server and costs nothing on the client. Emphasized
- * endpoint and a faint baseline grid, per data-viz conventions.
+ * JS) so it renders on the server and costs nothing on the client.
+ *
+ * VISUAL REFRESH v0.2 (Aurora Glass): the flat area fill is now a vertical
+ * gradient (accent → transparent) and the primary line carries a soft accent
+ * glow (`glow` prop, default on). API is backward-compatible.
  */
-export function TrendChart({ data, height = 180, ariaLabel }: TrendChartProps) {
+export function TrendChart({
+  data,
+  height = 180,
+  ariaLabel,
+  glow = true,
+  gradientId = "trend-fill",
+}: TrendChartProps) {
   if (data.length === 0) return null;
 
   const W = 640;
@@ -53,6 +66,12 @@ export function TrendChart({ data, height = 180, ariaLabel }: TrendChartProps) {
       aria-label={ariaLabel}
       preserveAspectRatio="none"
     >
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.24} />
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
+        </linearGradient>
+      </defs>
       {gridYs.map((y, i) => (
         <line
           key={i}
@@ -65,7 +84,7 @@ export function TrendChart({ data, height = 180, ariaLabel }: TrendChartProps) {
           opacity={0.5}
         />
       ))}
-      <path d={area} fill="var(--accent)" fillOpacity={0.12} />
+      <path d={area} fill={`url(#${gradientId})`} />
       <path
         d={line}
         fill="none"
@@ -73,6 +92,11 @@ export function TrendChart({ data, height = 180, ariaLabel }: TrendChartProps) {
         strokeWidth={2}
         strokeLinejoin="round"
         strokeLinecap="round"
+        style={
+          glow
+            ? { filter: "drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent))" }
+            : undefined
+        }
       />
       <circle cx={last.x} cy={last.y} r={3.5} fill="var(--accent)" />
       {data.map((d, i) => (

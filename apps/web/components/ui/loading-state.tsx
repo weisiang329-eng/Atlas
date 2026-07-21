@@ -1,15 +1,12 @@
 import { cn } from "@/lib/cn";
 
-/** Base shimmer block. Honours prefers-reduced-motion. */
+/**
+ * Base shimmer block — VISUAL REFRESH v0.2: uses the `.skeleton` sweep
+ * (globals.css) instead of opacity pulse; honours prefers-reduced-motion via
+ * the global rule (falls back to a static block).
+ */
 export function Skeleton({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "animate-pulse rounded bg-surface-2 motion-reduce:animate-none",
-        className,
-      )}
-    />
-  );
+  return <div className={cn("skeleton rounded", className)} />;
 }
 
 /** Generic block loading state for a panel or section. */
@@ -79,10 +76,7 @@ export function StatGridSkeleton({ count = 4 }: { count?: number }) {
 export function ChartSkeleton({ height = 160 }: { height?: number }) {
   return (
     <div role="status" aria-busy="true" className="w-full">
-      <div
-        className="w-full animate-pulse rounded bg-surface-2 motion-reduce:animate-none"
-        style={{ height }}
-      />
+      <div className="skeleton w-full rounded" style={{ height }} />
       <span className="sr-only">Loading chart</span>
     </div>
   );
