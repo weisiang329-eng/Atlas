@@ -51,15 +51,23 @@ without losing its data, provenance discipline, or cycle-intelligence ideas.
    Quarterly results pages become live for glove names (first real quarterly
    data in Atlas).
 
-### Phase 2 — industry intelligence (feeds P006)
+### Phase 2 — industry intelligence (feeds P006) — v1 DELIVERED 2026-07-21 (PR #31)
 
-- Add `industry_metric` + `commodity_series` tables (schema direction v0
-  already names them): import NBR/latex/brent/gas/FX history and MARGMA ASP
-  from glove-tracker migrations.
-- Glove-specific operating metrics (ASP, volume, capacity, utilisation) as
-  industry metrics attached to companies.
-- Industry workspace page for gloves: cost-factor charts + capacity table —
-  reusing Atlas chart components (their Power-BI-style dashboard's jobs).
+Delivered:
+- `industry_metric` table (industry-level time series, keyed by metric_key).
+- Imported MARGMA Malaysian glove ASP (28 pts) + NBR latex cost (31 pts) from
+  glove-tracker, provenance per point.
+- `domain/industry.ts` cycle-signal engine: output-price ÷ input-cost indexed
+  to cycle start = 100 (the margin proxy). `GET /v1/industries/:id{,/metrics}`.
+- `/industries` live taxonomy + `/industries/[id]` workspace (cost/price/cycle
+  charts, KPI grid, member companies).
+
+Remaining (Phase 2 v2):
+- Value-chain map (who supplies whom) — needs P007 knowledge graph.
+- Capacity / utilisation / volume metrics per company (glove-tracker has them).
+- Brent / natural-gas / FX daily series (large — the glove-tracker `_*_max.sql`
+  dumps exceed the GitHub contents API; pull via git clone when importing).
+- A dedicated `commodity` table split if `industry_metric` gets crowded.
 
 ### Phase 3 — intelligence & automation (feeds P011/P022)
 
