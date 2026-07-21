@@ -2,11 +2,11 @@ import type { ReactNode } from "react";
 import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { Badge } from "@/components/ui/badge";
 import { companyTabs } from "@/lib/nav";
-import { getMockCompany, MOCK_COMPANIES } from "@/lib/mock/companies";
+import { getStaticCompany, STATIC_UNIVERSE } from "@/lib/universe";
 
 // Static export: pre-render every company in the sample universe.
 export function generateStaticParams() {
-  return MOCK_COMPANIES.map((c) => ({ companyId: c.id }));
+  return STATIC_UNIVERSE.map((c) => ({ companyId: c.id }));
 }
 
 export default async function CompanyLayout({
@@ -17,7 +17,7 @@ export default async function CompanyLayout({
   params: Promise<{ companyId: string }>;
 }) {
   const { companyId } = await params;
-  const company = getMockCompany(companyId);
+  const company = getStaticCompany(companyId);
   const name = company?.name ?? "Unknown company";
   const monogram = (company?.ticker ?? companyId).slice(0, 2).toUpperCase();
 

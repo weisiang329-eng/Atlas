@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Panel, PanelBody } from "@/components/ui/panel";
-import { getMockCompany } from "@/lib/mock/companies";
+import { getStaticCompany } from "@/lib/universe";
 
 export const metadata: Metadata = { title: "Profile" };
 
@@ -11,7 +11,7 @@ export default async function CompanyProfilePage({
   params: Promise<{ companyId: string }>;
 }) {
   const { companyId } = await params;
-  const company = getMockCompany(companyId);
+  const company = getStaticCompany(companyId);
 
   const rows: { label: string; value: string }[] = [
     { label: "Legal name", value: company?.name ?? "—" },

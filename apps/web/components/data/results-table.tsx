@@ -1,9 +1,10 @@
 "use client";
 
 import { DataTable, type Column } from "@/components/data/data-table";
-import type { ResultRow } from "@/lib/mock/financials";
+import type { ResultRow } from "@/lib/types";
 
-const num = (v: number) => v.toLocaleString("en-US");
+// Coverage gaps arrive as null (the API never fabricates); render an em dash.
+const num = (v: number | null) => (v === null ? "—" : v.toLocaleString("en-US"));
 
 const columns: Column<ResultRow>[] = [
   { key: "period", header: "Period", sortable: true },
@@ -34,7 +35,7 @@ const columns: Column<ResultRow>[] = [
     header: "EPS",
     numeric: true,
     sortable: true,
-    render: (r) => r.eps.toFixed(2),
+    render: (r) => (r.eps === null ? "—" : r.eps.toFixed(2)),
   },
 ];
 

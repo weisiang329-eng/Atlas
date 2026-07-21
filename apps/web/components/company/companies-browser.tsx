@@ -7,7 +7,7 @@ import { DetailPanelLayout } from "@/components/layout/detail-panel-layout";
 import { Badge } from "@/components/ui/badge";
 import { StatGrid } from "@/components/ui/stat-grid";
 import { cn } from "@/lib/cn";
-import type { MockCompany } from "@/lib/mock/companies";
+import type { CompanySummary } from "@/lib/types";
 
 /**
  * Master–detail company browser: FilterBar + DetailPanelLayout. The list filters
@@ -15,7 +15,7 @@ import type { MockCompany } from "@/lib/mock/companies";
  * profile. Composes the layout and interaction frameworks — the pattern future
  * entity workspaces (suppliers, targets, holdings) reuse.
  */
-export function CompaniesBrowser({ companies }: { companies: MockCompany[] }) {
+export function CompaniesBrowser({ companies }: { companies: CompanySummary[] }) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(companies[0]?.id ?? "");
 
@@ -89,7 +89,7 @@ export function CompaniesBrowser({ companies }: { companies: MockCompany[] }) {
   );
 }
 
-function CompanyPreview({ company }: { company: MockCompany }) {
+function CompanyPreview({ company }: { company: CompanySummary }) {
   const monogram = company.ticker.slice(0, 2).toUpperCase();
   const facts: { label: string; value: string }[] = [
     { label: "Ticker", value: company.ticker },

@@ -3,7 +3,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { StatGrid } from "@/components/ui/stat-grid";
 import { EmptyState } from "@/components/ui/empty-state";
-import { getMockCompany } from "@/lib/mock/companies";
+import { getStaticCompany } from "@/lib/universe";
 
 export const metadata: Metadata = { title: "Overview" };
 
@@ -13,7 +13,7 @@ export default async function CompanyOverviewPage({
   params: Promise<{ companyId: string }>;
 }) {
   const { companyId } = await params;
-  const company = getMockCompany(companyId);
+  const company = getStaticCompany(companyId);
 
   const facts: { label: string; value: string }[] = [
     { label: "Segment", value: company?.segment ?? "—" },
