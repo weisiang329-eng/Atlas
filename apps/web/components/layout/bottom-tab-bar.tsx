@@ -23,10 +23,13 @@ interface Tab {
   glyph: string;
 }
 
+// Mirrors the sidebar's "Daily" group so the two navigations agree about what
+// matters. Companies and Markets moved to More: on a phone the owner is far
+// more often checking a position than browsing coverage.
 const TABS: Tab[] = [
   { key: "nav.home", href: "/", glyph: "HM" },
-  { key: "nav.companies", href: "/companies", glyph: "CO" },
-  { key: "nav.markets", href: "/markets", glyph: "MK" },
+  { key: "nav.ledger", href: "/ledger", glyph: "LG" },
+  { key: "nav.portfolio", href: "/portfolio", glyph: "PF" },
   { key: "nav.watchlist", href: "/watchlist", glyph: "WL" },
 ];
 

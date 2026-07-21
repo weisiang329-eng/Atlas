@@ -26,9 +26,9 @@ export function NavGroups({ pathname }: { pathname: string }) {
   return (
     <>
       {NAV_GROUPS.map((group) => (
-        <div key={group.title} className="mb-6">
-          <p className="eyebrow px-2 pb-2">{groupLabel(group.title)}</p>
-          <ul className="space-y-0.5">
+        <div key={group.title} className="mb-5">
+          <p className="eyebrow px-3 pb-1.5">{groupLabel(group.title)}</p>
+          <ul>
             {group.items.map((item) => {
               const active = isActive(pathname, item.href);
               return (
@@ -38,16 +38,25 @@ export function NavGroups({ pathname }: { pathname: string }) {
                     aria-current={active ? "page" : undefined}
                     title={item.description}
                     className={cn(
-                      "flex items-center gap-2.5 rounded px-2 py-1.5 text-sm transition-colors focus-visible:outline focus-visible:outline-2 -outline-offset-2 focus-visible:outline-accent",
+                      // A 2px accent rail marks the active row instead of a
+                      // filled chip. The eye finds one bright edge faster than
+                      // it finds one filled badge among twenty grey ones — and
+                      // colour stays reserved for meaning (DESIGN-SYSTEM §2).
+                      "relative flex items-center gap-2.5 rounded-r py-1.5 pl-3 pr-2 text-sm transition-colors focus-visible:outline focus-visible:outline-2 -outline-offset-2 focus-visible:outline-accent",
+                      "before:absolute before:left-0 before:top-1/2 before:h-4 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:transition-colors",
                       active
-                        ? "bg-surface-2 font-medium text-fg"
-                        : "text-muted hover:bg-surface-2 hover:text-fg",
+                        ? "bg-surface-2 font-medium text-fg before:bg-accent"
+                        : "text-muted before:bg-transparent hover:bg-surface-2/60 hover:text-fg",
                     )}
                   >
+                    {/* The glyph is a quiet mono monogram, not a filled chip:
+                        it survives the collapsed rail and reads as texture
+                        rather than as twenty competing buttons. */}
                     <span
+                      aria-hidden
                       className={cn(
-                        "grid h-6 w-6 shrink-0 place-items-center rounded font-mono text-2xs font-semibold",
-                        active ? "bg-accent text-black" : "bg-surface-2 text-faint",
+                        "w-5 shrink-0 font-mono text-2xs font-medium tabular-nums transition-colors",
+                        active ? "text-accent" : "text-faint",
                       )}
                     >
                       {item.glyph}
@@ -56,7 +65,7 @@ export function NavGroups({ pathname }: { pathname: string }) {
                       {itemLabel(item.href, item.label)}
                     </span>
                     {item.soon ? (
-                      <span className="text-2xs uppercase tracking-wide text-faint">
+                      <span className="rounded-pill bg-surface-3 px-1.5 py-px font-mono text-[9px] uppercase tracking-wide text-faint">
                         soon
                       </span>
                     ) : null}

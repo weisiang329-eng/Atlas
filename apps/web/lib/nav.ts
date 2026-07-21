@@ -29,85 +29,16 @@ export interface NavGroup {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    title: "Workspace",
+    // What the owner opens every day. Deliberately short — if everything is
+    // top-level, nothing is.
+    title: "Daily",
     items: [
       {
         label: "Home",
         href: "/",
         glyph: "HM",
-        description: "Platform overview and status.",
+        description: "What changed, what needs a decision.",
       },
-      {
-        label: "Companies",
-        href: "/companies",
-        glyph: "CO",
-        description: "Company intelligence workspace.",
-      },
-      {
-        label: "Markets",
-        href: "/markets",
-        glyph: "MK",
-        description: "Live-simulated quotes, intraday and candlestick charts (sample data).",
-      },
-      {
-        label: "News",
-        href: "/news",
-        glyph: "NW",
-        description: "News intelligence feed, tagged and prioritized (sample data).",
-      },
-      {
-        label: "Industries",
-        href: "/industries",
-        glyph: "ID",
-        description: "Industry and supply-chain intelligence.",
-      },
-      {
-        label: "Value Chain",
-        href: "/value-chain",
-        glyph: "VC",
-        description: "The AI-hardware stack and its supply links.",
-      },
-      {
-        label: "Rankings",
-        href: "/scores",
-        glyph: "AS",
-        description: "Atlas Score leaderboard across the coverage universe.",
-      },
-      {
-        label: "Analyst",
-        href: "/agent",
-        glyph: "AI",
-        description: "AI research analyst — ask questions about the data.",
-      },
-      {
-        label: "Research",
-        href: "/research",
-        glyph: "RS",
-        description: "Research notes, reports and evidence.",
-      },
-      {
-        label: "Financials",
-        href: "/financials",
-        glyph: "FN",
-        description: "Statements, metrics and results (sample data).",
-      },
-      {
-        label: "Reports",
-        href: "/reports",
-        glyph: "RP",
-        description: "Intelligence reports and decision documents.",
-      },
-      {
-        label: "Knowledge",
-        href: "/knowledge",
-        glyph: "KG",
-        description: "Relationships, exposure and decision structure.",
-      },
-    ],
-  },
-  {
-    title: "Positions",
-    items: [
       {
         label: "Trade Ledger",
         href: "/ledger",
@@ -125,19 +56,97 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Watchlist",
         href: "/watchlist",
         glyph: "WL",
-        description: "Tracked companies with Atlas Score.",
+        description: "Companies you follow, with their Atlas Score.",
+      },
+      {
+        label: "Markets",
+        href: "/markets",
+        glyph: "MK",
+        description: "Quotes and index snapshot.",
+      },
+      {
+        label: "News",
+        href: "/news",
+        glyph: "NW",
+        description: "Tagged global and holdings news.",
+      },
+    ],
+  },
+  {
+    // Deciding what to own: the analytical surface.
+    title: "Research",
+    items: [
+      {
+        label: "Companies",
+        href: "/companies",
+        glyph: "CO",
+        description: "Profiles, financials and scores for the coverage universe.",
+      },
+      {
+        label: "Rankings",
+        href: "/scores",
+        glyph: "AS",
+        description: "The Atlas Score leaderboard.",
+      },
+      {
+        label: "Financials",
+        href: "/financials",
+        glyph: "FN",
+        description: "Statements, metrics, ratios and trends across companies.",
+      },
+      {
+        label: "Industries",
+        href: "/industries",
+        glyph: "ID",
+        description: "Cost factors, output prices and the margin cycle signal.",
+      },
+      {
+        label: "Value Chain",
+        href: "/value-chain",
+        glyph: "VC",
+        description: "The AI-hardware stack and its supply links.",
+      },
+      {
+        label: "Knowledge",
+        href: "/knowledge",
+        glyph: "KG",
+        description: "Supplier, customer and competitor relationships.",
+      },
+      {
+        label: "Notes",
+        href: "/research",
+        glyph: "RS",
+        description: "Research notes and the decision journal.",
+      },
+      {
+        label: "Reports",
+        href: "/reports",
+        glyph: "RP",
+        description: "Generated company and industry reports.",
+      },
+      {
+        label: "Analyst",
+        href: "/agent",
+        glyph: "AI",
+        description: "Ask Claude about the data in Atlas.",
+      },
+    ],
+  },
+  {
+    // Acting on a decision. Separated from Daily because these move money.
+    title: "Execution",
+    items: [
+      {
+        label: "Trading",
+        href: "/trading",
+        glyph: "TR",
+        description: "Order ticket and blotter. Manual confirm only.",
       },
       {
         label: "Alerts",
         href: "/alerts",
         glyph: "AL",
-        description: "Rule-triggered alert feed (sample data).",
-      },
-      {
-        label: "Trading",
-        href: "/trading",
-        glyph: "TR",
-        description: "Paper order execution, manual-confirm only (sample data).",
+        description: "Price, metric and news rules.",
       },
     ],
   },
@@ -148,25 +157,19 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "CEO Dashboard",
         href: "/ceo",
         glyph: "CE",
-        description: "Cross-company KPI roll-up (sample data).",
+        description: "Company-wide operating view.",
       },
       {
         label: "ERP",
         href: "/erp",
         glyph: "ER",
-        description: "ERP intelligence — revenue/SKU/customers (sample data).",
+        description: "Manufacturing, procurement and warehouse intelligence.",
       },
       {
         label: "Board",
         href: "/board",
         glyph: "BD",
-        description: "Risk matrix, register and board packs (sample data).",
-      },
-      {
-        label: "Agent Ops",
-        href: "/agents",
-        glyph: "AG",
-        description: "Agent runtime task queue — distinct from Analyst (sample data).",
+        description: "Board-level risk and decision pack.",
       },
     ],
   },
@@ -174,22 +177,28 @@ export const NAV_GROUPS: NavGroup[] = [
     title: "System",
     items: [
       {
-        label: "Style Guide",
-        href: "/style-guide",
-        glyph: "SG",
-        description: "Living design-system gallery.",
+        label: "Agent Ops",
+        href: "/agents",
+        glyph: "AG",
+        description: "Agent runtime queue and traces.",
       },
       {
         label: "Admin",
         href: "/admin",
         glyph: "AD",
-        description: "Workspace administration — users, audit log (sample data).",
+        description: "Users, audit log and data sources.",
+      },
+      {
+        label: "Style Guide",
+        href: "/style-guide",
+        glyph: "SG",
+        description: "The design system in living form.",
       },
       {
         label: "Settings",
         href: "/settings",
         glyph: "ST",
-        description: "Appearance and preferences.",
+        description: "Language, theme and density.",
       },
     ],
   },
@@ -277,8 +286,8 @@ export const NAV_ITEM_KEYS: Record<string, keyof Dict> = {
   "/value-chain": "nav.valueChain",
   "/scores": "nav.scores",
   "/agent": "nav.agent",
-  "/research": "nav.research",
-  "/financials": "fin.incomeStatement",
+  "/research": "nav.notes",
+  "/financials": "nav.financials",
   "/reports": "nav.reports",
   "/knowledge": "nav.knowledge",
   "/ledger": "nav.ledger",
@@ -296,9 +305,9 @@ export const NAV_ITEM_KEYS: Record<string, keyof Dict> = {
 
 /** Group title (as written in NAV_GROUPS) → dictionary key. */
 export const NAV_GROUP_KEYS: Record<string, keyof Dict> = {
-  Workspace: "nav.workspace",
-  Intelligence: "nav.intelligence",
-  Positions: "nav.portfolio",
+  Daily: "nav.daily",
+  Research: "nav.researchGroup",
+  Execution: "nav.execution",
   Enterprise: "nav.enterprise",
   System: "nav.system",
 };
