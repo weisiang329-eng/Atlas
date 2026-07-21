@@ -1,3 +1,5 @@
+"use client";
+
 import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { NewsFeed } from "@/components/news/news-feed";

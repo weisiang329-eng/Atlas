@@ -1,3 +1,5 @@
+"use client";
+
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ChartContainer } from "@/components/chart/chart-container";
 import { OrderTicket } from "@/components/trading/order-ticket";

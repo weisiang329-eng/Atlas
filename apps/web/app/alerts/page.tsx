@@ -1,3 +1,5 @@
+"use client";
+
 import { SectionHeading } from "@/components/ui/section-heading";
 import { AlertList } from "@/components/alerts/alert-list";
 import { MOCK_ALERTS } from "@/lib/mock/watchlist";

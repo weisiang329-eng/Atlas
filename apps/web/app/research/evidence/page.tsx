@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+
 import { SectionHeading } from "@/components/ui/section-heading";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { Badge } from "@/components/ui/badge";
 import { SAMPLE_EVIDENCE, type SampleEvidenceRow } from "@/lib/mock/research";
 
-export const metadata: Metadata = { title: "Evidence" };
 
 const TONE = { high: "positive", med: "warning", low: "neutral" } as const;
 

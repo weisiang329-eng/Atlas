@@ -1,3 +1,5 @@
+"use client";
+
 import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { DataTable, type Column } from "@/components/data/data-table";

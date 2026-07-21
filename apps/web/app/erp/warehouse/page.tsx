@@ -1,3 +1,5 @@
+"use client";
+
 import { SectionHeading } from "@/components/ui/section-heading";
 import { StatGrid } from "@/components/ui/stat-grid";
 import { ChartContainer } from "@/components/chart/chart-container";

@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+
 import { SectionHeading } from "@/components/ui/section-heading";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { Badge } from "@/components/ui/badge";
 import { SAMPLE_HYPOTHESES, type SampleHypothesisRow } from "@/lib/mock/research";
 
-export const metadata: Metadata = { title: "Hypotheses" };
 
 const TONE = { open: "info", supported: "positive", refuted: "negative" } as const;
 const LABEL = { open: "待验证", supported: "已支持", refuted: "已证伪" } as const;

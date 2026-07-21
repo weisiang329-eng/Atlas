@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+
 import { SectionHeading } from "@/components/ui/section-heading";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { formatDateTime } from "@/lib/format";
 import { SAMPLE_VERSIONS, type SampleVersionRow } from "@/lib/mock/research";
 
-export const metadata: Metadata = { title: "Versions" };
 
 const cols: Column<SampleVersionRow>[] = [
   { key: "doc", header: "文档", sortable: true },
