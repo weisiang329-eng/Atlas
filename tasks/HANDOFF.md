@@ -5,6 +5,7 @@
 | File | What it gives you |
 | --- | --- |
 | [`CLAUDE.md`](../CLAUDE.md) | Rules: stack, conventions, commands, definition of done |
+| [`docs/INVESTMENT-METHODOLOGY.md`](../docs/INVESTMENT-METHODOLOGY.md) | **The analytical model** — factors, weights, thresholds, known limitations |
 | [`docs/CODEBASE-MAP.md`](../docs/CODEBASE-MAP.md) | Where everything lives and why |
 | [`docs/METHODOLOGY.md`](../docs/METHODOLOGY.md) | How we work: worktree → PR → review → merge → deploy |
 

@@ -39,7 +39,7 @@ The UI never computes a financial number, and never fetches directly.
 | --- | --- |
 | `src/index.ts` | Worker entry: CORS (env allowlist), per-request Postgres connection, route mounting, error handling |
 | `src/routes/` | HTTP layer only — parse, call domain, return. `companies` `industries` `scores` `graph` `agent` |
-| `src/domain/` | **All computation lives here.** `statements` `ratios` `scoring` `industry` `graph` `valuechain` `concepts` (concept vocabulary) `presenters` (shape → API contract) |
+| `src/domain/` | **All computation lives here.** `statements` `ratios` `scoring` `industry` `graph` `valuechain` `concepts` (concept vocabulary) `presenters` (shape → API contract). Governed by `docs/INVESTMENT-METHODOLOGY.md` — the two must always agree |
 | `src/db/schema.ts` | Drizzle Postgres schema — the tables |
 | `src/db/repo.ts` | Typed queries. No formatting, no computation |
 | `src/agent/` | `runtime.ts` (Claude tool-use loop) + `tools.ts` (read-only data tools) |
@@ -111,6 +111,7 @@ frames: 375×812 and 1440.
 
 | Path | What it holds |
 | --- | --- |
+| `docs/INVESTMENT-METHODOLOGY.md` | **the analytical model** — factors, weights, thresholds, limitations, and the rule for changing them |
 | `docs/CODEBASE-MAP.md` | this file |
 | `docs/METHODOLOGY.md` | worktree → PR → review → merge → deploy, and the review standard |
 | `docs/00-foundation/` | architecture, design tokens, layout system, component catalog, integration points, development standard |
@@ -127,7 +128,8 @@ frames: 375×812 and 1440.
 | Job | Start here |
 | --- | --- |
 | Add a company | `apps/api/seed/data.mjs` + `apps/web/lib/universe.ts` (keep in sync) → `npm run seed:build` → `npm run db:test` |
-| Add a metric/ratio | `domain/concepts.ts` → `domain/ratios.ts` → presenter → `web/lib/types.ts` |
+| Add a metric/ratio | `domain/concepts.ts` → `domain/ratios.ts` → presenter → `web/lib/types.ts`, and document it in `docs/INVESTMENT-METHODOLOGY.md` §3 |
+| Change a score factor/weight/threshold | `domain/scoring.ts` **and** `docs/INVESTMENT-METHODOLOGY.md` §4 in the same PR — never tune to move a company's rank |
 | New API endpoint | `src/routes/` + a `domain/` function; never compute in the route |
 | New page | route in `app/` + a `*-live.tsx` using `useApiResource` → `<DataState>` |
 | Wire a sample page | replace `lib/mock/*` import with a loader; delete the mock |

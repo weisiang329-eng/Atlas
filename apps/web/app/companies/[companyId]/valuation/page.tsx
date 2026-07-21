@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
-import { StatGrid } from "@/components/ui/stat-grid";
-import { EmptyState } from "@/components/ui/empty-state";
+import { PlannedModule } from "@/components/ui/planned-module";
 
 export const metadata: Metadata = { title: "Valuation" };
 
@@ -11,29 +9,22 @@ export default function CompanyValuationPage() {
     <>
       <SectionHeading
         title="Valuation"
-        description="Multiples and model output. Maps to valuation_metric and the scoring engine (planned)."
+        description="Price against quality — the question the Atlas Score deliberately does not answer."
       />
-
-      <div className="mb-6">
-        <StatGrid
-          items={[
-            { label: "P / E", value: "—" },
-            { label: "EV / EBITDA", value: "—" },
-            { label: "Fair value", value: "—" },
-            { label: "Upside", value: "—" },
-          ]}
-        />
-      </div>
-
-      <Panel>
-        <PanelHeader eyebrow="Model" title="Valuation model" />
-        <PanelBody>
-          <EmptyState
-            title="No model yet"
-            body="Versioned valuation methods and assumptions will render here. Scoring and valuation logic stays server-side, never in the UI."
-          />
-        </PanelBody>
-      </Panel>
+      <PlannedModule
+        program="P010 v2 · P027"
+        title="Multiples and quality-vs-price"
+        body="The Atlas Score measures business quality from reported fundamentals only, with no price input. Valuation is the other half: a 90-scoring company can still be a poor investment at the wrong price. This module adds the multiples and the quality-against-price view that completes the picture."
+        fields={[
+          "P / E",
+          "EV / EBITDA",
+          "FCF yield",
+          "P / B",
+          "vs. sector median",
+          "Atlas Score vs. multiple",
+        ]}
+        requires="Market price data — a market-data API key (MARKET_DATA_KEY) under programme P027. Multiples cannot be derived from filings alone."
+      />
     </>
   );
 }
