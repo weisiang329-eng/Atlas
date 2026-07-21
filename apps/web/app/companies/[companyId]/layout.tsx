@@ -3,6 +3,7 @@ import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 import { Badge } from "@/components/ui/badge";
 import { companyTabs } from "@/lib/nav";
 import { HeaderScore } from "@/components/company/header-score";
+import { WatchlistButton } from "@/components/company/watchlist-button";
 import { getStaticCompany, STATIC_UNIVERSE } from "@/lib/universe";
 
 // Static export: pre-render every company in the sample universe.
@@ -47,9 +48,7 @@ export default async function CompanyLayout({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="inline-flex cursor-not-allowed items-center rounded border border-border bg-surface px-3 py-2 text-sm text-faint">
-            ☆ Watchlist
-          </span>
+          <WatchlistButton companyId={companyId} />
           <div className="rounded border border-border bg-surface px-3 py-2 text-right">
             <p className="eyebrow">Atlas Score</p>
             <HeaderScore companyId={companyId} />
