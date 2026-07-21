@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Panel } from "@/components/ui/panel";
-import { Badge } from "@/components/ui/badge";
-import { NotesTable } from "@/components/research/research-tables";
-import { NOTES } from "@/lib/mock/research";
+import { NotesLive } from "@/components/research/notes-live";
 
 export const metadata: Metadata = { title: "Research Notes" };
 
@@ -11,13 +8,10 @@ export default function ResearchNotesPage() {
   return (
     <>
       <SectionHeading
-        title="Notes"
-        description="Working research notes. Maps to the research_note data model."
-        action={<Badge tone="accent">Sample</Badge>}
+        title="Research notes"
+        description="Working notes, optionally tagged to a company. Stored locally in your browser."
       />
-      <Panel className="overflow-hidden">
-        <NotesTable rows={NOTES} />
-      </Panel>
+      <NotesLive />
     </>
   );
 }
