@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useDecisions, type Decision } from "@/lib/loaders/use-research";
 import { STATIC_UNIVERSE, getStaticCompany } from "@/lib/universe";
+import { fmtDate } from "@/lib/format";
 
 const convictionTone = (c: Decision["conviction"]): "positive" | "warning" | "neutral" =>
   c === "high" ? "positive" : c === "medium" ? "warning" : "neutral";
@@ -112,7 +113,7 @@ export function DecisionsLive() {
                         ) : null}
                       </div>
                       {d.rationale ? <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{d.rationale}</p> : null}
-                      <p className="mt-2 text-2xs text-faint">{d.date.slice(0, 10)}</p>
+                      <p className="mt-2 text-2xs text-faint">{fmtDate(d.date)}</p>
                     </div>
                     <button type="button" onClick={() => remove(d.id)} className="text-faint hover:text-negative" aria-label="Delete decision">
                       ✕

@@ -32,7 +32,7 @@ export default function ProcurementPage() {
         </p>
       </div>
       <ChartContainer title="供应商" subtitle="份额 / 准时率 / 风险标记">
-        <DataTable
+        <DataTable columnPickerId="erp-procurement"
         mobileCards columns={cols} rows={SUPPLIERS} getRowId={(r) => r.id} caption="Suppliers" />
       </ChartContainer>
     </>

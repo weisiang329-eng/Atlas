@@ -3,8 +3,11 @@
 import { DataTable, type Column } from "@/components/data/data-table";
 import type { ResultRow } from "@/lib/types";
 
-// Coverage gaps arrive as null (the API never fabricates); render an em dash.
-const num = (v: number | null) => (v === null ? "—" : v.toLocaleString("en-US"));
+import { fmtNumber } from "@/lib/format";
+
+// Coverage gaps arrive as null (the API never fabricates); `fmtNumber` renders
+// the em-dash for those, per DESIGN-SYSTEM §3.
+const num = (v: number | null) => fmtNumber(v);
 
 const columns: Column<ResultRow>[] = [
   { key: "period", header: "Period", sortable: true },

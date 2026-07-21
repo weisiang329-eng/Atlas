@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useNotes } from "@/lib/loaders/use-research";
 import { STATIC_UNIVERSE, getStaticCompany } from "@/lib/universe";
+import { fmtDate } from "@/lib/format";
 
 export function NotesLive() {
   const { items, add, remove } = useNotes();
@@ -95,7 +96,7 @@ export function NotesLive() {
                         ) : null}
                       </div>
                       {n.body ? <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{n.body}</p> : null}
-                      <p className="mt-2 text-2xs text-faint">{n.createdAt.slice(0, 10)}</p>
+                      <p className="mt-2 text-2xs text-faint">{fmtDate(n.createdAt)}</p>
                     </div>
                     <button type="button" onClick={() => remove(n.id)} className="text-faint hover:text-negative" aria-label="Delete note">
                       ✕

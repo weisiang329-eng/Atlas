@@ -36,7 +36,7 @@ export default function LearningPage() {
     <WorkspaceLayout title="Learning" eyebrow="P023 · Learning Engine" description="预测 vs 实际复盘（接 P008 决策日志），量化判断准确率，反哺评分模型迭代。">
       <SectionHeading title="判断准确率" description="小样本仅供参考（n<10 标注）；到期预测自动比对实际后人工确认。" />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
-        <DataTable
+        <DataTable columnPickerId="research-learning"
         mobileCards columns={cols} rows={LEARNING_STATS} getRowId={(r) => r.dim} caption="Learning stats" />
       </div>
     </WorkspaceLayout>

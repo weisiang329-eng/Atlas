@@ -7,6 +7,7 @@
  * selected subject, or the labelled sample data when no API is configured.
  * No section computes a financial number — display only.
  */
+import { fmtNumber } from "@/lib/format";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Badge } from "@/components/ui/badge";
@@ -95,7 +96,7 @@ function useFinancialsResource(): Resource<CompanyFinancials> {
 // --- Overview ---------------------------------------------------------------
 
 const fmtM = (v: number | undefined): string =>
-  v === undefined ? "—" : Math.round(v).toLocaleString("en-US");
+  fmtNumber(v === undefined ? undefined : Math.round(v));
 
 export function OverviewSection() {
   const { isSample } = useFinancialSubject();

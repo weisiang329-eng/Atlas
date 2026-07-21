@@ -28,7 +28,7 @@ export default function WarehousePage() {
         />
       </div>
       <ChartContainer title="呆滞品清单" subtitle="超过 90 天无动销，按金额排序">
-        <DataTable
+        <DataTable columnPickerId="erp-warehouse"
         mobileCards columns={cols} rows={DEADSTOCK} getRowId={(r) => r.id} caption="Deadstock" />
       </ChartContainer>
     </>

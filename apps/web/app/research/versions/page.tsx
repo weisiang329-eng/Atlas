@@ -18,7 +18,7 @@ export default function ResearchVersionsPage() {
     <>
       <SectionHeading title="版本历史" description="研究与报告的版本留痕，历史永不删除（审计与复盘依据，sample data）。" />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
-        <DataTable
+        <DataTable columnPickerId="research-versions"
         mobileCards columns={cols} rows={SAMPLE_VERSIONS} getRowId={(v) => v.id} caption="Version history" />
       </div>
     </>

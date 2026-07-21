@@ -6,6 +6,7 @@
  * sample fallback (there is no truthful mock for an industry's real cost
  * curves), so without an API configured it shows the empty/guidance state.
  */
+import { fmtNumber } from "@/lib/format";
 import Link from "next/link";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { PageHeader } from "@/components/ui/page-header";
@@ -86,7 +87,7 @@ export function IndustryWorkspace({ industryId }: { industryId: string }) {
                 items={[
                   ...d.series.map((s) => ({
                     label: s.label,
-                    value: s.latest === null ? "—" : `${s.latest.toLocaleString("en-US")}`,
+                    value: fmtNumber(s.latest),
                     hint: `${s.unit} · YoY ${pct(s.changeYoYPct)}`,
                   })),
                   {
@@ -110,7 +111,7 @@ export function IndustryWorkspace({ industryId }: { industryId: string }) {
                   <ChartContainer
                     key={s.key}
                     title={s.label}
-                    subtitle={`${s.unit} · latest ${s.latest?.toLocaleString("en-US") ?? "—"} (${s.latestDate ?? "—"})`}
+                    subtitle={`${s.unit} · latest ${fmtNumber(s.latest)} (${s.latestDate ?? "—"})`}
                     footer="Source-linked data via Atlas API"
                   >
                     <TrendChart data={toChart(s)} ariaLabel={`${s.label} history`} />
@@ -137,7 +138,7 @@ export function IndustryWorkspace({ industryId }: { industryId: string }) {
             description="Members of the coverage universe mapped to this industry."
           />
           <Panel className="overflow-hidden">
-            <DataTable
+            <DataTable columnPickerId="industry-compare"
               columns={companyColumns}
               rows={d.companies}
               getRowId={(c) => c.id}
