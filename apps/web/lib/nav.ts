@@ -88,15 +88,13 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Portfolio",
         href: "/portfolio",
         glyph: "PF",
-        soon: true,
-        description: "Holdings and exposure (planned).",
+        description: "Holdings, cost-weighted exposure and quality.",
       },
       {
         label: "Watchlist",
         href: "/watchlist",
         glyph: "WL",
-        soon: true,
-        description: "Tracked companies (planned).",
+        description: "Tracked companies with Atlas Score.",
       },
       {
         label: "Alerts",
