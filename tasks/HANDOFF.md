@@ -99,33 +99,46 @@ There is **no local Postgres**; for live local dev put `DATABASE_URL` +
 `ANTHROPIC_API_KEY` in `apps/api/.dev.vars` (see `.dev.vars.example`) and run
 `wrangler dev`, or just point the web app at the deployed API.
 
-## 7. Deploy to production (owner-only — the path to "live")
+## 7. Deploy to production — **LIVE as of 2026-07-21**
 
-Full step-by-step: **`management/deployment/production-runbook.md`**. Summary:
+- **Web:** https://atlas-web-2yd.pages.dev (Cloudflare Pages project `atlas-web`)
+- **API:** https://atlas-api.weisiang329.workers.dev (Cloudflare Worker `atlas-api`)
+- **Database:** Supabase project `fsbcltowqpfniodzaslo`, migrations 0000+0001 and
+  all 5 seeds applied via the SQL editor (17 companies, 3,982 facts, 23 graph
+  edges, 59 industry-metric points, matches `db:test`).
+- Both secrets (`DATABASE_URL` — transaction pooler, port 6543 — and
+  `ANTHROPIC_API_KEY`) are set on the Worker; `/v1/agent/status` reports
+  `configured: true`.
 
-1. `wrangler login` (owner's Cloudflare).
-2. In the Supabase SQL editor, run in order: `apps/api/drizzle/0000_init_postgres.sql`,
-   then the 5 seeds (`seed/seed.sql`, `seed/edgar/edgar-seed.sql`,
-   `seed/glove/glove-seed.sql`, `seed/glove/industry-metrics.sql`,
-   `seed/graph/graph-seed.sql`).
-3. `wrangler secret put DATABASE_URL` (Supabase **transaction pooler** URL, port
-   6543) and `wrangler secret put ANTHROPIC_API_KEY`.
-4. `cd apps/api && wrangler deploy` → note the workers.dev URL.
-5. Set `NEXT_PUBLIC_API_BASE_URL` (that URL) on the Pages project →
-   `cd apps/web && npm run build && wrangler pages deploy out`.
+Full step-by-step for a fresh environment: **`management/deployment/production-runbook.md`**.
 
 **Supabase project:** `fsbcltowqpfniodzaslo` (owner's). It is **not** reachable
 from the Supabase MCP connector used previously (different org — that connector
 only exposed the owner's *Houzs* projects, which must never be touched).
-**Security:** the DB password was shared in chat once — rotate it in Supabase
-after setup and re-run `wrangler secret put DATABASE_URL`.
+**Security — outstanding, deliberately deferred by the owner (2026-07-21):**
+the DB password and the Anthropic key were both shared in chat once during
+setup. **Rotate both once the frontend/mobile work below has landed and the
+app is stable** — reset the Supabase DB password (Settings → Database →
+Reset database password) and re-run `wrangler secret put DATABASE_URL`;
+regenerate the Anthropic key at console.anthropic.com and re-run
+`wrangler secret put ANTHROPIC_API_KEY`. Do not treat "not urgent" as "skip."
 
-## 8. Pending decision — login / access
+## 8. Login / access — **LIVE, but wide open (owner's explicit choice for now)**
 
-**DECIDED 2026-07-21: Option A — Cloudflare Access (Zero Trust).** Email-code
-login gate on the Pages domain, zero code, works on phone. The owner enables it
-in the Cloudflare dashboard at deploy time (see the runbook). Option B
-(Supabase Auth, in-app multi-user login) remains a possible later upgrade.
+**DECIDED 2026-07-21: Option A — Cloudflare Access (Zero Trust).** Configured
+on the Pages domain: Application `atlas-web-2yd` → Policy **"Everyone" /
+Action = Bypass**. Bypass means Access enforces **no authentication at all** —
+anyone with the URL gets straight in, no email, no click. This was the
+owner's explicit choice ("谁都可以进ok啊之后我们才做user权限" — open now,
+real permissions later), not an oversight.
+
+**To lock it down later** (Cloudflare One → Access controls → Applications →
+`atlas-web-2yd` → Policies): change the policy Action from **Bypass** to
+**Allow**, and set Include to **Emails** (remove the `Everyone` include rule —
+Bypass policies reject a mixed Emails+Everyone include, so this requires
+editing, not just toggling). Cloudflare's default login method then prompts
+for an email one-time PIN. Option B (Supabase Auth, in-app multi-user login)
+remains a possible later upgrade if password-based login is wanted instead.
 
 ## 9. What's built vs blocked (all programs)
 
@@ -184,24 +197,31 @@ Full detail + v1 designs + unblock requirements:
 1. ~~Merge **PR #43** (all code) + **PR #26** (all docs) into `main`; close #4.~~
    **DONE 2026-07-21** — main has everything; #4 closed, #27–#42 marked merged.
 2. ~~Get the owner's **login choice** (§8).~~ **DONE — A (Cloudflare Access).**
-3. Run the **deploy runbook** (§7) with the owner's Cloudflare + Supabase auth.
-4. Verify live (`/v1/scores`, Home shows 17 companies, `/agent` answers).
-5. Then work the backlog below (§13).
+3. ~~Run the **deploy runbook** (§7).~~ **DONE 2026-07-21** — API + web + DB all live (§7).
+4. ~~Verify live.~~ **DONE** — `/v1/scores`, `/v1/companies/nvidia/financials`, Home
+   (17 companies), `/v1/agent/status` all verified 200 against the live Worker.
+5. **Outstanding, deliberately deferred (owner, 2026-07-21):** rotate the
+   Supabase DB password + the Anthropic API key (both were shared in chat
+   during setup) — do this once the frontend/mobile work below is stable, not
+   before. See §7.
+6. Then work the backlog below (§13) — Aurora frontend refresh + mobile in
+   progress, see `management/plans/2026-07-21-aurora-frontend-mobile.md`.
 
 ## 13. Complete remaining-work backlog
 
 Everything not yet done, exhaustively, by priority. Tick as you go.
 
-### 13.1 To go live (must-do, owner-gated)
-- [x] Merge PR #43 (code) + PR #26 (docs) → `main`; close Codex PR #4. *(done 2026-07-21)*
-- [x] Owner picks login: **A — Cloudflare Access** (no code, §8). *(decided 2026-07-21)*
-- [ ] Deploy per `management/deployment/production-runbook.md`: Supabase SQL (migration + 5 seeds) → `wrangler secret put DATABASE_URL` + `ANTHROPIC_API_KEY` → `wrangler deploy` → set `NEXT_PUBLIC_API_BASE_URL` on Pages → `wrangler pages deploy out`.
-- [ ] **Rotate the Supabase DB password** (it was shared in chat once), then re-set the `DATABASE_URL` secret.
-- [ ] Smoke-test live: `/v1/scores`, `/v1/companies/nvidia/financials`, Home, `/agent`.
+### 13.1 To go live (must-do, owner-gated) — **ALL DONE 2026-07-21**
+- [x] Merge PR #43 (code) + PR #26 (docs) → `main`; close Codex PR #4.
+- [x] Owner picks login: **A — Cloudflare Access** (no code, §8).
+- [x] Deploy: Supabase SQL (migration 0000+0001 + 5 seeds) → both Worker secrets set → `wrangler deploy` (atlas-api) → `wrangler pages deploy` (atlas-web).
+- [x] Smoke-test live: `/v1/scores`, `/v1/companies/nvidia/financials`, `/v1/companies`, `/v1/agent/status` — all 200.
+- [ ] **Rotate the Supabase DB password + the Anthropic API key** (both shared in chat during setup) — deliberately deferred by the owner until the frontend/mobile work is stable (§7). Do not forget.
 
-### 13.2 Production hardening (do before/at launch)
-- [ ] **CORS**: `apps/api/src/index.ts` currently allows `origin: "*"`. Restrict to the Pages domain.
-- [ ] **Agent rate-limiting**: `/v1/agent/ask` calls Claude (costs money) with no limit. Add per-IP/day limiting (Cloudflare rate-limit rule or KV counter) before public exposure.
+### 13.2 Production hardening — **DONE 2026-07-21** (PR #45)
+- [x] **CORS**: `ALLOWED_ORIGINS` env allowlist (unset ⇒ permissive), see `apps/api/src/index.ts`.
+- [x] **Agent rate-limiting**: `agent_usage` table, per-IP/day quota enforced before calling Claude (`AGENT_DAILY_LIMIT`, default 50).
+- [ ] Neither `ALLOWED_ORIGINS` nor a tightened `AGENT_DAILY_LIMIT` has been *set* on the live Worker yet (both currently run on defaults) — set `ALLOWED_ORIGINS=https://atlas-web-2yd.pages.dev` once the domain is final.
 - [ ] **Observability**: enable `wrangler tail` review / an error sink; Supabase has logs.
 - [ ] **Secrets hygiene**: confirm no secret is in git; `.dev.vars` is gitignored.
 - [ ] Consider Cloudflare **Access** even if login = B, to gate staging.
