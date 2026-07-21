@@ -122,15 +122,10 @@ after setup and re-run `wrangler secret put DATABASE_URL`.
 
 ## 8. Pending decision — login / access
 
-The app has **no built-in auth** (single-user design) and is **mobile-responsive**
-(open the deployed URL on a phone). The owner wants a login + phone access.
-Two options, awaiting the owner's pick:
-
-- **A — Cloudflare Access (Zero Trust):** email-code login gate on the Pages
-  domain, no code, works on phone. Fastest; recommended for launch.
-- **B — Supabase Auth:** a real in-app login page (email+password / multi-user)
-  built with Supabase's auth. A real feature to build (login UI + session +
-  route protection + API JWT verification) — **not yet built**; would be a new PR.
+**DECIDED 2026-07-21: Option A — Cloudflare Access (Zero Trust).** Email-code
+login gate on the Pages domain, zero code, works on phone. The owner enables it
+in the Cloudflare dashboard at deploy time (see the runbook). Option B
+(Supabase Auth, in-app multi-user login) remains a possible later upgrade.
 
 ## 9. What's built vs blocked (all programs)
 
@@ -186,8 +181,9 @@ Full detail + v1 designs + unblock requirements:
 
 ## 12. Immediate next actions for whoever takes over
 
-1. Merge **PR #43** (all code) + **PR #26** (all docs) into `main`; close #4.
-2. Get the owner's **login choice** (§8) — if B, build Supabase Auth.
+1. ~~Merge **PR #43** (all code) + **PR #26** (all docs) into `main`; close #4.~~
+   **DONE 2026-07-21** — main has everything; #4 closed, #27–#42 marked merged.
+2. ~~Get the owner's **login choice** (§8).~~ **DONE — A (Cloudflare Access).**
 3. Run the **deploy runbook** (§7) with the owner's Cloudflare + Supabase auth.
 4. Verify live (`/v1/scores`, Home shows 17 companies, `/agent` answers).
 5. Then work the backlog below (§13).
@@ -197,8 +193,8 @@ Full detail + v1 designs + unblock requirements:
 Everything not yet done, exhaustively, by priority. Tick as you go.
 
 ### 13.1 To go live (must-do, owner-gated)
-- [ ] Merge PR #43 (code) + PR #26 (docs) → `main`; close Codex PR #4.
-- [ ] Owner picks login: **A** Cloudflare Access (no code) or **B** Supabase Auth (build it, §8).
+- [x] Merge PR #43 (code) + PR #26 (docs) → `main`; close Codex PR #4. *(done 2026-07-21)*
+- [x] Owner picks login: **A — Cloudflare Access** (no code, §8). *(decided 2026-07-21)*
 - [ ] Deploy per `management/deployment/production-runbook.md`: Supabase SQL (migration + 5 seeds) → `wrangler secret put DATABASE_URL` + `ANTHROPIC_API_KEY` → `wrangler deploy` → set `NEXT_PUBLIC_API_BASE_URL` on Pages → `wrangler pages deploy out`.
 - [ ] **Rotate the Supabase DB password** (it was shared in chat once), then re-set the `DATABASE_URL` secret.
 - [ ] Smoke-test live: `/v1/scores`, `/v1/companies/nvidia/financials`, Home, `/agent`.
