@@ -6,6 +6,7 @@ import { DataTable, type Column } from "@/components/data/data-table";
 import { Badge } from "@/components/ui/badge";
 import { formatRelative } from "@/lib/format";
 import { INGEST_PIPELINES, type IngestPipeline } from "@/lib/mock/ops";
+import { SampleDataNotice } from "@/components/ui/sample-data-notice";
 
 const cols: Column<IngestPipeline>[] = [
   { key: "kind", header: "管道", sortable: true },
@@ -18,6 +19,7 @@ const cols: Column<IngestPipeline>[] = [
 export default function IngestPage() {
   return (
     <WorkspaceLayout title="Ingest" eyebrow="P022 · Continuous Research" description="季度 YTD-diff、IFRS 映射、新闻/公告与 Cron 全自动摄取的运行监控。">
+      <SampleDataNotice reason="Requires the ingestion run log to be persisted; today runs are fire-and-forget." />
       <SectionHeading title="摄取管道" description="每个数值可回查原文；失败管道红色高亮，可重跑。" />
       <div className="rounded-panel border border-border bg-surface shadow-panel">
         <DataTable columnPickerId="admin-ingest"

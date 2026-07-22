@@ -6,6 +6,7 @@ import { TrendChart } from "@/components/chart/trend-chart";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { Badge } from "@/components/ui/badge";
 import { PROC_PRICE, SUPPLIERS, type SupplierRow } from "@/lib/mock/erp-ops";
+import { SampleDataNotice } from "@/components/ui/sample-data-notice";
 
 const RISK_TONE = { "single-source": "negative", "price-drift": "warning", none: "positive" } as const;
 const RISK_LABEL = { "single-source": "单一来源", "price-drift": "价差漂移", none: "正常" } as const;
@@ -20,6 +21,7 @@ const cols: Column<SupplierRow>[] = [
 export default function ProcurementPage() {
   return (
     <>
+      <SampleDataNotice reason="Requires supplier and purchase-order tables to be ingested." />
       <SectionHeading title="采购供应链 P016" description="采购价 vs 大宗曲线对标、供应商表现与断供风险。" />
       <div className="mb-6">
         <ChartContainer title="采购价 vs 大宗代理曲线" subtitle="指数化 (1月=100) · 采购价滞后于原料上涨" height={200}>

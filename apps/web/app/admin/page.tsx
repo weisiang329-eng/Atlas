@@ -7,6 +7,7 @@ import { DataTable, type Column } from "@/components/data/data-table";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime } from "@/lib/format";
 import { USERS, AUDIT_LOG, type UserRow, type AuditRow } from "@/lib/mock/admin";
+import { SampleDataNotice } from "@/components/ui/sample-data-notice";
 
 const ROLE_TONE = { owner: "accent", analyst: "info", viewer: "neutral" } as const;
 
@@ -26,6 +27,7 @@ const auditCols: Column<AuditRow>[] = [
 export default function AdminPage() {
   return (
     <WorkspaceLayout title="Admin" eyebrow="P025 · Atlas 1.0" description="用户与权限、审计日志、系统状态。组合/交易/ERP 默认仅 owner 可见（UI + API 双层校验）。">
+      <SampleDataNotice reason="Real users, roles and audit rows arrive with multi-user auth (login option B); nothing is persisted yet." />
       <SectionHeading title="平台管理" description="权限双层校验、审计 append-only、每日 D1 备份至 R2。" />
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartContainer title="用户与角色" subtitle="owner / analyst / viewer">

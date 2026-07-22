@@ -6,6 +6,7 @@ import { ChartContainer } from "@/components/chart/chart-container";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { formatCompact, formatNumber } from "@/lib/format";
 import { WH_KPIS, DEADSTOCK, type DeadstockRow } from "@/lib/mock/erp-ops";
+import { SampleDataNotice } from "@/components/ui/sample-data-notice";
 
 const cols: Column<DeadstockRow>[] = [
   { key: "sku", header: "SKU", sortable: true },
@@ -16,6 +17,7 @@ const cols: Column<DeadstockRow>[] = [
 export default function WarehousePage() {
   return (
     <>
+      <SampleDataNotice reason="Requires stock-movement and inventory tables to be ingested." />
       <SectionHeading title="仓储运营 P017" description="库存天数、周转与呆滞品——现金流视角看库存。" />
       <div className="mb-6">
         <StatGrid
