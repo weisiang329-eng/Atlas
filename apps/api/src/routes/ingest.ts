@@ -8,14 +8,19 @@
  */
 import { Hono } from "hono";
 import { desc, sql } from "drizzle-orm";
+import type { Sql } from "postgres";
 import type { Env } from "../index.ts";
 import { createDb, listCompanies } from "../db/repo.ts";
 import { newsItem, pmsFxRate } from "../db/schema.ts";
 import { fetchBnmRates } from "../ingest/fx.ts";
 import { dedupe, fetchNews, tagItem, type TaggingSubject } from "../ingest/news.ts";
 import { DATA_SOURCES } from "../ingest/sources.ts";
+import { ingestEdgarQuarters } from "../ingest/edgar.ts";
 
-type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
+type AppEnv = {
+  Bindings: Env;
+  Variables: { db: ReturnType<typeof createDb>; sql: Sql };
+};
 
 export const ingest = new Hono<AppEnv>();
 
@@ -248,4 +253,33 @@ ingest.get("/sources", async (c) => {
       rejected: DATA_SOURCES.filter((s) => s.status === "rejected").length,
     },
   });
+});
+
+/**
+ * Pull quarterly financials from SEC EDGAR into financial_period/_fact.
+ *
+ * POST /v1/ingest/edgar          whole roster
+ * POST /v1/ingest/edgar?company=nvidia   one company
+ *
+ * Quarters land every 90 days, so this is a pull rather than a redeploy —
+ * the annual seed is checked in, but 400+ quarterly periods and 8,000+ facts
+ * would be a 3.4 MB SQL blob inside the Worker bundle.
+ *
+ * Requests are spaced by politeFetch at ~6.7/s against SEC's published 10/s;
+ * their policy is enforced by IP ban, not by 429, so the margin is deliberate.
+ */
+ingest.post("/edgar", async (c) => {
+  const only = c.req.query("company") ?? undefined;
+  const results = await ingestEdgarQuarters(c.get("sql"), only);
+  const failed = results.filter((r) => r.error);
+  return c.json(
+    {
+      companies: results.length,
+      quarters: results.reduce((n, r) => n + r.quarters, 0),
+      facts: results.reduce((n, r) => n + r.facts, 0),
+      results,
+    },
+    // Partial success is still success; a total failure is not.
+    failed.length === results.length && results.length > 0 ? 502 : 200,
+  );
 });
