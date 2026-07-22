@@ -314,6 +314,42 @@ checked against history. A driver whose stated relationship never held is a
 driver to remove, not to keep. This is the same discipline as convention #0:
 the model is written down so it can be wrong in public.
 
+**Built 2026-07-23, and it immediately did its job.** `industry_driver` +
+`domain/drivers.ts` + `GET /v1/industries/:id/drivers`; every claim is
+regressed against the real series and rendered next to its verdict. Three
+things that came out of building it are worth more than the code:
+
+1. **Drivers must be estimated JOINTLY, not one at a time.** The first version
+   tested each driver alone and reported that **rising NBR latex RAISES glove
+   margin** — +4.3 points per +10%, stated with a straight face. The sample is
+   dominated by the 2020–21 pandemic spike (industry net margin ran 10% → 52%
+   → −16%), when ASP rose far faster than feedstock, so a single-driver fit
+   hands the boom's margin to whatever else was rising. Classic
+   omitted-variable bias, and it would have printed "your latex claim is
+   CONTRADICTED" and been wrong for the wrong reason. Coefficients are now
+   partial effects: latex with ASP held fixed.
+2. **The regression is on CHANGES, not levels.** Two series that both trend
+   correlate at 0.9 in levels and mean nothing.
+3. **The latex claim still does not survive, and the lag is unresolved.**
+   Holding ASP fixed, over 2019Q4–2026Q1 (n=26, R²=0.45), latex comes out at
+   **+2.98 pp per +10%** against a claimed −3 to −4. Scanning the lag shows
+   the sign is not even stable: `0q +3.27 · 1q +2.98 · 2q +1.39 · 3q +0.01 ·
+   4q −1.30`. Excluding the pandemic (2022Q1 onward, n≈15) it is +2.86 at the
+   claimed one-quarter lag but −1.85 at two quarters. **The honest reading is
+   that this sample cannot resolve the relationship** — not that latex does
+   not matter, and not that lag 2 is the answer. Picking the best-fitting lag
+   out of five is fitting noise; the lag profile is published as a
+   DIAGNOSTIC, never as a verdict.
+
+What would settle it: gross margin instead of net (the Bursa quarterlies carry
+revenue and net income only, so the test runs on a labelled proxy), volume or
+utilisation to separate price from demand, and a longer pre-2019 window for
+both series. All three are data problems, which is the right kind of problem
+to be left with.
+
+**The claim stays on the page, marked contradicted.** Deleting it would erase
+the finding, and the finding is the product.
+
 ---
 
 ## 6. Cross-industry propagation
@@ -361,6 +397,18 @@ drivers takes about a week and covers what decisions actually need.
      covers each today, and another level is another level to maintain.
 2. `industry_driver` table per §2; **3–5 drivers per leaf, owner reviews the
    list** — this step decides whether the whole model is right
+   **Mechanism done 2026-07-23; the list is not.** The table, the joint
+   backtest and the driver panel are live, seeded with **gloves only** — the
+   one leaf where both sides of a claim exist in the database (MARGMA ASP +
+   NBR latex, and 555 Bursa quarterlies). Seeding the other six from prose
+   would produce exactly what §5 warns against: claims nobody can check. Two
+   of the four glove drivers already read "no series yet" and name their
+   blocker (`EIA_API_KEY`; per-maker utilisation), which is the honest form of
+   a to-do. Breadth comes when the free feeds land — see step 3.
+   **Note for the owner's review:** §2 gives NBR latex `phase: leading,
+   lagQuarters: 1` while §3 files 胶价 under 同步. The seed encodes §2, and
+   the lag profile now reports what the data supports at each lag, so this can
+   be settled with evidence rather than by editing prose.
 3. Wire the free feeds (FRED, EIA, BNM first — keys already requested)
 4. Industry page renders the driver panel: series + 6M/1Y/5Y + current
    reading + **who it hits and by how much**

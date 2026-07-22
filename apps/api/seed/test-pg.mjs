@@ -22,6 +22,7 @@ const migrations = [
   // by this suite. 0007 is, because it turns the taxonomy into a tree and the
   // seeds below upsert onto it.
   "drizzle/0007_industry_tree.sql",
+  "drizzle/0008_industry_driver.sql",
 ];
 const seeds = [
   "seed/seed.sql",
@@ -62,6 +63,13 @@ check(
   "the 7 company-bearing industries are unchanged",
   (await one("SELECT count(*)::int n FROM industry WHERE level = 3")).n,
   (v) => v === 7,
+);
+// Drivers ship with migration 0008; the model and its backtest are asserted
+// in test-drivers.mjs. This only proves the migration lands with the seeds.
+check(
+  "glove drivers seeded",
+  (await one("SELECT count(*)::int n FROM industry_driver WHERE industry_id = 'rubber-gloves'")).n,
+  (v) => v === 4,
 );
 check("relationships", (await one("SELECT count(*)::int n FROM relationship")).n, (v) => v === 23);
 check("industry_metric points", (await one("SELECT count(*)::int n FROM industry_metric")).n, (v) => v === 59);

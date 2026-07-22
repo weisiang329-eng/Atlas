@@ -334,11 +334,35 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
     nodes. The design says a company is filed on a LEAF, but Micron makes
     DRAM, NAND *and* HBM, so re-filing is a judgement call, not a migration.
     Roll-up means nothing is blocked by leaving it.
-  - **Next (§7 step 2):** `industry_driver` — 3–5 drivers per leaf, each with
-    phase / lag / elasticity / who-it-hits. The doc is explicit that **the
-    owner reviews that list**, because it decides whether the model is right.
-    Then the free feeds (FRED, EIA, BNM) behind it — FRED and EIA still need
-    the keys in §13.10.
+- [x] **Driver model + backtest (2026-07-23)** — §7 step 2's *mechanism*.
+  `industry_driver` (migration 0008), `domain/drivers.ts`,
+  `GET /v1/industries/:id/drivers`, and a driver panel that shows every claim
+  next to its verdict. Seeded for **gloves only**: the one leaf where both
+  sides of a claim exist in the database. 17 db:test suites.
+  - **Drivers are estimated JOINTLY.** Tested one at a time, the glove data
+    says rising latex RAISES margin (+4.3 pp per +10%) — the 2020–21 ASP spike
+    leaking into everything that moved with it. Coefficients are partial
+    effects now, and the regression is on changes, not levels.
+  - **First real finding: the latex claim does not survive.** Holding ASP
+    fixed, 2019Q4–2026Q1 (n=26, R²=0.45), latex is **+2.98 pp per +10%**
+    against a claimed −3~−4, and the sign flips across lags
+    (`0q +3.27 · 1q +2.98 · 2q +1.39 · 3q +0.01 · 4q −1.30`). The honest
+    reading is that this sample cannot resolve it. The claim stays on the page
+    marked contradicted — deleting it would erase the finding.
+  - What would settle it: **gross** margin (Bursa filers report revenue and
+    net income only, so the test runs on a labelled net-margin proxy), volume
+    or utilisation to separate price from demand, and a longer pre-2019
+    window. All data problems.
+  - **Still open — the driver LIST.** Six leaves have no drivers, by choice:
+    seeding them from prose would create claims nobody can check. Two of the
+    four glove drivers already read "no series yet" and name their blocker
+    (`EIA_API_KEY`, per-maker utilisation), which is the honest form of a
+    to-do. Breadth lands with the free feeds below.
+  - **Owner review needed:** the doc disagrees with itself on the latex lag
+    (§2 says leading/1q, §3 files it as coincident). The seed encodes §2; the
+    lag profile now shows what the data supports at each lag.
+  - **Next (§7 step 3):** wire FRED/EIA/BNM so the other leaves get series —
+    FRED and EIA keys are still the blocker (§13.10).
 - [x] **P022 v2** — quarterly EDGAR ingestion is live. `POST /v1/ingest/edgar`
   (optionally `?company=<id>`) pulls SEC companyfacts through `politeFetch`
   and writes 402 quarters / ~8,560 facts for the seven US names. Flow figures
