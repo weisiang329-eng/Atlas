@@ -379,18 +379,26 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
     (`extractQuarters` has it and drops it). Then live-ingested quarters stop
     needing derivation at all. `semis-equipment` still shows 0 quarters because
     ASML is its only member and has no quarterly periods seeded.
-  - ⚠️ **`seed:build` is NOT currently a no-op for `edgar-seed.sql` — do not
-    regenerate it casually.** Running it while doing the above dropped **32
-    `DilutedShares` facts**, and only some of them were the bad ones: NVIDIA
-    Q1 FY10 = `0.542` is the documented 1000×-too-small defect and deserves to
-    go, but NVIDIA Q1 FY24 = `2490`, Arista `~316`, and Broadcom `~429` are all
-    correct and were dropped too. The checked-in seed predates a plausibility
-    gate added later (PR #69), so generator and artefact have drifted, and the
-    generator is now stricter than it should be for a **non-additive** concept:
-    share counts do not sum across quarters, so reconciling them against an
-    annual total is the wrong test. The regenerated file was reverted in this
-    PR — fixing the gate is its own task, and it should come with an assertion
-    that `seed:build` leaves the checked-in SQL unchanged.
+  - ✅ **The `seed:build` share-count trap is fixed (2026-07-23).** Regenerating
+    dropped **32 `DilutedShares` facts**, only some of them bad: NVIDIA Q1 FY10
+    `0.542` is the documented 1000×-too-small defect, but NVIDIA `2490`, Arista
+    `~316` and Broadcom `~429` are correct and were being deleted too.
+    **Cause:** SEC's companyfacts carries the ANNUAL share count *split-
+    adjusted* by later filings while the quarterly keeps the count as
+    originally filed — so after NVIDIA's 10-for-1 the two differ by exactly 10×
+    with both correct, and the plausibility band (0.5×–2× vs annual,
+    0.2×–5× vs median) deleted whichever side of the split was shorter. The
+    band is now 0.01×–100× via `isImplausibleShareCount`, which still catches a
+    1000× unit error and leaves every split intact; ten assertions in
+    `test-quarters.mjs` pin both halves.
+    - **The lost facts come back on the next `refresh.mjs`**, which needs
+      network access to SEC — `facts.json` is the post-filter artefact, so the
+      values cannot be restored offline. Run it when convenient; the checked-in
+      SQL is currently AHEAD of `facts.json` by those 32 facts, so **do not
+      regenerate `edgar-seed.sql` until the refresh has run.**
+    - Still open and unchanged: **split-adjusting historical share counts** so
+      EPS is comparable across a split (§13.6). Widening the gate stops data
+      loss; it does not make pre- and post-split EPS the same units.
 - [x] **Driver list encoded (2026-07-23, migration 0009) — needs owner review.**
   §3's 领先/同步/滞后 lists are now rows: **30 drivers across 10 leaves**
   (DRAM · NAND · HBM · 先进/成熟制程 · 设备 · 加速器 · 网络/ASIC ·
