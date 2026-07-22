@@ -156,9 +156,34 @@
 }
 
 @layer components {
-  /* Small uppercase eyebrow used across the terminal for section labels. */
+  /*
+   * Small uppercase eyebrow used across the product for section labels.
+   *
+   * Two fixes, both found by measuring rather than looking:
+   *
+   * 1. FONT. IBM Plex Mono has no CJK coverage, so "每日" / "持仓" were not
+   *    rendering in it at all — they fell through to whatever generic
+   *    monospace the OS supplies, which matches nothing else on screen.
+   *    (Measured: "DAILY" in Plex Mono is 33px wide vs 30.24px generic —
+   *    Plex is being used; "每日" is 22px in both — it is not.)
+   *
+   *    Naming Plex Sans after Plex Mono was not enough — Plex Sans has no CJK
+   *    either, so the glyphs still fell to the LAST entry in the stack. The
+   *    entry that matters is therefore the final one: it must be `system-ui,
+   *    sans-serif`, which is exactly where body Chinese already lands, rather
+   *    than `monospace`. The browser resolves per glyph, so Latin keeps Plex
+   *    Mono and its deliberate terminal character while CJK matches the rest
+   *    of the interface.
+   *
+   * 2. TRACKING. 0.16em is right for small uppercase Latin and actively
+   *    harmful for Chinese, which has no letterforms to separate — at 11px it
+   *    pushed the two glyphs 1.76px apart and made them read as faint and
+   *    smeared. That, not the colour, is why these looked washed out: the
+   *    contrast measures 5.61:1 and passes AA.
+   */
   .eyebrow {
-    @apply font-mono text-2xs uppercase tracking-[0.16em] text-faint;
+    font-family: var(--font-mono), var(--font-sans), system-ui, sans-serif;
+    @apply text-2xs uppercase tracking-[0.08em] text-faint;
   }
 
   /* Aurora glass — translucent floating surfaces (drawers, popovers, sticky bars). */
