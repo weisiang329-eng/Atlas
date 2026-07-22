@@ -310,6 +310,32 @@ console.log("\n--- against the real glove data ---");
   check("every untested driver names the feed it needs",
     all.filter((r) => r.series === null).every((r) => r.src && r.src.length > 10), true);
 
+  // 0011: the blocker vocabulary. The claim being made here is that "blocked"
+  // was hiding two very different situations.
+  await db.exec(read("drizzle/0011_driver_blockers.sql"));
+  await db.exec(read("drizzle/0011_driver_blockers.sql")); // replay is a no-op
+  const blocked = (await db.query(
+    `SELECT blocker, count(*)::int n FROM industry_driver GROUP BY blocker ORDER BY blocker`)).rows;
+  const byBlocker = Object.fromEntries(blocked.map((r) => [r.blocker, r.n]));
+  console.log("  · blockers:", JSON.stringify(byBlocker));
+  check("every driver is classified", byBlocker.unclassified ?? 0, 0);
+  check("nothing is blocked on money that is not actually paid-only",
+    byBlocker.paid, (v) => v === 5); // contract_price on DRAM + NAND, spot spread, HBM price, book-to-bill
+  // The finding worth keeping visible: more drivers are waiting on CODE than
+  // on anyone's chequebook or key.
+  check("more drivers need extraction than need money",
+    (byBlocker["needs-extraction"] ?? 0) > (byBlocker.paid ?? 0), true);
+
+  const substituted = (await db.query(
+    `SELECT industry_id AS ind, key, source_id AS src FROM industry_driver
+     WHERE key = 'inventory_days' ORDER BY industry_id`)).rows;
+  check("the paid channel-inventory driver was replaced on both memory leaves",
+    substituted.map((r) => r.ind), ["memory-dram", "memory-nand"]);
+  check("and its replacement is computed, not bought",
+    substituted.every((r) => r.src === "derived-filings"), true);
+  check("the paid original is gone, not left as a duplicate",
+    (await db.query("SELECT count(*)::int n FROM industry_driver WHERE key = 'inventory_weeks'")).rows[0].n, 0);
+
   // The finding this suite exists to keep visible: on the real sample the
   // latex claim does not survive, and its sign is not even stable across
   // lags. Asserting the INSTABILITY (not a particular verdict) keeps the test

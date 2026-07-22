@@ -23,6 +23,7 @@ import { industryKnowledgeRoutes } from "./routes/industry-knowledge.ts";
 import { ingest } from "./routes/ingest.ts";
 import { news } from "./routes/news.ts";
 import { drivers } from "./routes/drivers.ts";
+import { pending } from "./routes/pending.ts";
 
 export interface Env {
   /**
@@ -121,6 +122,7 @@ app.route("/v1/industries", industryKnowledgeRoutes);
 app.route("/v1/industries", drivers);
 app.route("/v1/ingest", ingest);
 app.route("/v1/news", news);
+app.route("/v1/pending", pending);
 
 app.notFound((c) =>
   c.json({ error: "The requested resource was not found." }, 404),

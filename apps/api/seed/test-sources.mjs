@@ -29,6 +29,19 @@ console.log("--- the registry is complete and internally consistent ---");
     DATA_SOURCES.filter(s => s.status === "rejected").every(s => s.rejectedReason), true);
   check("connected sources need no key",
     DATA_SOURCES.filter(s => s.status === "connected").every(s => !s.secretName), true);
+
+  // A paid source that does not say what replaces it is just a wish list.
+  check("every paid source names its cost AND its substitute",
+    DATA_SOURCES.filter(s => s.status === "paid")
+      .every(s => s.costNote && (s.substitutedBy?.length ?? 0) > 0 && s.rejectedReason), true);
+  check("every substitute id resolves to a real source",
+    DATA_SOURCES.flatMap(s => s.substitutedBy ?? []).filter(id => !SOURCE_BY_ID.has(id)), []);
+  // `unverified` exists precisely because a laptop probe proves nothing about
+  // the Worker — Google News answers one and 503s the other.
+  check("unverified sources need no key either",
+    DATA_SOURCES.filter(s => s.status === "unverified").every(s => !s.secretName), true);
+  check("the derived pseudo-source is not pretending to be a feed",
+    DATA_SOURCES.filter(s => s.status === "derived").every(s => s.minIntervalMs === 0 && !s.registerUrl), true);
 }
 
 console.log("\n--- rate limits stay UNDER the published ceiling ---");
@@ -50,8 +63,15 @@ console.log("\n--- rate limits stay UNDER the published ceiling ---");
   // 120/min = 500ms.
   check("FRED interval respects 120/min", fred.minIntervalMs >= 500, true);
 
-  check("no active source is unthrottled",
-    DATA_SOURCES.filter(s => s.status !== "rejected").every(s => s.minIntervalMs > 0), true);
+  // Only sources Atlas actually FETCHES need a throttle. A paid source it will
+  // never call, a one-off import, and a value computed from local data are not
+  // exceptions to the rule — they are not requests.
+  const FETCHED = new Set(["connected", "unverified", "awaiting-key"]);
+  check("every source Atlas actually fetches is throttled",
+    DATA_SOURCES.filter(s => FETCHED.has(s.status) && s.id !== "glove-tracker")
+      .every(s => s.minIntervalMs > 0), true);
+  check("and nothing non-fetching pretends to have a rate limit",
+    DATA_SOURCES.filter(s => !FETCHED.has(s.status)).every(s => s.minIntervalMs === 0), true);
 }
 
 console.log("\n--- the throttle actually spaces calls ---");

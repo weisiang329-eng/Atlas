@@ -626,6 +626,17 @@ export const industryDriver = pgTable(
     confidence: doublePrecision("confidence").notNull().default(0.3),
     sourceName: text("source_name"),
     sourceUrl: text("source_url"),
+    /**
+     * What stands between this claim and a backtest, in one vocabulary:
+     * `none` · `needs-key` · `needs-extraction` · `paid` · `unavailable`.
+     *
+     * The distinction that matters is needs-extraction vs paid — half the
+     * "blocked" drivers were never blocked on money, only on code nobody had
+     * written yet. As free text inside `source_name` that was unaskable.
+     */
+    blocker: text("blocker"),
+    /** Registry id in `src/ingest/sources.ts` (not an FK — the registry is code). */
+    sourceId: text("source_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({

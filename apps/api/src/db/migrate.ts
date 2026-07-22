@@ -31,6 +31,7 @@ import industryTree0007 from "../../drizzle/0007_industry_tree.sql";
 import industryDriver0008 from "../../drizzle/0008_industry_driver.sql";
 import driverList0009 from "../../drizzle/0009_driver_list.sql";
 import fiscalYearEnd0010 from "../../drizzle/0010_fiscal_year_end.sql";
+import driverBlockers0011 from "../../drizzle/0011_driver_blockers.sql";
 
 /**
  * Ordered. Never renumber or edit a shipped migration — append a new one.
@@ -65,6 +66,8 @@ const MIGRATIONS: { id: string; sql: string; sentinel: string }[] = [
   { id: "0009_driver_list", sql: driverList0009, sentinel: "__none__" },
   // ADD COLUMN IF NOT EXISTS + targeted UPDATEs: a replay is a no-op.
   { id: "0010_fiscal_year_end", sql: fiscalYearEnd0010, sentinel: "__none__" },
+  // Columns + reclassification of existing rows; idempotent by construction.
+  { id: "0011_driver_blockers", sql: driverBlockers0011, sentinel: "__none__" },
 ];
 
 /** Arbitrary but fixed — the lock key every Atlas Worker agrees on. */

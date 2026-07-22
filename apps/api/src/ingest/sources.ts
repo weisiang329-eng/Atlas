@@ -17,8 +17,23 @@
 export type SourceStatus =
   /** Free, no key, verified reachable from the Worker. */
   | "connected"
+  /**
+   * Free and no key, but only checked from a laptop — NOT yet probed from the
+   * Worker. The distinction is not pedantry: Google News RSS answers a laptop
+   * and returns 503 to Cloudflare Workers. Run /v1/ingest/probe after a deploy
+   * to promote these to `connected`.
+   */
+  | "unverified"
   /** Free tier exists but needs a key the owner has not supplied yet. */
   | "awaiting-key"
+  /**
+   * Costs real money and is deliberately NOT bought. Kept in the registry
+   * with the substitute named, so the decision survives and nobody re-opens
+   * it as an unknown.
+   */
+  | "paid"
+  /** Not an external source at all — computed from data Atlas already holds. */
+  | "derived"
   /** Tried and rejected — kept so nobody re-adds it. */
   | "rejected";
 
@@ -41,6 +56,14 @@ export interface DataSource {
   minIntervalMs: number;
   /** Why it was rejected, when it was. */
   rejectedReason?: string;
+  /** Roughly what it costs, for `paid` — so the trade-off is on the record. */
+  costNote?: string;
+  /**
+   * Source ids used INSTEAD of this one. A substitute is never the same
+   * measurement — company inventory days is not channel inventory weeks — so
+   * whatever consumes it must restate what it is now measuring.
+   */
+  substitutedBy?: string[];
   priority?: number;
 }
 
@@ -166,6 +189,97 @@ export const DATA_SOURCES: DataSource[] = [
       "The key appears on screen",
       "Run: wrangler secret put ALPHAVANTAGE_API_KEY",
     ],
+  },
+
+  {
+    id: "glove-tracker",
+    name: "glove-tracker dumps (MARGMA ASP + NBR latex)",
+    serves:
+      "The only industry driver series Atlas holds today — imported once from the owner's glove-tracker migrations, not fetched live",
+    status: "connected",
+    docsUrl: "https://www.margma.com.my/",
+    publishedLimit: "n/a — a one-off import, not a live feed",
+    minIntervalMs: 0,
+  },
+
+  /* ── Free, verified from a laptop, not yet probed from the Worker ─────── */
+  {
+    id: "twse-monthly-revenue",
+    name: "TWSE open data — monthly revenue (t187ap05_L)",
+    serves:
+      "Foundry, advanced packaging and AI-server demand: every Taiwan-listed company files revenue MONTHLY, ~10 days after month end. TSMC, UMC, ASE, Quanta, Wistron in one free JSON feed — the highest-frequency read on the AI hardware chain that exists without paying for it.",
+    status: "unverified",
+    docsUrl: "https://openapi.twse.com.tw/",
+    publishedLimit: "No published quota; a courtesy limit is applied",
+    minIntervalMs: 1000,
+    priority: 1,
+  },
+  {
+    id: "sia-monthly-sales",
+    name: "SIA / WSTS monthly semiconductor sales",
+    serves: "Industry-wide billings — the denominator for share and cycle",
+    status: "unverified",
+    docsUrl: "https://www.semiconductors.org/",
+    publishedLimit: "Press releases, not an API — HTML parsing required",
+    minIntervalMs: 2000,
+  },
+
+  /* ── Free but needs a (free) key ──────────────────────────────────────── */
+  {
+    id: "census-m3",
+    name: "US Census M3 — manufacturers' shipments, inventories & orders",
+    serves:
+      "Semiconductor (NAICS 3344) inventories, shipments and new orders — the free stand-in for channel inventory, and the only public inventories-to-shipments ratio for the sector",
+    status: "awaiting-key",
+    secretName: "CENSUS_API_KEY",
+    registerUrl: "https://api.census.gov/data/key_signup.html",
+    docsUrl: "https://www.census.gov/data/developers/data-sets/economic-indicators.html",
+    publishedLimit: "500 requests/day without a key; unlimited with one (free)",
+    minIntervalMs: 500,
+    priority: 4,
+    steps: [
+      "Request a key at api.census.gov/data/key_signup.html (name + email)",
+      "The key arrives by email within minutes",
+      "Run: wrangler secret put CENSUS_API_KEY",
+    ],
+  },
+
+  /* ── Not a source: computed from what Atlas already stores ────────────── */
+  {
+    id: "derived-filings",
+    name: "Derived from stored filings",
+    serves:
+      "Inventory days, capex, and every other driver computable from financial_fact — no external source, no key, no cost. Needs code, not permission.",
+    status: "derived",
+    publishedLimit: "n/a — local computation",
+    minIntervalMs: 0,
+  },
+
+  /* ── Paid, and deliberately not bought ────────────────────────────────── */
+  {
+    id: "trendforce",
+    name: "TrendForce / DRAMeXchange",
+    serves: "(would serve) DRAM & NAND contract and spot prices, HBM pricing",
+    status: "paid",
+    publishedLimit: "n/a",
+    minIntervalMs: 0,
+    costNote:
+      "Enterprise research subscription — quoted in the thousands to tens of thousands of USD per year, per report family. One subscription per industry would cost more than everything else in this platform combined.",
+    substitutedBy: ["derived-filings", "census-m3", "fred", "twse-monthly-revenue"],
+    rejectedReason:
+      "Price series are the LAGGING half of the memory model anyway (INDUSTRY-INTELLIGENCE §3: 'price is lagging confirmation; inventory is the leading signal'). Buying the lagging half at that price to skip the leading half we can compute for free is the wrong trade.",
+  },
+  {
+    id: "semi-bookings",
+    name: "SEMI equipment book-to-bill",
+    serves: "(would serve) semiconductor equipment order momentum",
+    status: "paid",
+    publishedLimit: "n/a",
+    minIntervalMs: 0,
+    costNote: "SEMI membership plus report fees.",
+    substitutedBy: ["derived-filings", "twse-monthly-revenue"],
+    rejectedReason:
+      "SEMI stopped publishing the public North America book-to-bill years ago, so even paying does not restore the series everyone quotes. Fab capex from filings leads equipment revenue by 2–3 quarters and is already in the database; Taiwan equipment suppliers file monthly revenue for free.",
   },
 
   {
