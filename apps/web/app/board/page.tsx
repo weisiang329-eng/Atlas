@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { RiskMatrix } from "@/components/board/risk-matrix";
 import { formatDate } from "@/lib/format";
 import { RISK_REGISTER, BOARD_MEETINGS, type RiskItem } from "@/lib/mock/board";
+import { SampleDataNotice } from "@/components/ui/sample-data-notice";
 
 const STATUS_TONE = { open: "negative", mitigating: "warning", closed: "positive" } as const;
 const STATUS_LABEL = { open: "未处理", mitigating: "缓解中", closed: "已关闭" } as const;
@@ -32,6 +33,7 @@ const riskCols: Column<RiskItem>[] = [
 export default function BoardPage() {
   return (
     <>
+      <SampleDataNotice reason="Requires a risk register and board-pack tables; none exist yet." />
       <SectionHeading title="董事会情报" description="风险矩阵 + 登记册 + 会议与董事会包状态。" />
 
       <div className="mb-6 grid gap-6 lg:grid-cols-[auto_1fr]">

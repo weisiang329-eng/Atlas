@@ -6,6 +6,7 @@ import { ChartContainer } from "@/components/chart/chart-container";
 import { BarSeries } from "@/components/chart/bar-series";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { formatCompact, formatNumber } from "@/lib/format";
+import { SampleDataNotice } from "@/components/ui/sample-data-notice";
 import {
   ERP_REVENUE_BY_MONTH,
   ERP_CUSTOMERS,
@@ -39,6 +40,7 @@ export default function ErpFurniturePage() {
   const totalRev = ERP_CUSTOMERS.reduce((a, c) => a + c.revenue, 0);
   return (
     <>
+      <SampleDataNotice reason="Requires the 晨光家具 sales and SKU tables to be ingested." />
       <SectionHeading title="晨光家具 · 经营情报" description="收入结构、客户集中度与 SKU 毛利。所有聚合后端算好，UI 零计算。" />
 
       <div className="mb-6">

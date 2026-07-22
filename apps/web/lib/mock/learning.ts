@@ -5,11 +5,17 @@
 export interface MemoryItem {
   id: string; entity: string; kind: "conclusion" | "profile" | "fact"; text: string; origin: string; createdAt: number;
 }
-export const MEMORIES: MemoryItem[] = [
-  { id: "m1", entity: "HLXC", kind: "conclusion", text: "HLXC 的护城河在软件生态而非单纯算力，价格战对其毛利影响有限。", origin: "研究笔记 2026-06", createdAt: Date.now() - 20 * 24 * 3600e3 },
-  { id: "m2", entity: "手套行业", kind: "conclusion", text: "手套周期见底信号需同时看 ASP 环比转正 + 稼动率回升，单一指标易误判。", origin: "决策复盘 d2", createdAt: Date.now() - 15 * 24 * 3600e3 },
-  { id: "m3", entity: "VTXM", kind: "profile", text: "存储纯周期股，业绩弹性大但可预测性低，仓位应小而灵活。", origin: "研究笔记 2026-05", createdAt: Date.now() - 40 * 24 * 3600e3 },
-];
+/*
+ * MEMORIES was removed with the fake Memory page (P021 is not built).
+ * `MemoryItem` is kept as the intended shape for when pgvector lands.
+ *
+ * Worth remembering why it had to go rather than just being labelled: the
+ * entries carried an `origin` — "研究笔记 2026-06", "决策复盘 d2" — so each
+ * fabricated conclusion cited a source that does not exist, and one was
+ * attributed to 手套行业, a real sector under real coverage. A fake number is
+ * bad; a fake number wearing a citation is worse, because the citation is the
+ * exact signal a reader uses to decide the number is trustworthy.
+ */
 
 export interface LearningStat {
   dim: string; hitRate: number; n: number;
