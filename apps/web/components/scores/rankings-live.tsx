@@ -11,6 +11,7 @@ import { Panel } from "@/components/ui/panel";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataState } from "@/components/ui/data-state";
 import { DataTable, type Column } from "@/components/data/data-table";
+import { FactorCell } from "@/components/scores/factor-bar";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { isApiConfigured } from "@/lib/api/client";
 import type { ScoreRow } from "@/lib/types";
@@ -22,8 +23,9 @@ function tone(score: number | null): "positive" | "warning" | "negative" | "neut
   return "negative";
 }
 
-const factorCell = (v: number | null) =>
-  v === null ? <span className="text-faint">—</span> : <span className="num">{v}</span>;
+// The design renders factors as bars, not bare numbers: a column of bars
+// shows the shape of a company profile at a glance.
+const factorCell = (v: number | null) => <FactorCell score={v} />;
 
 const columns: Column<ScoreRow>[] = [
   {
