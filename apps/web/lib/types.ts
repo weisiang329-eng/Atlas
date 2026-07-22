@@ -189,11 +189,39 @@ export interface ValueChain {
 export interface IndustryDetail {
   id: string;
   name: string;
+  nameZh: string | null;
   sector: string;
   description: string | null;
+  /** Root → this node. Rendered as a breadcrumb; `level` never reaches the UI. */
+  path: TaxonomyRef[];
+  /** Direct children, so a parent offers the way down. */
+  children: (TaxonomyRef & { companyCount: number })[];
+  /** Members INCLUDING descendants — a parent is never falsely empty. */
   companies: CompanySummary[];
   series: MetricSeries[];
   cycleSignal: CycleSignal | null;
+}
+
+// --- Industry taxonomy ------------------------------------------------------
+
+/** A node referenced from a path or a child list. */
+export interface TaxonomyRef {
+  id: string;
+  name: string;
+  nameZh: string | null;
+}
+
+export interface TaxonomyTreeNode extends TaxonomyRef {
+  /** Companies at or below this node. */
+  companyCount: number;
+  /** Companies filed exactly here — 0 on every node that is a pure grouping. */
+  directCompanyCount: number;
+  children: TaxonomyTreeNode[];
+}
+
+/** GET /v1/industries/tree */
+export interface TaxonomyTree {
+  roots: TaxonomyTreeNode[];
 }
 
 // --- News monitoring --------------------------------------------------------

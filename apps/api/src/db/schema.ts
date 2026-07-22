@@ -54,7 +54,25 @@ export const source = pgTable("source", {
 export const industry = pgTable("industry", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  /** Chinese name. The app defaults to zh and a taxonomy is data, not UI copy. */
+  nameZh: text("name_zh"),
   sector: text("sector").notNull(),
+  /**
+   * Parent node in the taxonomy; null at the root.
+   *
+   * The tree exists so drivers can hang off DRIVER-HOMOGENEOUS leaves: HBM is
+   * bound to AI capex and CoWoS allocation while commodity DRAM follows phone
+   * and PC demand, so averaging them produces a curve that describes neither.
+   * See docs/INDUSTRY-INTELLIGENCE.md §1.
+   */
+  parentId: text("parent_id"),
+  /**
+   * Depth, 1 at the root. **Schema vocabulary only — never a UI label.** The
+   * nesting conveys depth on screen (科技 › 半导体 › 存储 › DRAM); printing
+   * "L4" leaks the schema and invites "why does this branch have an extra
+   * level", whose honest answer is that depth is uneven by design.
+   */
+  level: integer("level"),
   description: text("description"),
   /**
    * Position in the sector's value chain (1 = upstream). Industries sharing a

@@ -75,12 +75,51 @@ export function IndustryWorkspace({ industryId }: { industryId: string }) {
     >
       {d ? (
         <>
+          {/* Where this industry sits in the taxonomy. The nesting conveys
+              depth; the level number is schema vocabulary and never shown
+              (docs/INDUSTRY-INTELLIGENCE.md §1). */}
+          {d.path && d.path.length > 1 ? (
+            <nav aria-label="Industry taxonomy" className="mb-2 flex flex-wrap items-center gap-1.5 text-2xs">
+              {d.path.map((node, i) => (
+                <span key={node.id} className="flex items-center gap-1.5">
+                  {i > 0 ? <span className="text-faint">›</span> : null}
+                  {node.id === d.id ? (
+                    <span className="text-fg">{node.nameZh ?? node.name}</span>
+                  ) : (
+                    <Link href={`/industries/${node.id}`} className="text-muted hover:text-accent">
+                      {node.nameZh ?? node.name}
+                    </Link>
+                  )}
+                </span>
+              ))}
+            </nav>
+          ) : null}
+
           <PageHeader
             eyebrow={d.sector}
             title={d.name}
             description={d.description ?? undefined}
             actions={<Badge tone="accent">{d.companies.length} companies</Badge>}
           />
+
+          {/* The way down. A sub-industry with no company filed on it yet is
+              shown with a real zero rather than hidden — the taxonomy states
+              where coverage is missing, which is the point of having it. */}
+          {d.children && d.children.length > 0 ? (
+            <div className="mb-6 flex flex-wrap items-center gap-1.5">
+              <span className="mr-1 text-2xs text-faint">细分</span>
+              {d.children.map((ch) => (
+                <Link
+                  key={ch.id}
+                  href={`/industries/${ch.id}`}
+                  className="rounded-pill border border-border px-2.5 py-1 text-2xs text-muted transition-colors hover:border-accent-dim hover:text-fg"
+                >
+                  {ch.nameZh ?? ch.name}
+                  <span className="num ml-1.5 text-faint">{ch.companyCount}</span>
+                </Link>
+              ))}
+            </div>
+          ) : null}
 
           {d.cycleSignal ? (
             <div className="mb-6">

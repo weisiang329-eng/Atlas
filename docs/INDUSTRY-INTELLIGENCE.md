@@ -340,8 +340,25 @@ Deliberately **breadth-first on drivers, depth-last on prose**. Finishing one
 industry to 90% leaves six blind spots for months; giving all seven their
 drivers takes about a week and covers what decisions actually need.
 
-1. `industry` gains `parentId` + `level`; existing seven hang at L3; add L4
-   (DRAM / NAND / HBM, 先进/成熟制程, 前道/后道) and L5 where gloves need it
+1. ~~`industry` gains `parentId` + `level`; existing seven hang at L3; add L4
+   (DRAM / NAND / HBM, 先进/成熟制程, 前道/后道) and L5 where gloves need it~~
+   **DONE 2026-07-23.** 21 nodes: 2 roots, 3 chain segments, the 7 industries,
+   9 sub-industries. Source of truth `apps/api/seed/taxonomy.mjs`, shipped in
+   migration `0007_industry_tree.sql` (the Worker self-migrates, so production
+   picks it up without anyone pasting SQL). Membership **rolls up** — 半导体
+   reports the 7 companies under 存储/代工/设备 rather than reading empty.
+   Three deviations from the sketch above, each deliberate:
+   - **Gloves reach depth 4, not 5** (医疗保健 › 医疗耗材 › 手套 › 丁腈手套).
+     Under the splitting rule there is no driver-distinct level between 手套
+     and the feedstock split. A real fifth level (检查手套 vs 工业手套 —
+     different customer, different cycle) is one row per node if wanted, but
+     it should be added because the drivers differ, not to match a number.
+   - **Companies still hang on the seven L3 nodes**, not on leaves. Filing
+     Micron is a judgement — it makes DRAM, NAND *and* HBM — and the design
+     says one company sits at one position. That decision is the owner's;
+     roll-up means the tree is already usable and nothing has to move first.
+   - **AI 加速器, 网络/ASIC and 数据中心电力 are not split.** One driver set
+     covers each today, and another level is another level to maintain.
 2. `industry_driver` table per §2; **3–5 drivers per leaf, owner reviews the
    list** — this step decides whether the whole model is right
 3. Wire the free feeds (FRED, EIA, BNM first — keys already requested)
