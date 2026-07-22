@@ -23,6 +23,7 @@ const migrations = [
   // seeds below upsert onto it.
   "drizzle/0007_industry_tree.sql",
   "drizzle/0008_industry_driver.sql",
+  "drizzle/0009_driver_list.sql",
 ];
 const seeds = [
   "seed/seed.sql",
@@ -70,6 +71,11 @@ check(
   "glove drivers seeded",
   (await one("SELECT count(*)::int n FROM industry_driver WHERE industry_id = 'rubber-gloves'")).n,
   (v) => v === 4,
+);
+check(
+  "every §3 leaf carries drivers (0009)",
+  (await one("SELECT count(DISTINCT industry_id)::int n FROM industry_driver")).n,
+  (v) => v === 10,
 );
 check("relationships", (await one("SELECT count(*)::int n FROM relationship")).n, (v) => v === 23);
 check("industry_metric points", (await one("SELECT count(*)::int n FROM industry_metric")).n, (v) => v === 59);

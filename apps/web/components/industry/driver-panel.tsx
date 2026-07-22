@@ -13,6 +13,7 @@
  * So a contradicted claim is rendered in red and kept on screen. Deleting it
  * quietly would erase the finding; the finding IS the product.
  */
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { DataState } from "@/components/ui/data-state";
 import { useApiResource } from "@/lib/loaders/use-api";
@@ -75,6 +76,17 @@ function DriverCard({ d, zh }: { d: IndustryDriver; zh: boolean }) {
   return (
     <li className="rounded-panel border border-border bg-surface p-4 shadow-panel">
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
+        {/* Drivers hang off the leaf whose drivers they are, but the companies
+            sit higher up — so a parent shows its children's drivers, labelled
+            with where they belong rather than silently absorbed. */}
+        {d.inherited ? (
+          <Link
+            href={`/industries/${d.nodeId}`}
+            className="rounded-pill border border-border px-2 py-0.5 font-mono text-2xs text-faint hover:text-accent"
+          >
+            {zh ? (d.nodeNameZh ?? d.nodeName) : d.nodeName}
+          </Link>
+        ) : null}
         <span className="text-sm font-medium text-fg">{zh ? (d.nameZh ?? d.name) : d.name}</span>
         <Badge tone="neutral">{(PHASE_LABEL[d.phase] ?? PHASE_LABEL.coincident!)[zh ? "zh" : "en"]}</Badge>
         <Badge tone={VERDICT_TONE[b.verdict]}>{verdict[zh ? "zh" : "en"]}</Badge>

@@ -21,7 +21,7 @@ import {
   type BacktestResult,
   type DriverClaim,
 } from "../domain/drivers.ts";
-import { rollUpMembers } from "../domain/taxonomy.ts";
+import { descendantIds, rollUpMembers } from "../domain/taxonomy.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
@@ -39,15 +39,26 @@ drivers.get("/:id/drivers", async (c) => {
   const db = c.get("db");
   const industryId = c.req.param("id");
 
-  const [claims, industries, companies] = await Promise.all([
-    db
-      .select()
-      .from(industryDriver)
-      .where(eq(industryDriver.industryId, industryId))
-      .orderBy(asc(industryDriver.phase), asc(industryDriver.key)),
+  const [industries, companies] = await Promise.all([
     listIndustries(db),
     listCompanies(db),
   ]);
+
+  /*
+   * Drivers roll DOWN as well as up. They hang off the leaf whose drivers they
+   * are — HBM's CoWoS constraint is not DRAM's inventory cycle, which is why
+   * those nodes are split at all — but the companies sit on 存储, and that is
+   * the page a reader opens. Showing only a node's own drivers would hide the
+   * entire model one level below where anyone looks.
+   */
+  const scope = descendantIds(industries, industryId);
+  const claims = await db
+    .select()
+    .from(industryDriver)
+    .where(inArray(industryDriver.industryId, [...scope]))
+    .orderBy(asc(industryDriver.industryId), asc(industryDriver.phase), asc(industryDriver.key));
+
+  const nodeById = new Map(industries.map((i) => [i.id, i]));
 
   if (claims.length === 0) {
     // Not an error: most leaves have no drivers yet, and the empty state is
@@ -55,18 +66,21 @@ drivers.get("/:id/drivers", async (c) => {
     return c.json({ industryId, drivers: [], target: null });
   }
 
-  // The target: this industry's own margin history, rolled up over the tree so
-  // a parent node is tested against the companies beneath it.
-  const memberIds = new Set(rollUpMembers(industries, companies).get(industryId) ?? []);
-  const periods = (
-    await Promise.all(
-      [...memberIds].map((id) => getPeriodsWithFacts(db, id, "quarter")),
-    )
-  ).flat();
+  const membersByNode = rollUpMembers(industries, companies);
 
-  const target = industryNetMargin(
-    periods.map((p) => ({ reportDate: p.period.reportDate, facts: p.facts })),
-  );
+  /** One node's margin history: its members', rolled up over the tree. */
+  const targetFor = async (nodeId: string) => {
+    const memberIds = membersByNode.get(nodeId) ?? [];
+    const periods = (
+      await Promise.all(memberIds.map((id) => getPeriodsWithFacts(db, id, "quarter")))
+    ).flat();
+    return {
+      memberIds,
+      points: industryNetMargin(
+        periods.map((p) => ({ reportDate: p.period.reportDate, facts: p.facts })),
+      ),
+    };
+  };
 
   const seriesKeys = claims
     .map((d) => d.seriesKey)
@@ -80,42 +94,23 @@ drivers.get("/:id/drivers", async (c) => {
           .from(industryMetric)
           .where(
             and(
-              eq(industryMetric.industryId, industryId),
+              inArray(industryMetric.industryId, [...scope]),
               inArray(industryMetric.metricKey, seriesKeys),
             ),
           )
           .orderBy(asc(industryMetric.observationDate));
 
+  // Keyed by node + series: two nodes may both track "utilisation" and they
+  // are not the same series.
   const pointsByKey = new Map<string, { date: string; value: number }[]>();
   for (const row of metricRows) {
-    const list = pointsByKey.get(row.metricKey) ?? [];
+    const k = `${row.industryId}::${row.metricKey}`;
+    const list = pointsByKey.get(k) ?? [];
     list.push({ date: row.observationDate, value: row.value });
-    pointsByKey.set(row.metricKey, list);
+    pointsByKey.set(k, list);
   }
-
-  // One joint model over every driver that has a series, each at its own lag,
-  // so each coefficient is a partial effect. Tested separately, the glove
-  // drivers report that rising feedstock RAISES margin — the pandemic ASP
-  // spike leaking into whatever else moved with it.
-  const backtestInput = {
-    drivers: claims
-      .filter((d) => d.seriesKey && (pointsByKey.get(d.seriesKey)?.length ?? 0) > 0)
-      .map((d) => ({
-        key: d.key,
-        observations: toQuarterly(pointsByKey.get(d.seriesKey!)!),
-        lagQuarters: d.lagQuarters,
-        direction: d.direction,
-      })),
-    target,
-    targetMetric: "net_margin_pct",
-    // Every seeded glove claim is about gross margin; the filers report net.
-    isProxy: claims.some((d) => d.targetMetric !== "net_margin_pct"),
-    proxyNote: claims.some((d) => d.targetMetric !== "net_margin_pct")
-      ? PROXY_NOTE
-      : null,
-  };
-
-  const backtests = backtestDrivers(backtestInput);
+  const pointsFor = (d: { industryId: string; seriesKey: string | null }) =>
+    d.seriesKey ? pointsByKey.get(`${d.industryId}::${d.seriesKey}`) : undefined;
 
   const untested: BacktestResult = {
     verdict: "insufficient-data",
@@ -131,33 +126,73 @@ drivers.get("/:id/drivers", async (c) => {
     sampleTo: null,
   };
 
-  const results = claims.map((claim) => {
-    const hasSeries = Boolean(
-      claim.seriesKey && (pointsByKey.get(claim.seriesKey)?.length ?? 0) > 0,
-    );
-    return {
-      ...(claim as unknown as DriverClaim),
-      /** Present so the UI can say WHY a driver was never tested. */
-      hasSeries,
-      backtest: backtests.get(claim.key) ?? untested,
-      /**
-       * Diagnostic, not a verdict — see scanLags. Exposed because "the sign
-       * flips between lag 1 and lag 2" is the honest answer to "is our stated
-       * lag right?", and hiding it would leave a claim looking settled.
-       */
-      lagProfile: hasSeries ? scanLags(backtestInput, claim.key) : [],
+  /*
+   * One joint model PER NODE. Drivers are only controls for each other when
+   * they act on the same target: holding DRAM's inventory cycle fixed says
+   * nothing about HBM's margin, and pooling them would invent a control that
+   * does not exist.
+   */
+  const byNode = new Map<string, typeof claims>();
+  for (const claim of claims) {
+    const list = byNode.get(claim.industryId) ?? [];
+    list.push(claim);
+    byNode.set(claim.industryId, list);
+  }
+
+  const results: unknown[] = [];
+  for (const [nodeId, nodeClaims] of byNode) {
+    const { points: target } = await targetFor(nodeId);
+    const isProxy = nodeClaims.some((d) => d.targetMetric !== "net_margin_pct");
+    const backtestInput = {
+      drivers: nodeClaims
+        .filter((d) => (pointsFor(d)?.length ?? 0) > 0)
+        .map((d) => ({
+          key: d.key,
+          observations: toQuarterly(pointsFor(d)!),
+          lagQuarters: d.lagQuarters,
+          direction: d.direction,
+        })),
+      target,
+      targetMetric: "net_margin_pct",
+      isProxy,
+      proxyNote: isProxy ? PROXY_NOTE : null,
     };
-  });
+    const backtests = backtestDrivers(backtestInput);
+    const node = nodeById.get(nodeId);
+
+    for (const claim of nodeClaims) {
+      const hasSeries = (pointsFor(claim)?.length ?? 0) > 0;
+      results.push({
+        ...(claim as unknown as DriverClaim),
+        /** Which node this driver hangs off — it may be below the one asked for. */
+        nodeId,
+        nodeName: node?.name ?? nodeId,
+        nodeNameZh: node?.nameZh ?? null,
+        inherited: nodeId !== industryId,
+        /** Present so the UI can say WHY a driver was never tested. */
+        hasSeries,
+        backtest: backtests.get(claim.key) ?? untested,
+        /**
+         * Diagnostic, not a verdict — see scanLags. Exposed because "the sign
+         * flips between lag 1 and lag 2" is the honest answer to "is our stated
+         * lag right?", and hiding it would leave a claim looking settled.
+         */
+        lagProfile: hasSeries ? scanLags(backtestInput, claim.key) : [],
+      });
+    }
+  }
+
+  const own = await targetFor(industryId);
 
   return c.json({
     industryId,
-    /** The series every claim was tested against, so a reader can check it. */
+    /** The series claims on THIS node were tested against. */
     target: {
       metric: "net_margin_pct",
       label: "Revenue-weighted net margin",
       unit: "%",
-      points: target,
-      companies: [...memberIds].sort(),
+      points: own.points,
+      companies: [...own.memberIds].sort(),
     },
     drivers: results,
   });

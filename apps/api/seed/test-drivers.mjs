@@ -284,6 +284,24 @@ console.log("\n--- against the real glove data ---");
   // as untested rather than quietly vanish.
   check("drivers without a series are stored anyway", claims.filter((c) => !c.series).map((c) => c.key), ["natural_gas", "utilisation"]);
 
+  // §3's lists for the other leaves, encoded in 0009. They exist to be
+  // reviewed and to name the feed each one needs — not to look verified.
+  await db.exec(read("drizzle/0009_driver_list.sql"));
+  await db.exec(read("drizzle/0009_driver_list.sql")); // replay is a no-op
+  const all = (await db.query(
+    `SELECT industry_id AS ind, key, kind, series_key AS series, source_name AS src
+     FROM industry_driver ORDER BY industry_id, key`)).rows;
+  check("every leaf in §3 now carries drivers", new Set(all.map((r) => r.ind)).size, 10);
+  check("every claim is an assumption until a backtest says otherwise",
+    all.every((r) => r.kind === "assumption"), true);
+  // The honest part: nothing outside gloves has a series, and each row says
+  // which feed it is waiting for. That is the data shopping list.
+  check("no fabricated series appeared with them",
+    all.filter((r) => r.series !== null).map((r) => r.ind + ":" + r.key),
+    ["rubber-gloves:asp_my", "rubber-gloves:nbr_latex"]);
+  check("every untested driver names the feed it needs",
+    all.filter((r) => r.series === null).every((r) => r.src && r.src.length > 10), true);
+
   // The finding this suite exists to keep visible: on the real sample the
   // latex claim does not survive, and its sign is not even stable across
   // lags. Asserting the INSTABILITY (not a particular verdict) keeps the test
