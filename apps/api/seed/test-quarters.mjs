@@ -15,6 +15,7 @@ import {
   fiscalQuarterOf,
   reconcileQuarters,
 } from "./edgar/quarters.mjs";
+import { isImplausibleShareCount } from "../src/ingest/edgar-quarters.ts";
 
 let failures = 0;
 const check = (label, actual, expected) => {
@@ -147,6 +148,32 @@ console.log("\n--- only 10-Q / 10-K forms are trusted ---");
   };
   const q = extractQuarters(gaap, { fyEndMonth: 1 }, TAGS, DUR);
   check("an 8-K press release is not a filing of record", Object.keys(q), []);
+}
+
+console.log("\n--- share counts: catch unit errors, NEVER delete a stock split ---");
+{
+  // The defect the gate exists for: filed in units while the rest are in
+  // millions — off by ~1000x.
+  check("a 1000x unit error is implausible", isImplausibleShareCount(0.591, 588.684), true);
+  check("NVIDIA FY10 Q1 0.542 against a 628 median", isImplausibleShareCount(0.542, 628), true);
+
+  /*
+   * The regression this pins. SEC carries the ANNUAL count split-ADJUSTED by
+   * later filings while the quarterly keeps the count as originally filed, so
+   * after a 10-for-1 the two differ by exactly 10x with BOTH correct. The old
+   * 0.5x–2x band deleted 32 real quarters — NVIDIA 616 and 2,490, Broadcom
+   * 429, Arista 79 — the first time the seed was regenerated after it shipped.
+   */
+  check("NVIDIA pre-split 2,490 against a post-split 24,940 survives",
+    isImplausibleShareCount(2490, 24940), false);
+  check("NVIDIA pre-split 616 survives a 10-for-1", isImplausibleShareCount(616, 6160), false);
+  check("Broadcom 429 survives its 10-for-1", isImplausibleShareCount(429, 4290), false);
+  check("Arista 79 survives its 4-for-1", isImplausibleShareCount(78.756, 315), false);
+  check("even a 20-for-1 survives", isImplausibleShareCount(50, 1000), false);
+
+  check("zero is never a share count", isImplausibleShareCount(0, 500), true);
+  check("negative is never a share count", isImplausibleShareCount(-5, 500), true);
+  check("no reference means no judgement is possible", isImplausibleShareCount(500, 0), true);
 }
 
 console.log(

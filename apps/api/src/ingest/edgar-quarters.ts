@@ -247,6 +247,33 @@ export function extractQuarters(
  * annual — and discarding real quarters over that would cost more than it
  * saves. What this catches is the order-of-magnitude wrong, not the imprecise.
  */
+/**
+ * Is a filed diluted-share count a UNIT ERROR rather than a real change?
+ *
+ * The only defect this is for: a value filed in units while its neighbours are
+ * in millions — off by roughly 1000x. NVIDIA's FY11 Q1 came back as 0.591
+ * against a full-year 588.684, which rendered EPS of ±200–370.
+ *
+ * **The band must stay wide enough for stock splits.** At 0.2x–5x this check
+ * deleted 32 CORRECT quarters the first time the seed was regenerated after it
+ * shipped — NVIDIA's 616 and 2,490 against a post-10-for-1 median, Broadcom's
+ * 429 against its own 10-for-1, Arista's 79 against its 4-for-1. A split moves
+ * the count by 4x–10x and a whole-history median sits on one side of it, so a
+ * tight band cannot tell a split from an error; it just deletes whichever side
+ * of the company's history is shorter. A gate that removes real data to be
+ * safe is not being safe.
+ *
+ * 100x leaves every split intact and still catches a 1000x unit error.
+ */
+export function isImplausibleShareCount(
+  value: number,
+  reference: number,
+): boolean {
+  if (!(value > 0) || !(reference > 0)) return true;
+  const ratio = value / reference;
+  return ratio < 0.01 || ratio > 100;
+}
+
 export function reconcileQuarters(
   years: Record<string, Record<string, number>>,
   quarters: QuarterFacts,
@@ -255,6 +282,11 @@ export function reconcileQuarters(
   const dropped: { fy: number; annual: number; sum: number }[] = [];
   const out: QuarterFacts = {};
   for (const [k, v] of Object.entries(quarters)) out[k] = { ...v };
+
+  /*
+   * Pass 0 note — see `isImplausibleShareCount` for why the share-count bands
+   * below are as wide as they are. A tighter gate deleted 32 correct quarters.
+   */
 
   /*
    * Pass 1 — zero revenue is not a slow quarter, it is the wrong entity.
@@ -286,8 +318,12 @@ export function reconcileQuarters(
       const k = key(fy, q);
       const v = out[k]?.DilutedShares;
       if (v === undefined) continue;
-      const ratio = v / annualShares;
-      if (ratio < 0.5 || ratio > 2) {
+      // Same band as pass 3, and for a sharper reason: SEC's companyfacts
+      // carries the ANNUAL figure split-ADJUSTED by later filings while the
+      // quarterly figure keeps the count as originally filed. After NVIDIA's
+      // 10-for-1 the two differ by exactly 10x with both numbers correct, so a
+      // 0.5x–2x band deleted every pre-split quarter it touched.
+      if (isImplausibleShareCount(v, annualShares)) {
         delete out[k]!.DilutedShares;
         if (Object.keys(out[k]!).length === 0) delete out[k];
       }
@@ -300,8 +336,22 @@ export function reconcileQuarters(
    * Pass 2 needs an annual share count to compare against, and older fiscal
    * years often have none, which let NVIDIA's FY10/FY11 unit errors through.
    * A company's diluted share count is one of the most stable series it
-   * reports, so the median of its own quarters is a reliable yardstick: a
-   * 1000x error stands out against it no matter which year it lands in.
+   * reports, so the median of its own quarters is a yardstick a 1000x error
+   * cannot hide from.
+   *
+   * THE BAND IS DELIBERATELY WIDE, and it was not always. At 0.2x–5x this
+   * gate deleted 32 CORRECT quarters the first time the seed was regenerated
+   * after it shipped: NVIDIA's pre-split 616 and 2,490 against a
+   * post-10-for-1 median, Broadcom's 429 against its own 10-for-1, Arista's
+   * 79 against its 4-for-1. **A stock split legitimately moves the share
+   * count by 4x–10x**, and a whole-history median sits on one side of it, so
+   * a tight band cannot tell a split from an error — it just deletes whichever
+   * side of the company's history is shorter.
+   *
+   * The defect this exists to catch is a UNIT error: filed in units where the
+   * rest are in millions, i.e. off by ~1000x. So the band only has to exclude
+   * that, and 0.01x–100x does, while leaving every split intact. A gate that
+   * removes real history to be safe is not being safe.
    */
   {
     const counts = Object.values(out)
@@ -313,7 +363,7 @@ export function reconcileQuarters(
       for (const k of Object.keys(out)) {
         const v = out[k]!.DilutedShares;
         if (v === undefined) continue;
-        if (v <= 0 || v / median < 0.2 || v / median > 5) {
+        if (isImplausibleShareCount(v, median)) {
           delete out[k]!.DilutedShares;
           if (Object.keys(out[k]!).length === 0) delete out[k];
         }
