@@ -8,6 +8,7 @@
  */
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { originAllowed } from "./http/cors.ts";
 import postgres, { type Sql } from "postgres";
 import { createDb } from "./db/repo.ts";
 import { ensureSchema, MIGRATION_IDS } from "./db/migrate.ts";
@@ -55,20 +56,11 @@ type AppEnv = {
 
 const app = new Hono<AppEnv>();
 
-// The web app is a static Cloudflare Pages site on a different origin. In
-// production set ALLOWED_ORIGINS (comma-separated) to the Pages domain(s);
-// when unset (local dev, pre-config deploys) the policy stays permissive.
 app.use("*", async (c, next) => {
   const allowed = c.env.ALLOWED_ORIGINS;
   const handler = cors({
     origin: allowed
-      ? (origin) =>
-          allowed
-            .split(",")
-            .map((s) => s.trim())
-            .includes(origin)
-            ? origin
-            : undefined
+      ? (origin) => (originAllowed(allowed, origin) ? origin : undefined)
       : "*",
     allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: ["content-type"],
