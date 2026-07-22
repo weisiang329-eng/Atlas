@@ -56,6 +56,23 @@ Worked examples of the rule:
 - **DRAM does NOT need L5.** DDR4 vs DDR5 share drivers; splitting buys
   nothing.
 
+### "L1..L5" is schema vocabulary and must never reach the screen
+
+The level numbers exist so the code and this document can talk about depth.
+They are not labels. A reader should never see `L4 细分` — only:
+
+```
+科技  ›  半导体  ›  存储  ›  DRAM
+```
+
+The nesting already conveys depth; numbering it just leaks the schema. It
+would also actively confuse, because **depth is uneven by design**: gloves go
+five levels deep and DRAM stops at four, so a visible "L5" invites the
+question "why does this one have an extra level" — whose honest answer is an
+implementation detail the reader does not need.
+
+`level` stays in the database column, in code, and in this file. Nowhere else.
+
 ### Geography is a TAG, not a level
 
 `科技股` is an industry. `中资股` is a listing venue. A Chinese technology
