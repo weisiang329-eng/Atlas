@@ -305,6 +305,9 @@ export const pmsFxRate = pgTable(
     fromCurrency: text("from_currency").notNull(),
     toCurrency: text("to_currency").notNull(),
     rate: doublePrecision("rate").notNull(),
+    /** Half the dealer buy/sell spread as a % of mid — the conversion cost. */
+    halfSpreadPct: doublePrecision("half_spread_pct"),
+    provider: text("provider"),
     sourceId: text("source_id").references(() => source.id),
   },
   (t) => ({
@@ -556,3 +559,28 @@ export const industryKpi = pgTable(
 
 export type IndustryKnowledge = typeof industryKnowledge.$inferSelect;
 export type IndustryKpi = typeof industryKpi.$inferSelect;
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * News monitoring (free sources)
+ * A headline is a monitoring signal, never a source of record for a number.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+export const newsItem = pgTable(
+  "news_item",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    link: text("link").notNull(),
+    publisher: text("publisher"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    query: text("query"),
+    companyIds: text("company_ids"),
+    industryIds: text("industry_ids"),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    publishedIdx: index("news_item_published_idx").on(t.publishedAt),
+  }),
+);
+
+export type NewsItem = typeof newsItem.$inferSelect;
