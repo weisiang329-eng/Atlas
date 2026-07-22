@@ -255,6 +255,12 @@ export interface IndustryDriver {
   confidence: number;
   sourceName: string | null;
   sourceUrl: string | null;
+  /** The node this driver hangs off — may be a leaf below the one requested. */
+  nodeId: string;
+  nodeName: string;
+  nodeNameZh: string | null;
+  /** True when it belongs to a descendant rather than the node being viewed. */
+  inherited: boolean;
   hasSeries: boolean;
   backtest: DriverBacktest;
   lagProfile: DriverLagProbe[];

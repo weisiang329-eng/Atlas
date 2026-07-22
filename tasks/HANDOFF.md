@@ -353,11 +353,24 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
     net income only, so the test runs on a labelled net-margin proxy), volume
     or utilisation to separate price from demand, and a longer pre-2019
     window. All data problems.
-  - **Still open — the driver LIST.** Six leaves have no drivers, by choice:
-    seeding them from prose would create claims nobody can check. Two of the
-    four glove drivers already read "no series yet" and name their blocker
-    (`EIA_API_KEY`, per-maker utilisation), which is the honest form of a
-    to-do. Breadth lands with the free feeds below.
+- [x] **Driver list encoded (2026-07-23, migration 0009) — needs owner review.**
+  §3's 领先/同步/滞后 lists are now rows: **30 drivers across 10 leaves**
+  (DRAM · NAND · HBM · 先进/成熟制程 · 设备 · 加速器 · 网络/ASIC ·
+  数据中心电力 · 手套). Nothing invented — where §3 states no elasticity the
+  band stays NULL. All are `assumption`; only the two glove drivers have a
+  series, and every other row **names the feed it needs**, so the table is
+  also the data shopping list:
+  - **free, needs a key** — FRED (auto/industrial inventory, copper), EIA
+    (electricity, natural gas)
+  - **derivable from filings Atlas already stores** — maker capex, fab capex,
+    customer capex, backlog ratio: extraction work, not a new source
+  - **paid, out of scope** — TrendForce/DRAMeXchange (DRAM/NAND contract +
+    spot, HBM pricing), SEMI book-to-bill
+  - **may never be a series** — HBM stacking yield (qualitative commentary)
+  - **Drivers roll DOWN as well as up:** companies sit on 存储 while the
+    drivers hang off DRAM/NAND/HBM, so an industry page shows its descendants'
+    drivers labelled with their node. Each node is backtested as its own joint
+    model — pooling them would invent a control that does not exist.
   - **Owner review needed:** the doc disagrees with itself on the latex lag
     (§2 says leading/1q, §3 files it as coincident). The seed encodes §2; the
     lag profile now shows what the data supports at each lag.

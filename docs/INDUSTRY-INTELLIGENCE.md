@@ -397,14 +397,35 @@ drivers takes about a week and covers what decisions actually need.
      covers each today, and another level is another level to maintain.
 2. `industry_driver` table per §2; **3–5 drivers per leaf, owner reviews the
    list** — this step decides whether the whole model is right
-   **Mechanism done 2026-07-23; the list is not.** The table, the joint
-   backtest and the driver panel are live, seeded with **gloves only** — the
-   one leaf where both sides of a claim exist in the database (MARGMA ASP +
-   NBR latex, and 555 Bursa quarterlies). Seeding the other six from prose
-   would produce exactly what §5 warns against: claims nobody can check. Two
-   of the four glove drivers already read "no series yet" and name their
-   blocker (`EIA_API_KEY`; per-maker utilisation), which is the honest form of
-   a to-do. Breadth comes when the free feeds land — see step 3.
+   **Mechanism done 2026-07-23. List encoded 2026-07-23, awaiting review.**
+   The table, the joint backtest and the driver panel are live. Gloves came
+   first because it is the one leaf where both sides of a claim exist in the
+   database (MARGMA ASP + NBR latex, and 555 Bursa quarterlies).
+   **§3's lists are now encoded as rows** for the other nine leaves — 30
+   drivers across DRAM · NAND · HBM · 先进/成熟制程 · 设备 · 加速器 ·
+   网络/ASIC · 数据中心电力 · 手套. Nothing was invented: where §3 states no
+   elasticity, the band stays NULL rather than being filled with a plausible
+   number. None of them has a series, and **each row names the feed it needs**,
+   so the table doubles as the data shopping list. Grouped by what it would
+   take to connect them:
+   - **free, needs a key:** FRED (auto/industrial inventories, copper), EIA
+     (electricity, natural gas)
+   - **derivable from data already ingested:** maker capex, fab capex,
+     customer capex, backlog ratio — all sit in filings Atlas already stores;
+     they need extraction, not a new source
+   - **paid, out of scope:** TrendForce / DRAMeXchange (DRAM & NAND contract
+     and spot prices, HBM pricing), SEMI book-to-bill
+   - **may never be a series:** HBM stacking yield — disclosed qualitatively
+     in commentary, if at all
+
+   **Drivers roll DOWN as well as up.** A driver hangs off the leaf whose
+   drivers it is, but companies sit higher (Micron and SK hynix are filed on
+   存储, not DRAM), so an industry page shows its descendants' drivers, each
+   labelled with the node it belongs to. Otherwise the entire model would be
+   invisible one level below where anyone looks. Each node is backtested as
+   its own joint model — holding DRAM's inventory cycle fixed says nothing
+   about HBM's margin, and pooling them would invent a control that does not
+   exist.
    **Note for the owner's review:** §2 gives NBR latex `phase: leading,
    lagQuarters: 1` while §3 files 胶价 under 同步. The seed encodes §2, and
    the lag profile now reports what the data supports at each lag, so this can
