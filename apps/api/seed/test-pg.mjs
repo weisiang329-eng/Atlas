@@ -24,6 +24,7 @@ const migrations = [
   "drizzle/0007_industry_tree.sql",
   "drizzle/0008_industry_driver.sql",
   "drizzle/0009_driver_list.sql",
+  "drizzle/0010_fiscal_year_end.sql",
 ];
 const seeds = [
   "seed/seed.sql",

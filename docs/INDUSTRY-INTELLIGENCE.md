@@ -347,6 +347,17 @@ utilisation to separate price from demand, and a longer pre-2019 window for
 both series. All three are data problems, which is the right kind of problem
 to be left with.
 
+**The other side of the test was broken too, and it was invisible.** Every US
+industry had an EMPTY margin history: the EDGAR seed writes 402 quarterly
+periods with no `report_date`, so nothing could be placed on a calendar
+quarter and every row silently dropped. Fixed 2026-07-23 by recording each
+company's fiscal year end and deriving the calendar quarter from
+(fy, quarter, fiscal-year-end) where no date was filed — 存储 recovered 68
+quarters back to 2008Q4, 加速器 72, 网络 52. It changes no verdict today
+(none of those leaves has a driver series yet) but it is the difference
+between "we tested and could not tell" and "we never tested and did not
+notice."
+
 **The claim stays on the page, marked contradicted.** Deleting it would erase
 the finding, and the finding is the product.
 

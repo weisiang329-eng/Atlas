@@ -94,9 +94,10 @@ for (const c of GLOVE_COMPANIES) {
         industry_id: q(GLOVE_INDUSTRY.id),
         description: q(c.description),
         reporting_currency: q("MYR"),
+        fiscal_year_end_month: c.fyEndMonth ?? "NULL",
       },
       ["id"],
-      ["name", "ticker", "exchange", "segment", "country", "industry_id", "description", "reporting_currency"],
+      ["name", "ticker", "exchange", "segment", "country", "industry_id", "description", "reporting_currency", "fiscal_year_end_month"],
     ),
   );
 

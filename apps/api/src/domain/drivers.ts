@@ -416,23 +416,27 @@ export function scanLags(
  * Net margin is used because that is what exists — the Bursa quarterlies carry
  * revenue and net income only. Callers must pass `isProxy` on to the backtest
  * when the claim is about gross margin.
+ *
+ * `quarter` is supplied by the caller (see domain/fiscal.ts `placePeriod`)
+ * rather than read from a date here, because half the periods in the database
+ * have no filed date and can only be placed through their fiscal calendar.
+ * A period this function cannot place is dropped, never bucketed by guess.
  */
 export function industryNetMargin(
   periods: {
-    reportDate: string | null;
+    quarter: string | null;
     facts: Record<string, number | undefined>;
   }[],
 ): Observation[] {
   const byQuarter = new Map<string, { revenue: number; net: number }>();
 
   for (const p of periods) {
-    if (!p.reportDate) continue;
+    const q = p.quarter;
+    if (!q) continue;
     const revenue = p.facts.Revenue;
     const net = p.facts.NetIncome;
     if (revenue === undefined || net === undefined || revenue <= 0) continue;
 
-    const q = quarterOf(p.reportDate);
-    if (!q) continue;
     const acc = byQuarter.get(q) ?? { revenue: 0, net: 0 };
     acc.revenue += revenue;
     acc.net += net;

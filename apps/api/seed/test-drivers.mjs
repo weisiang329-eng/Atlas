@@ -20,6 +20,7 @@ import {
   shiftQuarter,
   toQuarterly,
 } from "../src/domain/drivers.ts";
+import { placePeriod } from "../src/domain/fiscal.ts";
 
 /** One driver, tested alone — the k=1 case of the joint model. */
 const backtestOne = (o) =>
@@ -201,11 +202,11 @@ console.log("\n--- a proxy target is labelled as one ---");
 console.log("\n--- industry margin is revenue-weighted, not an average of averages ---");
 {
   const periods = [
-    { reportDate: "2026-03-31", facts: { Revenue: 1000, NetIncome: 100 } }, // 10%
-    { reportDate: "2026-03-31", facts: { Revenue: 100, NetIncome: -50 } },  // −50%
-    { reportDate: "2026-06-30", facts: { Revenue: 500, NetIncome: 50 } },
-    { reportDate: "2026-06-30", facts: { Revenue: 500 } },                  // incomplete
-    { reportDate: null, facts: { Revenue: 900, NetIncome: 90 } },           // undated
+    { quarter: "2026Q1", facts: { Revenue: 1000, NetIncome: 100 } }, // 10%
+    { quarter: "2026Q1", facts: { Revenue: 100, NetIncome: -50 } },  // −50%
+    { quarter: "2026Q2", facts: { Revenue: 500, NetIncome: 50 } },
+    { quarter: "2026Q2", facts: { Revenue: 500 } },                  // incomplete
+    { quarter: null, facts: { Revenue: 900, NetIncome: 90 } },       // unplaceable
   ];
   const m = industryNetMargin(periods);
   check("one point per quarter", m.map((o) => o.quarter), ["2026Q1", "2026Q2"]);
@@ -213,7 +214,7 @@ console.log("\n--- industry margin is revenue-weighted, not an average of averag
   // letting the smallest maker define the industry.
   check("the big maker dominates, as 'industry margin' means", m[0].value, (v) => Math.abs(v - 4.545) < 0.01);
   check("a period missing NetIncome is skipped, not zero-filled", m[1].value, 10);
-  check("an undated period cannot be placed and is dropped", m.length, 2);
+  check("an unplaceable period is dropped, never bucketed by guess", m.length, 2);
 }
 
 console.log("\n--- against the real glove data ---");
@@ -222,6 +223,7 @@ console.log("\n--- against the real glove data ---");
   for (const m of [
     "drizzle/0000_init_postgres.sql",
     "drizzle/0007_industry_tree.sql",
+    "drizzle/0010_fiscal_year_end.sql",
     "drizzle/0008_industry_driver.sql",
   ]) await db.exec(read(m));
   await db.exec(read("drizzle/0008_industry_driver.sql")); // replay must be a no-op
@@ -245,7 +247,13 @@ console.log("\n--- against the real glove data ---");
      WHERE p.period_type = 'quarter' GROUP BY p.id, p.report_date`,
   )).rows;
   const target = industryNetMargin(
-    periods.map((r) => ({ reportDate: r.reportDate, facts: { Revenue: r.revenue, NetIncome: r.net } })),
+    periods.map((r) => ({
+      quarter: placePeriod(
+        { reportDate: r.reportDate, fiscalYear: null, fiscalQuarter: null },
+        null,
+      ).quarter,
+      facts: { Revenue: r.revenue, NetIncome: r.net },
+    })),
   );
   check("the glove quarterlies produce a real margin history", target.length, (v) => v > 40);
 

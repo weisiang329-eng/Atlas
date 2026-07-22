@@ -70,9 +70,10 @@ for (const c of COMPANIES) {
         founded_year: n(c.foundedYear),
         website: q(c.website),
         reporting_currency: q(c.currency),
+        fiscal_year_end_month: n(c.fyEndMonth),
       },
       ["id"],
-      ["name", "ticker", "exchange", "segment", "country", "industry_id", "description", "headquarters", "founded_year", "website", "reporting_currency"],
+      ["name", "ticker", "exchange", "segment", "country", "industry_id", "description", "headquarters", "founded_year", "website", "reporting_currency", "fiscal_year_end_month"],
     ),
   );
 
