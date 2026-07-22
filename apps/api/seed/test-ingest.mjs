@@ -1,12 +1,18 @@
 /**
- * Verifies the free-source ingestion.
+ * Verifies the free-source ingestion AND the feed presenter that renders it.
  *
  * The behaviour that matters is TAGGING PRECISION. A missed tag is
  * recoverable — the item is still in the feed. A wrong tag pollutes the
  * knowledge graph and makes a company look like it was in the news when it
  * was not, which is worse than silence.
+ *
+ * The presenter is here rather than in its own suite because it defends the
+ * same property from the other end: the query that surfaced an item must
+ * never be promoted into a company tag, and a missing publisher must never be
+ * invented.
  */
 import { parseRss, tagItem, dedupe } from "../src/ingest/news.ts";
+import { hostOf, presentNewsItem, presentNewsFeed } from "../src/domain/news.ts";
 
 let failures = 0;
 const check = (label, actual, expected) => {
@@ -74,6 +80,57 @@ console.log("\n--- de-duplication unions tags rather than overwriting ---");
   const merged = out.find(i => i.link === "https://x.test/1");
   check("company tags unioned, not overwritten", merged.companyIds.sort(), ["amd","micron"]);
   check("industry tags unioned too", merged.industryIds.sort(), ["semis-accelerators","semis-memory"]);
+}
+
+console.log("\n--- feed presentation (what the page is allowed to claim) ---");
+{
+  const ROSTER = [
+    { id: "nvidia", name: "NVIDIA Corporation", ticker: "NVDA" },
+    { id: "micron", name: "Micron Technology", ticker: "MU" },
+  ];
+  const byId = new Map(ROSTER.map((c) => [c.id, c]));
+  const row = (over) => ({
+    id: "i1", title: "t", link: "https://www.fool.com/investing/x", publisher: null,
+    publishedAt: new Date("2026-07-20T09:00:00Z"), query: "NVDA",
+    companyIds: null, industryIds: null, fetchedAt: new Date("2026-07-22T01:03:00Z"),
+    ...over,
+  });
+
+  check("host derived, www stripped", hostOf("https://www.fool.com/a"), "fool.com");
+  check("a malformed link yields no host", hostOf("not a url"), null);
+
+  const derived = presentNewsItem(row(), byId);
+  check("no publisher ⇒ source falls back to the host", derived.source, "fool.com");
+  check("the fallback is flagged as derived", derived.sourceDerived, true);
+
+  const stated = presentNewsItem(row({ publisher: "Reuters" }), byId);
+  check("a stated publisher is used as-is", stated.source, "Reuters");
+  check("a stated publisher is not flagged derived", stated.sourceDerived, false);
+
+  // THE property. Production measured 30 tagged out of 100 pulled: a ticker
+  // feed carries general market copy, so `query` is provenance only.
+  check("the query does NOT become a company tag", derived.companies, []);
+  check("the query is still exposed as provenance", derived.query, "NVDA");
+
+  const tagged = presentNewsItem(row({ companyIds: "nvidia,micron" }), byId);
+  check("tagged ids resolve to companies", tagged.companies.map((c) => c.ticker), ["NVDA", "MU"]);
+
+  const stale = presentNewsItem(row({ companyIds: "nvidia,delisted-co" }), byId);
+  check("a tag for a company we no longer cover is dropped, not rendered dead",
+    stale.companies.map((c) => c.id), ["nvidia"]);
+
+  check("dates leave as ISO strings", derived.publishedAt, "2026-07-20T09:00:00.000Z");
+
+  const feed = presentNewsFeed(
+    [row({ id: "a", fetchedAt: new Date("2026-07-21T00:00:00Z") }),
+     row({ id: "b", fetchedAt: new Date("2026-07-22T01:03:00Z") })],
+    ROSTER,
+    { total: 100, tagged: 30 },
+  );
+  check("lastFetchedAt is the newest pull, not the first row",
+    feed.lastFetchedAt, "2026-07-22T01:03:00.000Z");
+  check("unfiltered totals are reported so the page can say what it hides",
+    [feed.total, feed.tagged], [100, 30]);
 }
 
 console.log(`\n${failures === 0 ? "ALL CHECKS PASSED" : failures + " CHECK(S) FAILED"}`);

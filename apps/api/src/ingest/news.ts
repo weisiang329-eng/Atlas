@@ -32,10 +32,15 @@ export interface TaggedNewsItem extends RawNewsItem {
  *
  * Google News RSS was the first choice and is unusable here: it returns 503 to
  * Cloudflare Workers specifically (verified via /v1/ingest/probe — it is the
- * only one of eight free sources that blocks datacentre egress). Yahoo is
- * ticker-scoped rather than keyword-scoped, which is actually the better fit:
- * a feed for "NVDA" cannot drift onto an unrelated company the way a search
- * for "Micron" can.
+ * only one of eight free sources that blocks datacentre egress).
+ *
+ * This comment used to claim that a ticker-scoped feed "cannot drift onto an
+ * unrelated company the way a keyword search can". Measured against the 100
+ * rows production had stored (2026-07-22): only 30 mention any company in the
+ * coverage universe — the NVDA feed carries "SpaceX Is Down 20%" and "Should
+ * You Buy Moderna Stock". Ticker scoping constrains the QUERY, not the
+ * content. That is why `query` is stored as provenance and only `tagItem`'s
+ * match on the headline produces a tag.
  */
 const FEED = "https://feeds.finance.yahoo.com/rss/2.0/headline";
 

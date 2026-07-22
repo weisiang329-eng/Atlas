@@ -278,7 +278,29 @@ Everything not yet done, exhaustively, by priority. Tick as you go.
 Live already: Home, Companies list + overview/profile/financials/relations, all
 `/financials/*`, Industries + `/industries/[id]`, Value Chain, Rankings,
 Watchlist, Portfolio, Research overview + notes + decision-journal, Knowledge +
-graph, `/reports/company/[id]`, Agent. **Still not real:**
+graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
+- [x] **`/news` — wired 2026-07-22.** Reads `GET /v1/news` (routes/news.ts +
+  domain/news.ts); `lib/mock/news.ts` deleted, and with it an item attributed
+  to **MARGMA** — a real trade association — carrying a specific glove-ASP
+  number. That is a fabricated citation in all but name, and it was live.
+  The mock's priority/URGENT tier, category and country columns are gone too:
+  nothing computes them, so a badge saying URGENT on a real headline was a
+  claim Atlas could not support. `components/news/related-news.tsx` was dead
+  code on the same mock and was deleted rather than rewired.
+  - **Measured, and it corrects a claim this repo made in three places:** a
+    ticker-scoped Yahoo feed drifts badly. Of 100 stored items, **30** mention
+    a covered company; the NVDA feed carries SpaceX and Moderna pieces. So
+    `query` is rendered as provenance ("from the NVDA feed"), never as a tag,
+    and the page shows the 30/100 ratio instead of hiding the 70.
+  - **Follow-ups this leaves open:** (a) nothing schedules
+    `POST /v1/ingest/news`, so the feed is only as fresh as the last manual
+    pull — the page prints "last pulled" for exactly that reason; a Workers
+    Cron trigger needs `export default { fetch, scheduled }` in
+    `src/index.ts`. (b) `GET /v1/news?company=<id>` exists and is verified —
+    a per-company news panel on the company page is now a small job.
+    (c) Tagging recall is untuned: `Advanced Micro Devices`/`AMD` matches, but
+    a headline saying only "Nvidia" does not match `NVIDIA Corporation`
+    (the full-name term needs the corporate suffix stripped).
 - [ ] `companies/[companyId]/products` — needs a `company_product` table + data (P005 v2).
 - [ ] `companies/[companyId]/management` — needs `company_management` table + data (P005 v2).
 - [ ] `companies/[companyId]/valuation` — needs valuation multiples (needs price → P027) (P010 v2).
@@ -371,6 +393,9 @@ graph, `/reports/company/[id]`, Agent. **Still not real:**
 
 ### 13.7 Tech-debt / cleanup
 - [ ] `apps/web/lib/mock/*` — delete each module as its page is wired (§13.3).
+  `mock/news.ts` is gone (2026-07-22); 24 modules remain. When deleting one,
+  check for other importers — `related-news.tsx` was dead code hanging off the
+  news mock and only surfaced because the mock went first.
 - [ ] Remove the superseded `tasks/handoff-2026-07-21.md` once everyone uses this file.
 - [ ] No CD — consider a GitHub Action to deploy on merge to `main` (after secrets are set in the CF/GH integration).
 - [ ] Nav still tags `alerts`/`admin` as `soon` — correct until built.
@@ -419,7 +444,7 @@ adding any source.
 | Source | Serves | Notes |
 | --- | --- | --- |
 | **BNM** (Bank Negara Malaysia) | The ledger's FX anchor | Middle rate + the dealer half-spread, stored separately (PORTFOLIO-ACCOUNTING §5). USD/MYR verified live. |
-| **Yahoo Finance RSS** | News Research Analyst, `/news` | Ticker-scoped, so a feed cannot drift onto an unrelated company the way a keyword search can. |
+| **Yahoo Finance RSS** | News Research Analyst, `/news` | Ticker-scoped — which constrains the query, **not the content**. Measured 2026-07-22: 30 of 100 stored items mention a covered company; the rest is general market copy arriving under a ticker. Tags come from matching the headline, never from the query. |
 | **SEC EDGAR** (`data.sec.gov`) | Company financials | Already the basis of US coverage. |
 | **SEC EDGAR filings atom + full-text** | Company/Industry analysts | Probe-verified reachable; not yet wired to a route. |
 | **World Bank** | Macro indicators for industry KPIs | Probe-verified; not yet wired. |
