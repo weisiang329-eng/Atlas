@@ -103,6 +103,13 @@ export const company = pgTable(
     website: text("website"),
     /** Reporting currency for this company's financials, e.g. "USD". */
     reportingCurrency: text("reporting_currency").notNull().default("USD"),
+    /**
+     * Month the fiscal year ends (1–12). The join key for comparing quarters
+     * across companies: NVIDIA's Q1 ends in April, Intel's in March. NULL
+     * where Atlas has not confirmed the calendar — those periods stay
+     * unplaced rather than guessed (see domain/fiscal.ts).
+     */
+    fiscalYearEndMonth: integer("fiscal_year_end_month"),
     createdAt: createdAt(),
     updatedAt: text("updated_at")
       .notNull()

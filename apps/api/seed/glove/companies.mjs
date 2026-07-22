@@ -18,6 +18,7 @@ export const GLOVE_INDUSTRY = {
 export const GLOVE_COMPANIES = [
   {
     id: "top-glove",
+    fyEndMonth: 8, // stated in the description below
     code: "TOPGLOV",
     name: "Top Glove Corporation",
     ticker: "TOPGLOV",
@@ -29,6 +30,7 @@ export const GLOVE_COMPANIES = [
   },
   {
     id: "hartalega",
+    fyEndMonth: 3, // stated in the description below
     code: "HARTA",
     name: "Hartalega Holdings",
     ticker: "HARTA",

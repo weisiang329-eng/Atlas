@@ -92,6 +92,7 @@ console.log("\n--- the database matches the written taxonomy ---");
   for (const m of [
     "drizzle/0000_init_postgres.sql",
     "drizzle/0007_industry_tree.sql",
+    "drizzle/0010_fiscal_year_end.sql",
   ]) {
     await db.exec(read(m));
   }

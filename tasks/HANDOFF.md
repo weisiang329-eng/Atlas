@@ -353,6 +353,44 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
     net income only, so the test runs on a labelled net-margin proxy), volume
     or utilisation to separate price from demand, and a longer pre-2019
     window. All data problems.
+- [x] **Fiscal-quarter alignment (2026-07-23, migration 0010) — a silent hole,
+  found by observation.** The EDGAR seed writes **402 quarterly periods with no
+  `report_date`** (the column is not in the INSERT, in the seed *or* in the
+  ingest route). `quarterOf(null)` returns nothing, so every US industry's
+  quarterly margin history was **empty**, and the driver backtest reported
+  "insufficient data" for a reason that had nothing to do with the data.
+  - `company.fiscal_year_end_month` + `domain/fiscal.ts`: a period is placed on
+    the calendar by its filed date where one exists, otherwise **derived** from
+    (fiscal year, fiscal quarter, fiscal year end) — fiscal quarters end three
+    months apart from the year end, so this is arithmetic, not a guess. No
+    invented date is ever written into `report_date`.
+  - Recovered: 存储 **68 quarters (2008Q4–2026Q2)**, 加速器 72, 网络 52,
+    数据中心电力 29 — all previously zero. Gloves unchanged at 95 with
+    `derived: 0`, because their Bursa periods already carry filed dates.
+  - The API reports `derivedQuarters` and `unplacedPeriods` on the target, so a
+    reader can see how the history was assembled.
+  - **Only sourced fiscal calendars are set.** The seven US filers come from
+    the EDGAR roster; Top Glove (August) and Hartalega (March) are stated in
+    their own seed descriptions. TSMC, ASML, SK hynix, Kossan, Supermax,
+    Careplus, Comfort and Hextar are left NULL — a plausible guess would
+    misplace every quarter by up to three months, and a wrong series that still
+    looks like a number is worse than an absent one.
+  - **Follow-up:** the ingest route should write the REAL period end from SEC
+    (`extractQuarters` has it and drops it). Then live-ingested quarters stop
+    needing derivation at all. `semis-equipment` still shows 0 quarters because
+    ASML is its only member and has no quarterly periods seeded.
+  - ⚠️ **`seed:build` is NOT currently a no-op for `edgar-seed.sql` — do not
+    regenerate it casually.** Running it while doing the above dropped **32
+    `DilutedShares` facts**, and only some of them were the bad ones: NVIDIA
+    Q1 FY10 = `0.542` is the documented 1000×-too-small defect and deserves to
+    go, but NVIDIA Q1 FY24 = `2490`, Arista `~316`, and Broadcom `~429` are all
+    correct and were dropped too. The checked-in seed predates a plausibility
+    gate added later (PR #69), so generator and artefact have drifted, and the
+    generator is now stricter than it should be for a **non-additive** concept:
+    share counts do not sum across quarters, so reconciling them against an
+    annual total is the wrong test. The regenerated file was reverted in this
+    PR — fixing the gate is its own task, and it should come with an assertion
+    that `seed:build` leaves the checked-in SQL unchanged.
 - [x] **Driver list encoded (2026-07-23, migration 0009) — needs owner review.**
   §3's 领先/同步/滞后 lists are now rows: **30 drivers across 10 leaves**
   (DRAM · NAND · HBM · 先进/成熟制程 · 设备 · 加速器 · 网络/ASIC ·

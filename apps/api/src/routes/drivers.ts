@@ -21,6 +21,7 @@ import {
   type BacktestResult,
   type DriverClaim,
 } from "../domain/drivers.ts";
+import { placePeriod } from "../domain/fiscal.ts";
 import { descendantIds, rollUpMembers } from "../domain/taxonomy.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
@@ -68,17 +69,50 @@ drivers.get("/:id/drivers", async (c) => {
 
   const membersByNode = rollUpMembers(industries, companies);
 
-  /** One node's margin history: its members', rolled up over the tree. */
+  const fyEndByCompany = new Map(
+    companies.map((co) => [co.id, co.fiscalYearEndMonth ?? null]),
+  );
+
+  /**
+   * One node's margin history: its members', rolled up over the tree.
+   *
+   * Each period is placed on the calendar before aggregation. Most US
+   * quarterly periods carry no filed date (the EDGAR seed never wrote one),
+   * so they are placed through the company's fiscal calendar instead —
+   * derivation, reported as such, never a fabricated date.
+   */
   const targetFor = async (nodeId: string) => {
     const memberIds = membersByNode.get(nodeId) ?? [];
-    const periods = (
-      await Promise.all(memberIds.map((id) => getPeriodsWithFacts(db, id, "quarter")))
-    ).flat();
+    const perCompany = await Promise.all(
+      memberIds.map(async (id) => ({
+        id,
+        periods: await getPeriodsWithFacts(db, id, "quarter"),
+      })),
+    );
+
+    let derivedCount = 0;
+    let unplaced = 0;
+    const placed = perCompany.flatMap(({ id, periods }) =>
+      periods.map((p) => {
+        const placement = placePeriod(
+          {
+            reportDate: p.period.reportDate,
+            fiscalYear: p.period.fiscalYear,
+            fiscalQuarter: p.period.fiscalQuarter,
+          },
+          fyEndByCompany.get(id) ?? null,
+        );
+        if (placement.derived) derivedCount += 1;
+        if (!placement.quarter) unplaced += 1;
+        return { quarter: placement.quarter, facts: p.facts };
+      }),
+    );
+
     return {
       memberIds,
-      points: industryNetMargin(
-        periods.map((p) => ({ reportDate: p.period.reportDate, facts: p.facts })),
-      ),
+      points: industryNetMargin(placed),
+      derivedCount,
+      unplaced,
     };
   };
 
@@ -193,6 +227,15 @@ drivers.get("/:id/drivers", async (c) => {
       unit: "%",
       points: own.points,
       companies: [...own.memberIds].sort(),
+      /**
+       * How the quarters were placed. `derivedQuarters` counts periods with no
+       * filed date, aligned through their fiscal calendar; `unplacedPeriods`
+       * counts those Atlas could not place at all and therefore dropped.
+       * Both are on the wire because a margin history is only as trustworthy
+       * as its alignment.
+       */
+      derivedQuarters: own.derivedCount,
+      unplacedPeriods: own.unplaced,
     },
     drivers: results,
   });
