@@ -28,6 +28,7 @@ import industry0004 from "../../drizzle/0004_industry_knowledge.sql";
 import industrySeed0005 from "../../drizzle/0005_industry_seed.sql";
 import newsFx0006 from "../../drizzle/0006_news_fx.sql";
 import industryTree0007 from "../../drizzle/0007_industry_tree.sql";
+import industryDriver0008 from "../../drizzle/0008_industry_driver.sql";
 
 /**
  * Ordered. Never renumber or edit a shipped migration — append a new one.
@@ -55,6 +56,9 @@ const MIGRATIONS: { id: string; sql: string; sentinel: string }[] = [
   // statement is `ADD COLUMN IF NOT EXISTS` / `ON CONFLICT DO UPDATE` /
   // `UPDATE ... WHERE id =`, so a replay is a no-op.
   { id: "0007_industry_tree", sql: industryTree0007, sentinel: "__none__" },
+  // Table + its seed rows. `CREATE TABLE IF NOT EXISTS` plus an upsert, so a
+  // replay is a no-op and no sentinel is needed.
+  { id: "0008_industry_driver", sql: industryDriver0008, sentinel: "__none__" },
 ];
 
 /** Arbitrary but fixed — the lock key every Atlas Worker agrees on. */

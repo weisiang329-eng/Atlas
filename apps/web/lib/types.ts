@@ -202,6 +202,77 @@ export interface IndustryDetail {
   cycleSignal: CycleSignal | null;
 }
 
+// --- Industry drivers (the causal layer) ------------------------------------
+
+export type DriverVerdict =
+  | "insufficient-data"
+  | "holds"
+  | "weak"
+  | "contradicted";
+
+export interface DriverBacktest {
+  verdict: DriverVerdict;
+  n: number;
+  testedAgainst: string | null;
+  isProxy: boolean;
+  proxyNote: string | null;
+  /** Target-unit change per +10% driver move, holding `controlledFor` fixed. */
+  impliedElasticity: number | null;
+  r2: number | null;
+  signMatchesClaim: boolean | null;
+  controlledFor: string[];
+  sampleFrom: string | null;
+  sampleTo: string | null;
+}
+
+/** Diagnostic only — the claimed lag is what gets a verdict. */
+export interface DriverLagProbe {
+  lagQuarters: number;
+  impliedElasticity: number | null;
+  r2: number | null;
+  n: number;
+}
+
+export interface IndustryDriver {
+  id: number;
+  industryId: string;
+  key: string;
+  name: string;
+  nameZh: string | null;
+  whatItIs: string | null;
+  phase: "leading" | "coincident" | "lagging";
+  lagQuarters: number;
+  affects: string | null;
+  direction: number;
+  elasticityLow: number | null;
+  elasticityHigh: number | null;
+  elasticityUnit: string | null;
+  targetMetric: string | null;
+  whoItHits: string | null;
+  seriesKey: string | null;
+  frequency: string | null;
+  kind: "fact" | "assumption";
+  confidence: number;
+  sourceName: string | null;
+  sourceUrl: string | null;
+  hasSeries: boolean;
+  backtest: DriverBacktest;
+  lagProfile: DriverLagProbe[];
+}
+
+/** GET /v1/industries/:id/drivers */
+export interface IndustryDrivers {
+  industryId: string;
+  target: {
+    metric: string;
+    label: string;
+    unit: string;
+    points: { quarter: string; value: number }[];
+    companies: string[];
+  } | null;
+  drivers: IndustryDriver[];
+}
+
 // --- Industry taxonomy ------------------------------------------------------
 
 /** A node referenced from a path or a child list. */

@@ -575,8 +575,60 @@ export const industryKpi = pgTable(
   }),
 );
 
+/**
+ * What moves an industry — the causal layer.
+ *
+ * A row here is a CLAIM, not a series: phase, lag and elasticity are what turn
+ * a chart into arithmetic you can be wrong about in public
+ * (docs/INDUSTRY-INTELLIGENCE.md §2). Drivers hang off leaves, because a node
+ * whose children have different drivers cannot carry either child's.
+ *
+ * `kind` mirrors `industry_knowledge`: a claim is an `assumption` until a
+ * backtest supports it, and the UI must render the difference.
+ */
+export const industryDriver = pgTable(
+  "industry_driver",
+  {
+    id: serial("id").primaryKey(),
+    industryId: text("industry_id")
+      .notNull()
+      .references(() => industry.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    name: text("name").notNull(),
+    nameZh: text("name_zh"),
+    whatItIs: text("what_it_is"),
+    /** leading | coincident | lagging — the leading row is the one worth having. */
+    phase: text("phase").$type<"leading" | "coincident" | "lagging">().notNull(),
+    /** Quarters between the driver moving and the response. 0 = coincident. */
+    lagQuarters: integer("lag_quarters").notNull().default(0),
+    /** What it hits: COGS, ASP, volume… */
+    affects: text("affects"),
+    /** Expected sign of the response: +1 or -1. */
+    direction: integer("direction").notNull(),
+    /** Claimed response band, in target units per +10% driver move. */
+    elasticityLow: doublePrecision("elasticity_low"),
+    elasticityHigh: doublePrecision("elasticity_high"),
+    elasticityUnit: text("elasticity_unit"),
+    /** The metric the claim is about, e.g. `gross_margin_pct`. */
+    targetMetric: text("target_metric"),
+    whoItHits: text("who_it_hits"),
+    /** `industry_metric.metric_key` holding this driver's history. */
+    seriesKey: text("series_key"),
+    frequency: text("frequency"),
+    kind: text("kind").$type<"fact" | "assumption">().notNull().default("assumption"),
+    confidence: doublePrecision("confidence").notNull().default(0.3),
+    sourceName: text("source_name"),
+    sourceUrl: text("source_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    unq: uniqueIndex("industry_driver_unq").on(t.industryId, t.key),
+  }),
+);
+
 export type IndustryKnowledge = typeof industryKnowledge.$inferSelect;
 export type IndustryKpi = typeof industryKpi.$inferSelect;
+export type IndustryDriver = typeof industryDriver.$inferSelect;
 
 /* ═══════════════════════════════════════════════════════════════════════
  * News monitoring (free sources)

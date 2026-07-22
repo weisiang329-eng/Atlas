@@ -19,6 +19,7 @@ import { ChartContainer } from "@/components/chart/chart-container";
 import { TrendChart } from "@/components/chart/trend-chart";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { IndustryKnowledgePanel } from "@/components/industry/industry-knowledge-panel";
+import { DriverPanel } from "@/components/industry/driver-panel";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { isApiConfigured } from "@/lib/api/client";
 import type { CompanySummary, IndustryDetail, MetricSeries } from "@/lib/types";
@@ -172,6 +173,17 @@ export function IndustryWorkspace({ industryId }: { industryId: string }) {
               </div>
             </>
           ) : null}
+
+          {/* The causal layer, above everything descriptive: "what moves this"
+              is the question a decision needs, and each claim carries its own
+              backtest so a checked one is distinguishable from a guess. */}
+          <SectionHeading
+            title="什么在驱动这个行业"
+            description="每条驱动因素都是一个可证伪的断言：相位、滞后、弹性。下面并列显示它在真实数据上的检验结果 —— 包括被数据否定的那些。"
+          />
+          <div className="mb-6">
+            <DriverPanel industryId={d.id} />
+          </div>
 
           {/* Book 2's knowledge scorecard. Placed above the company list
               because "what do we still not know about this industry" is the
