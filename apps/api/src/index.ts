@@ -9,17 +9,17 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import postgres from "postgres";
-import { createDb } from "./db/repo";
-import { ensureSchema, MIGRATION_IDS } from "./db/migrate";
-import { companies } from "./routes/companies";
-import { industries } from "./routes/industries";
-import { scores } from "./routes/scores";
-import { graph } from "./routes/graph";
-import { agent } from "./routes/agent";
-import { pms } from "./routes/pms";
-import { analysts } from "./routes/analysts";
-import { industryKnowledgeRoutes } from "./routes/industry-knowledge";
-import { ingest } from "./routes/ingest";
+import { createDb } from "./db/repo.ts";
+import { ensureSchema, MIGRATION_IDS } from "./db/migrate.ts";
+import { companies } from "./routes/companies.ts";
+import { industries } from "./routes/industries.ts";
+import { scores } from "./routes/scores.ts";
+import { graph } from "./routes/graph.ts";
+import { agent } from "./routes/agent.ts";
+import { pms } from "./routes/pms.ts";
+import { analysts } from "./routes/analysts.ts";
+import { industryKnowledgeRoutes } from "./routes/industry-knowledge.ts";
+import { ingest } from "./routes/ingest.ts";
 
 export interface Env {
   /**

@@ -6,7 +6,7 @@
  * not from embeddings — for financial data, tool-calling over the real facts
  * is more accurate than RAG. Tools are READ-ONLY; the agent cannot mutate.
  */
-import type { Db } from "../db/repo";
+import type { Db } from "../db/repo.ts";
 import {
   getCompany,
   getIndustry,
@@ -14,12 +14,12 @@ import {
   listCompanies,
   listIndustryMetrics,
   listRelationshipsFor,
-} from "../db/repo";
-import { presentMetrics, presentRatioGroups } from "../domain/presenters";
-import { renderStatement } from "../domain/statements";
-import { computeScore } from "../domain/scoring";
-import { buildEgoGraph } from "../domain/graph";
-import { buildCycleSignal, buildMetricSeries } from "../domain/industry";
+} from "../db/repo.ts";
+import { presentMetrics, presentRatioGroups } from "../domain/presenters.ts";
+import { renderStatement } from "../domain/statements.ts";
+import { computeScore } from "../domain/scoring.ts";
+import { buildEgoGraph } from "../domain/graph.ts";
+import { buildCycleSignal, buildMetricSeries } from "../domain/industry.ts";
 
 export interface ToolDef {
   name: string;

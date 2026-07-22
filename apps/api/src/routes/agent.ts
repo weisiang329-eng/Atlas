@@ -8,10 +8,10 @@
  * passed to the runtime, never returned to the client.
  */
 import { Hono } from "hono";
-import type { Env } from "../index";
-import { createDb } from "../db/repo";
-import { isAgentConfigured, runAgent } from "../agent/runtime";
-import { recordAgentUse } from "../db/repo";
+import type { Env } from "../index.ts";
+import { createDb } from "../db/repo.ts";
+import { isAgentConfigured, runAgent } from "../agent/runtime.ts";
+import { recordAgentUse } from "../db/repo.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 

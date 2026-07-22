@@ -12,7 +12,7 @@
  *   - A ratio is `undefined` when any input is missing or the denominator is
  *     zero — never 0, never NaN. Formatters render undefined as "—".
  */
-import type { FactMap } from "./concepts";
+import type { FactMap } from "./concepts.ts";
 
 const div = (a?: number, b?: number): number | undefined =>
   a === undefined || b === undefined || b === 0 ? undefined : a / b;

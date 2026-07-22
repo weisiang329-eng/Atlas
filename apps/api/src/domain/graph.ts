@@ -3,7 +3,7 @@
  * frontend's ego-graph shape (a subject node at the centre, related companies
  * around it) with the correct node kind and edge label for the viewing side.
  */
-import type { Company, Relationship } from "../db/schema";
+import type { Company, Relationship } from "../db/schema.ts";
 
 export type EntityKind =
   | "company"

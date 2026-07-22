@@ -6,9 +6,9 @@
  * grows large this becomes a single windowed query.
  */
 import { Hono } from "hono";
-import type { Env } from "../index";
-import { createDb, getPeriodsWithFacts, listCompanies } from "../db/repo";
-import { computeScore } from "../domain/scoring";
+import type { Env } from "../index.ts";
+import { createDb, getPeriodsWithFacts, listCompanies } from "../db/repo.ts";
+import { computeScore } from "../domain/scoring.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 

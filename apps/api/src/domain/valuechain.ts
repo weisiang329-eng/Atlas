@@ -5,7 +5,7 @@
  * along the AI-hardware stack: equipment → foundry → memory → accelerators →
  * networking → power.
  */
-import type { Company, Industry, Relationship } from "../db/schema";
+import type { Company, Industry, Relationship } from "../db/schema.ts";
 
 export interface ChainCompanyDto {
   id: string;

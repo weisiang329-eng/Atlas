@@ -7,7 +7,7 @@
  * GET /:id/metrics  just the metric series (charts that poll independently)
  */
 import { Hono } from "hono";
-import type { Env } from "../index";
+import type { Env } from "../index.ts";
 import {
   createDb,
   getIndustry,
@@ -16,9 +16,9 @@ import {
   listCompaniesByIndustry,
   listIndustries,
   listIndustryMetrics,
-} from "../db/repo";
-import { buildCycleSignal, buildMetricSeries } from "../domain/industry";
-import { buildValueChain } from "../domain/valuechain";
+} from "../db/repo.ts";
+import { buildCycleSignal, buildMetricSeries } from "../domain/industry.ts";
+import { buildValueChain } from "../domain/valuechain.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 

@@ -7,7 +7,7 @@
  * drives the whole sector's earnings cycle). Computation lives here, never
  * in the UI.
  */
-import type { IndustryMetric } from "../db/schema";
+import type { IndustryMetric } from "../db/schema.ts";
 
 export interface SeriesPointDto {
   date: string;

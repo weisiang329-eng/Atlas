@@ -8,8 +8,8 @@
  * Claude returns a final answer or the step budget is hit. Read-only tools, so
  * the agent can inspect everything and change nothing.
  */
-import type { Db } from "../db/repo";
-import { TOOLS, TOOLS_BY_NAME } from "./tools";
+import type { Db } from "../db/repo.ts";
+import { TOOLS, TOOLS_BY_NAME } from "./tools.ts";
 
 const API_URL = "https://api.anthropic.com/v1/messages";
 const DEFAULT_MODEL = "claude-sonnet-5";

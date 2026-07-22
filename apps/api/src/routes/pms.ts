@@ -10,7 +10,7 @@
  * design; access is gated at the edge by Cloudflare Access (HANDOFF §8).
  */
 import { Hono } from "hono";
-import type { Env } from "../index";
+import type { Env } from "../index.ts";
 import {
   resetDerived,
   createDb,
@@ -27,9 +27,9 @@ import {
   listTradeFees,
   listTrades,
   updateLotRemaining,
-} from "../db/repo";
-import { estimateFees, totalFees, type Market } from "../domain/fees";
-import { buildPosition, matchSell, type OpenLot } from "../domain/matching";
+} from "../db/repo.ts";
+import { estimateFees, totalFees, type Market } from "../domain/fees.ts";
+import { buildPosition, matchSell, type OpenLot } from "../domain/matching.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
