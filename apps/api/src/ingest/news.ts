@@ -11,7 +11,7 @@
  * financial engine may read a number from here.
  */
 
-import { politeFetch } from "./sources";
+import { politeFetch } from "./sources.ts";
 
 export interface RawNewsItem {
   title: string;

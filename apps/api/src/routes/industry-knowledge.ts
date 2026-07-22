@@ -8,13 +8,13 @@
  */
 import { Hono } from "hono";
 import { asc, eq } from "drizzle-orm";
-import type { Env } from "../index";
-import { createDb } from "../db/repo";
-import { industryKnowledge, industryKpi } from "../db/schema";
+import type { Env } from "../index.ts";
+import { createDb } from "../db/repo.ts";
+import { industryKnowledge, industryKpi } from "../db/schema.ts";
 import {
   scoreCompleteness,
   type KnowledgeRecord,
-} from "../domain/industry-knowledge";
+} from "../domain/industry-knowledge.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 

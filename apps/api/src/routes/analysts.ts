@@ -12,16 +12,16 @@
  */
 import { Hono } from "hono";
 import { and, desc, eq } from "drizzle-orm";
-import type { Env } from "../index";
-import { createDb } from "../db/repo";
-import { agentControl, agentRun } from "../db/schema";
+import type { Env } from "../index.ts";
+import { createDb } from "../db/repo.ts";
+import { agentControl, agentRun } from "../db/schema.ts";
 import {
   ANALYSTS,
   ANALYST_IDS,
   systemPromptFor,
   type AnalystId,
-} from "../agent/analysts";
-import { isAgentConfigured, runAgent } from "../agent/runtime";
+} from "../agent/analysts.ts";
+import { isAgentConfigured, runAgent } from "../agent/runtime.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 

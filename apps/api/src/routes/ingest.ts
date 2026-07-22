@@ -8,12 +8,12 @@
  */
 import { Hono } from "hono";
 import { desc, sql } from "drizzle-orm";
-import type { Env } from "../index";
-import { createDb, listCompanies } from "../db/repo";
-import { newsItem, pmsFxRate } from "../db/schema";
-import { fetchBnmRates } from "../ingest/fx";
-import { dedupe, fetchNews, tagItem, type TaggingSubject } from "../ingest/news";
-import { DATA_SOURCES } from "../ingest/sources";
+import type { Env } from "../index.ts";
+import { createDb, listCompanies } from "../db/repo.ts";
+import { newsItem, pmsFxRate } from "../db/schema.ts";
+import { fetchBnmRates } from "../ingest/fx.ts";
+import { dedupe, fetchNews, tagItem, type TaggingSubject } from "../ingest/news.ts";
+import { DATA_SOURCES } from "../ingest/sources.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 

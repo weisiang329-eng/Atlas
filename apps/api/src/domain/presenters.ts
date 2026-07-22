@@ -3,9 +3,9 @@
  * already defines (MetricRow, RatioGroup, SeriesPoint, ResultRow). If a shape
  * here changes, apps/web types must change with it; these are the contract.
  */
-import type { FactMap } from "./concepts";
-import type { DerivedPeriod } from "./ratios";
-import { deriveSeries, direction, fmt, freeCashFlow, sparkline } from "./ratios";
+import type { FactMap } from "./concepts.ts";
+import type { DerivedPeriod } from "./ratios.ts";
+import { deriveSeries, direction, fmt, freeCashFlow, sparkline } from "./ratios.ts";
 
 // --- DTOs (mirrors of apps/web contracts) ----------------------------------
 

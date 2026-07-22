@@ -8,8 +8,8 @@
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type { Sql } from "postgres";
-import type { FactMap } from "../domain/concepts";
-import * as schema from "./schema";
+import type { FactMap } from "../domain/concepts.ts";
+import * as schema from "./schema.ts";
 
 export type Db = PostgresJsDatabase<typeof schema>;
 

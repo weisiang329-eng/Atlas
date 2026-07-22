@@ -101,9 +101,18 @@ Report faithfully. If a gate failed or was skipped, say so with the output.
 - One PR per task. The description says **what changed, why, and how it was
   verified** — the verification section is not decoration.
 - Merge only on green CI. Never merge red, never bypass hooks.
+- **Read the check result before merging — do not chain it.**
+  `gh pr checks --watch && gh pr merge` does not protect you: the exit code is
+  not reliably non-zero on failure, so the merge runs anyway. Run the check,
+  look at the word `pass` or `fail`, then merge as a separate step. This rule
+  exists because chaining them merged a red PR (see §7).
 - Direct commits to `main` are a defect, even when the change is correct.
 - Docs that the change made stale are updated **in the same PR**.
 - After merge: remove the worktree, then deploy if the change is user-visible.
+
+**Before pushing, re-run every test that loads a file you edited.** Adding an
+import to a module changes what happens for every test that reaches it, not
+just the test you were thinking about.
 
 ## 7. Post-mortems live in the repo
 
@@ -120,6 +129,24 @@ gate — could never pass. They retried into a dead end.
 *Cost:* ~80 minutes of wall-clock, plus manual recovery of both branches.
 *Now prevented by:* §3 (install before work) and §4 (15-minute supervision
 cadence, progress-not-liveness checks, take over after 20 minutes silent).
+
+**2026-07-22 — a red PR was merged.**
+*What:* PR #64 was merged with CI failing, breaking this repo's own rule that
+`main` stays green.
+*Why:* two mistakes compounded. First, an import was added to `ingest/news.ts`
+without re-running the test that loads it — Node's type stripping needs the
+`.ts` extension on relative imports, which the bundler does not, so the build
+passed and only the test broke. Second, and worse, the merge was chained as
+`gh pr checks --watch && gh pr merge`: that command's exit code is not reliably
+non-zero on failure, so the merge ran regardless of the result printed one line
+above it.
+*Cost:* small — production was unaffected, since the bundler resolved the
+import fine. The rule breach mattered more than the bug.
+*Now prevented by:* §6 — never chain the check into the merge, read the result
+first; and re-run every test that loads a file you edited. Relative imports in
+`apps/api/src` now carry `.ts` extensions throughout, with
+`allowImportingTsExtensions` set, so the two resolvers agree and this class of
+break cannot recur.
 
 ## 8. Handoff readiness
 

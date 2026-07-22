@@ -12,8 +12,8 @@
  * percentile ranking is a v2 refinement. Missing inputs are skipped and the
  * factor / composite is reweighted over what's available — never imputed.
  */
-import type { FactMap } from "./concepts";
-import { deriveSeries, type DerivedPeriod } from "./ratios";
+import type { FactMap } from "./concepts.ts";
+import { deriveSeries, type DerivedPeriod } from "./ratios.ts";
 
 /** Piecewise-linear normaliser: `lo`→0, `hi`→100, clamped. Handles hi<lo. */
 function norm(value: number | undefined, lo: number, hi: number): number | undefined {

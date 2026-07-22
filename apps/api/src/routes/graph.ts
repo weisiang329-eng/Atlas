@@ -5,15 +5,15 @@
  * GET /company/:id    one company's ego graph + relations list
  */
 import { Hono } from "hono";
-import type { Env } from "../index";
+import type { Env } from "../index.ts";
 import {
   createDb,
   getCompany,
   listAllRelationships,
   listCompanies,
   listRelationshipsFor,
-} from "../db/repo";
-import { buildEgoGraph, buildFullGraph } from "../domain/graph";
+} from "../db/repo.ts";
+import { buildEgoGraph, buildFullGraph } from "../domain/graph.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 

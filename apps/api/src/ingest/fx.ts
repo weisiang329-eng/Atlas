@@ -12,7 +12,7 @@
  * direction the ledger stores (trade currency → base).
  */
 
-import { politeFetch } from "./sources";
+import { politeFetch } from "./sources.ts";
 
 const BNM_URL = "https://api.bnm.gov.my/public/exchange-rate";
 

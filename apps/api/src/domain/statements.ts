@@ -8,12 +8,12 @@
  * headers always render. Missing values inside a kept row are `null`, which the
  * UI shows as "—".
  */
-import type { FactMap, RowSpec } from "./concepts";
+import type { FactMap, RowSpec } from "./concepts.ts";
 import {
   BALANCE_SHEET_SPEC,
   CASHFLOW_SPEC,
   INCOME_STATEMENT_SPEC,
-} from "./concepts";
+} from "./concepts.ts";
 
 /** Mirror of apps/web `StatementRow` with explicit nulls for missing values. */
 export interface StatementRowDto {

@@ -12,16 +12,16 @@
  * GET /:id/results?period=...    quarterly | annual results table rows
  */
 import { Hono } from "hono";
-import type { Env } from "../index";
-import { createDb, getCompany, getPeriodsWithFacts, listCompanies } from "../db/repo";
-import { isStatementType, renderStatement } from "../domain/statements";
+import type { Env } from "../index.ts";
+import { createDb, getCompany, getPeriodsWithFacts, listCompanies } from "../db/repo.ts";
+import { isStatementType, renderStatement } from "../domain/statements.ts";
 import {
   presentMetrics,
   presentRatioGroups,
   presentResults,
   presentTrends,
-} from "../domain/presenters";
-import { computeScore } from "../domain/scoring";
+} from "../domain/presenters.ts";
+import { computeScore } from "../domain/scoring.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
