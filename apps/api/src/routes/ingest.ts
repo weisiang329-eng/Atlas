@@ -7,7 +7,7 @@
  * fabricates a stand-in for them.
  */
 import { Hono } from "hono";
-import { desc, sql } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import type { Sql } from "postgres";
 import type { Env } from "../index.ts";
 import { createDb, listCompanies } from "../db/repo.ts";
@@ -135,22 +135,13 @@ ingest.post("/news", async (c) => {
   });
 });
 
-/** The tagged feed, newest first. */
-ingest.get("/news", async (c) => {
-  const db = c.get("db");
-  const company = c.req.query("company");
-  const rows = await db
-    .select()
-    .from(newsItem)
-    .where(
-      company
-        ? sql`${newsItem.companyIds} LIKE ${"%" + company + "%"}`
-        : undefined,
-    )
-    .orderBy(desc(newsItem.publishedAt))
-    .limit(100);
-  return c.json({ items: rows });
-});
+/*
+ * Reading the feed lives at `GET /v1/news` (routes/news.ts), not here.
+ * It used to return raw rows from this namespace; that meant two endpoints
+ * could answer "what is in the news feed" differently, and the raw one leaked
+ * storage detail (comma-joined id columns, a null publisher) into whatever
+ * consumed it. One read path, one presenter.
+ */
 
 /**
  * Probe which free sources are reachable FROM THE WORKER.

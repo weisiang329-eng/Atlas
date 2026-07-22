@@ -38,8 +38,8 @@ The UI never computes a financial number, and never fetches directly.
 | Path | Responsibility |
 | --- | --- |
 | `src/index.ts` | Worker entry: CORS (env allowlist), per-request Postgres connection, route mounting, error handling |
-| `src/routes/` | HTTP layer only — parse, call domain, return. `companies` `industries` `scores` `graph` `agent` |
-| `src/domain/` | **All computation lives here.** `statements` `ratios` `scoring` `industry` `graph` `valuechain` `concepts` (concept vocabulary) `presenters` (shape → API contract). Governed by `docs/INVESTMENT-METHODOLOGY.md` — the two must always agree |
+| `src/routes/` | HTTP layer only — parse, call domain, return. `companies` `industries` `scores` `graph` `agent` `pms` `ingest` (pull side) `news` (read side of the feed) |
+| `src/domain/` | **All computation lives here.** `statements` `ratios` `scoring` `industry` `graph` `valuechain` `concepts` (concept vocabulary) `presenters` (shape → API contract) `news` (feed presentation: derived source, resolved tags). Governed by `docs/INVESTMENT-METHODOLOGY.md` — the two must always agree |
 | `src/db/schema.ts` | Drizzle Postgres schema — the tables |
 | `src/db/repo.ts` | Typed queries. No formatting, no computation |
 | `src/agent/` | `runtime.ts` (Claude tool-use loop) + `tools.ts` (read-only data tools) |

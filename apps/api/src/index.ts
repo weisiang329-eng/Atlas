@@ -21,6 +21,7 @@ import { pms } from "./routes/pms.ts";
 import { analysts } from "./routes/analysts.ts";
 import { industryKnowledgeRoutes } from "./routes/industry-knowledge.ts";
 import { ingest } from "./routes/ingest.ts";
+import { news } from "./routes/news.ts";
 
 export interface Env {
   /**
@@ -117,6 +118,7 @@ app.route("/v1/pms", pms);
 app.route("/v1/analysts", analysts);
 app.route("/v1/industries", industryKnowledgeRoutes);
 app.route("/v1/ingest", ingest);
+app.route("/v1/news", news);
 
 app.notFound((c) =>
   c.json({ error: "The requested resource was not found." }, 404),

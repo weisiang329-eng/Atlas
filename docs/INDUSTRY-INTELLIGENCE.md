@@ -205,13 +205,25 @@ News is only useful if it lands on the tree. Every item carries:
 Tagging to a driver is what closes the loop with §5: "Micron guides capex
 down 20%" is not just news, it is a reading on a leading driver of DRAM.
 
-**Provenance rule applies unchanged.** As of 2026-07-22 the news PAGE renders
-`lib/mock/news` while a working Yahoo Finance RSS pipeline sits unused at
-`/v1/ingest/news`. The mock contains an item attributed to **MARGMA — a real
-trade association — making a specific claim about glove ASP**, which is the
-same defect as a fabricated citation: a real source name plus a checkable
-number reads as true whatever badge sits next to it. Wire the page to the
-real feed and delete any mock item that names a real organisation.
+**Provenance rule applies unchanged. Done 2026-07-22:** the news page now
+reads `GET /v1/news` and `lib/mock/news` is deleted — with it the item
+attributed to **MARGMA, a real trade association, making a specific claim
+about glove ASP**, which was the same defect as a fabricated citation (a real
+source name plus a checkable number reads as true whatever badge sits beside
+it). The mock's priority tier, category and country went too: nothing computes
+them, so they were six columns of invention.
+
+**And a claim in this document was measured and found false.** The pipeline
+comment asserted that a ticker-scoped Yahoo feed "cannot drift onto an
+unrelated company the way a keyword search can". It drifts constantly: of the
+100 items production had stored, **only 30 mention any company in the coverage
+universe** — the NVDA feed carries "SpaceX Is Down 20%" and "Should You Buy
+Moderna Stock". Ticker scoping controls the QUERY, not the content.
+
+The consequence for §4 is that the query is provenance, never a tag. Tags come
+from the word-boundary match on the headline; an item that matched nothing
+renders as "from the NVDA feed", which is what actually happened, and the
+page states the 30/100 ratio rather than hiding the 70.
 
 ---
 

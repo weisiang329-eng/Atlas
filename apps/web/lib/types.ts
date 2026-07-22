@@ -196,6 +196,39 @@ export interface IndustryDetail {
   cycleSignal: CycleSignal | null;
 }
 
+// --- News monitoring --------------------------------------------------------
+
+/** A company a headline was tagged to, resolved for display and linking. */
+export interface NewsCompanyRef {
+  id: string;
+  name: string;
+  ticker: string | null;
+}
+
+export interface NewsFeedItem {
+  id: string;
+  title: string;
+  link: string;
+  /** Publisher when the feed named one, else the link's host. */
+  source: string;
+  /** True when `source` was inferred from the URL rather than asserted. */
+  sourceDerived: boolean;
+  publishedAt: string | null;
+  /** The ticker feed this surfaced in — provenance, never a company tag. */
+  query: string | null;
+  companies: NewsCompanyRef[];
+  industryIds: string[];
+}
+
+/** GET /v1/news */
+export interface NewsFeed {
+  items: NewsFeedItem[];
+  lastFetchedAt: string | null;
+  /** Totals before filtering, so the page can state what it is not showing. */
+  total: number;
+  tagged: number;
+}
+
 /** GET /v1/companies/:id/financials — the whole workspace in one call. */
 export interface CompanyFinancials {
   company: { id: string; name: string; ticker: string };
