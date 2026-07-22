@@ -20,6 +20,20 @@ interface BarSeriesProps {
  * Simple vertical bar chart. Pure SVG, server-rendered. Negative values render
  * below the zero baseline in the "negative" semantic colour.
  */
+/**
+ * Evenly-spaced label indices including the first and last. Five, because the
+ * budget has to suit the NARROWEST panel a chart appears in — the SVG scales
+ * to its container but the font does not. See docs/DESIGN-SYSTEM.md §9.
+ */
+const MAX_TICKS = 5;
+function tickIndices(length: number): Set<number> {
+  const n = Math.min(MAX_TICKS, length);
+  if (n <= 1) return new Set([0]);
+  return new Set(
+    Array.from({ length: n }, (_, k) => Math.round((k * (length - 1)) / (n - 1))),
+  );
+}
+
 export function BarSeries({
   data,
   height = 180,
@@ -28,6 +42,7 @@ export function BarSeries({
 }: BarSeriesProps) {
   if (data.length === 0) return null;
 
+  const ticks = tickIndices(data.length);
   const W = 640;
   const H = height;
   const pad = { t: 12, r: 8, b: 24, l: 8 };
@@ -77,16 +92,22 @@ export function BarSeries({
               fill={positive ? posFill : "var(--negative)"}
               fillOpacity={0.85}
             />
+            {/* Same tick budget as TrendChart, and for the same reason: a
+                72-quarter series drew 72 labels into one grey smear. */}
+            {/* Edge labels anchor inward, or half the text hangs outside the
+                viewBox and is clipped. */}
+            {ticks.has(i) ? (
             <text
               x={cx}
               y={H - 6}
-              textAnchor="middle"
+              textAnchor={i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"}
               fill="var(--faint)"
               fontSize={11}
               fontFamily="var(--font-mono)"
             >
               {d.label}
             </text>
+            ) : null}
           </g>
         );
       })}
