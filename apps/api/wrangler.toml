@@ -14,6 +14,13 @@ main = "src/index.ts"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Who may call this API from a browser. Not a secret — it is a policy, so it
+# belongs in version control where a change is reviewable. `*.` matches any
+# subdomain, which covers the per-deploy Pages preview URLs.
+# Add a custom domain here the day one is pointed at the site.
+[vars]
+ALLOWED_ORIGINS = "https://atlas-web-2yd.pages.dev,*.atlas-web-2yd.pages.dev"
+
 # Pretty JSON + observability in the dashboard.
 [observability]
 enabled = true
