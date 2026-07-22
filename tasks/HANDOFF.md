@@ -553,19 +553,58 @@ adding any source.
 **Rejected:** Google News RSS — 503 from Workers. Superseded by Yahoo Finance
 RSS, which is a better fit anyway.
 
-**WAITING ON THE OWNER — free tiers that need a key.** Register, then
-`wrangler secret put <NAME>`; nothing below is faked in the meantime.
+### THE PENDING LIST LIVES AT `GET /v1/pending` — this section is a summary
 
-| Priority | Service | Secret | Free tier | What it unblocks |
-| --- | --- | --- | --- | --- |
-| **1** | [Finnhub](https://finnhub.io/register) | `FINNHUB_API_KEY` | 60 calls/min | **P027 in one stroke:** live quotes → unrealised P&L in the ledger, valuation multiples in the Atlas Score (its biggest stated gap), watchlist alerts, price charts |
-| **2** | [FRED](https://fredaccount.stlouisfed.org/apikeys) | `FRED_API_KEY` | unlimited | Commodity and macro series feeding the industry KPI database |
-| 3 | [EIA](https://www.eia.gov/opendata/register.php) | `EIA_API_KEY` | free | Energy prices — data-centre power, glove production cost |
-| 4 | [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | `ALPHAVANTAGE_API_KEY` | 25/day | Backup quote source |
+It used to live in three places (here, the source registry, and free text
+inside each driver's `source_name`), which is three chances to drift, and they
+had. Every driver now carries a `blocker` in one vocabulary and the endpoint
+groups them, sorted by what each item would unblock. **Do not add a fourth
+list — add a row.**
 
-**Out of scope (paid):** Bloomberg · Reuters · TrendForce / DRAMeXchange
-(memory pricing) · Drewry / Freightos (shipping) · IATA (aviation). **Bursa
-Malaysia has no free retail feed at all** — Malaysian quotes stay manual.
+Measured 2026-07-23: **32 drivers · 2 testable · 30 blocked.**
+
+| Blocker | Drivers | What it actually needs |
+| --- | --- | --- |
+| **needs-extraction** | **15** | Nothing external. The numbers are in `financial_fact` already — capex, inventory, backlog. This is code nobody has written, and it is the **largest group by far**. |
+| needs-key | 4 | A FREE key: FRED (copper, auto/industrial inventory) ×2, EIA (electricity, natural gas) ×2 |
+| paid | 5 | Deliberately **not bought** — see below |
+| unavailable | 6 | Nobody publishes it at any price (CoWoS capacity, HBM yield, fab ramp timing, port-speed migration, new DC capacity MW) |
+| none | 2 | The glove ASP and latex series |
+
+**Free keys still outstanding** (register, then `wrangler secret put <NAME>`):
+
+| Priority | Service | Secret | Unblocks |
+| --- | --- | --- | --- |
+| **1** | [Finnhub](https://finnhub.io/register) | `FINNHUB_API_KEY` | **P027 in one stroke:** live quotes → unrealised P&L, valuation multiples in the Atlas Score (its biggest stated gap), alerts, price charts |
+| **2** | [FRED](https://fredaccount.stlouisfed.org/apikeys) | `FRED_API_KEY` | 2 drivers now (copper, auto/industrial inventory) + macro series |
+| 3 | [EIA](https://www.eia.gov/opendata/register.php) | `EIA_API_KEY` | 2 drivers (electricity, glove natural gas) |
+| 4 | [Census M3](https://api.census.gov/data/key_signup.html) | `CENSUS_API_KEY` | Semiconductor inventories/shipments — the free stand-in for channel inventory |
+| 4 | [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | `ALPHAVANTAGE_API_KEY` | Backup quote source |
+
+**DECIDED 2026-07-23 — we do not subscribe to TrendForce / DRAMeXchange /
+SEMI.** One research subscription per industry would cost more than everything
+else in this platform combined, and the reasoning is not only about price:
+
+- **Price series are the LAGGING half of the memory model.** §3 says it
+  outright — "price is lagging confirmation; inventory is the leading signal."
+  Paying five figures for the lagging half while the leading half sits
+  uncomputed in filings we already hold is the wrong trade.
+- **SEMI stopped publishing the public book-to-bill years ago**, so paying
+  does not even restore the series everyone quotes. Fab capex from filings
+  leads equipment revenue by 2–3 quarters and is already in the database.
+
+What replaces them, and what each substitute actually measures:
+
+| Instead of | Use | Honest difference |
+| --- | --- | --- |
+| DRAM/NAND channel inventory weeks | **Maker inventory days (DSI)** = Inventory ÷ COGS × 91, from stored filings | The maker's OWN stock, not the channel's: moves later than distributor inventory, earlier than margin, and is contaminated by strategic builds. Shipped as `inventory_days`, described as exactly that. |
+| DRAM/NAND contract & spot price | Census M3 semiconductor inventories/shipments; FRED semiconductor PPI | Sector-wide, monthly, not a memory contract price |
+| HBM pricing, CoWoS capacity | TSMC/ASE **monthly revenue** via TWSE open data (verified free, no key) | Revenue, not capacity or price — a coincident read on the same constraint |
+| SEMI book-to-bill | Fab capex from filings + Taiwan equipment makers' monthly revenue | Orders inferred from spend, not surveyed bookings |
+
+Still genuinely out of scope: Bloomberg · Reuters · Drewry/Freightos ·
+IATA. **Bursa Malaysia has no free retail feed at all** — Malaysian quotes
+stay manual.
 
 ### 13.10 Portfolio accounting / trade book (PMS)
 Model: `docs/PORTFOLIO-ACCOUNTING.md`. Foundation merged in PR #53.
