@@ -238,7 +238,16 @@ Everything not yet done, exhaustively, by priority. Tick as you go.
 ### 13.2 Production hardening — **DONE 2026-07-21** (PR #45)
 - [x] **CORS**: `ALLOWED_ORIGINS` env allowlist (unset ⇒ permissive), see `apps/api/src/index.ts`.
 - [x] **Agent rate-limiting**: `agent_usage` table, per-IP/day quota enforced before calling Claude (`AGENT_DAILY_LIMIT`, default 50).
-- [ ] Neither `ALLOWED_ORIGINS` nor a tightened `AGENT_DAILY_LIMIT` has been *set* on the live Worker yet (both currently run on defaults) — set `ALLOWED_ORIGINS=https://atlas-web-2yd.pages.dev` once the domain is final.
+- [x] **`ALLOWED_ORIGINS` is set** (PR #71). Production had been serving
+  `Access-Control-Allow-Origin: *`, so any page on the internet could read
+  `/v1/scores` and `/v1/pms/book` — the trade ledger — out of a visitor's
+  browser. With no login yet, CORS was the only control there. Now
+  `https://atlas-web-2yd.pages.dev` plus `*.atlas-web-2yd.pages.dev` (the
+  wildcard covers per-deploy preview URLs), in `wrangler.toml [vars]` because
+  it is a reviewable policy, not a credential. **Add a custom domain there the
+  day one is pointed at the site, or the app will stop loading data.**
+- [ ] `AGENT_DAILY_LIMIT` still runs on its default (50/IP/day); tighten if the
+  agent starts costing real money.
 - [ ] **Observability**: enable `wrangler tail` review / an error sink; Supabase has logs.
 - [ ] **Secrets hygiene**: confirm no secret is in git; `.dev.vars` is gitignored.
 - [ ] Consider Cloudflare **Access** even if login = B, to gate staging.
