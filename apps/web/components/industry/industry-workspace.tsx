@@ -18,6 +18,7 @@ import { DataState } from "@/components/ui/data-state";
 import { ChartContainer } from "@/components/chart/chart-container";
 import { TrendChart } from "@/components/chart/trend-chart";
 import { DataTable, type Column } from "@/components/data/data-table";
+import { IndustryKnowledgePanel } from "@/components/industry/industry-knowledge-panel";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { isApiConfigured } from "@/lib/api/client";
 import type { CompanySummary, IndustryDetail, MetricSeries } from "@/lib/types";
@@ -132,6 +133,13 @@ export function IndustryWorkspace({ industryId }: { industryId: string }) {
               </div>
             </>
           ) : null}
+
+          {/* Book 2's knowledge scorecard. Placed above the company list
+              because "what do we still not know about this industry" is the
+              research question; the member list is reference. */}
+          <div className="mb-6">
+            <IndustryKnowledgePanel industryId={d.id} />
+          </div>
 
           <SectionHeading
             title="Companies in this industry"
