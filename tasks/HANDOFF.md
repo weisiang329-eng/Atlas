@@ -270,7 +270,20 @@ graph, `/reports/company/[id]`, Agent. **Still not real:**
 - [ ] After wiring each, delete the corresponding `apps/web/lib/mock/*` entry.
 
 ### 13.4 Buildable next — no external blocker (server-side value)
-- [ ] **P022 v2** — quarterly EDGAR ingestion (US names) via YTD-differencing; makes the quarterly results/charts live for NVDA/AMD/etc. (Today only glove names have quarters.)
+- [x] **P022 v2** — quarterly EDGAR ingestion is live. `POST /v1/ingest/edgar`
+  (optionally `?company=<id>`) pulls SEC companyfacts through `politeFetch`
+  and writes 402 quarters / ~8,560 facts for the seven US names. Flow figures
+  use the reported 3-month value where published and YTD-differencing
+  otherwise; quarters that cannot be derived honestly are omitted.
+  Logic lives in `src/ingest/edgar-quarters.ts` and is shared with the offline
+  seed generator via re-export shims, so the API and the seed cannot drift.
+  - **KNOWN RESIDUAL:** 3 of 402 quarters (NVIDIA Q1 FY10, Q1/Q2 FY11) carry a
+    diluted-share count ~1000x too small in SEC's own filed data, so those EPS
+    cells read ±200–370. Revenue, net income and every other figure for those
+    quarters are correct. Two plausibility gates (vs the annual figure, and vs
+    the company's median) are in `reconcileQuarters` but are not catching
+    these three; fixing it means tightening the median band or bounding EPS
+    directly. Everything from FY12 onward is clean.
 - [ ] **P022 v2** — IFRS ingestion for ASML & TSMC (20-F); they're on manual seed now.
 - [ ] **P010 v2** — cross-sectional percentile factor scores; persist `score_history` (versioning); valuation multiples once price lands.
 - [ ] **P021** — agent long-term memory: Supabase **pgvector** over research notes / entity profiles; semantic search tool for the agent.

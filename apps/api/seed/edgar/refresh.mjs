@@ -18,8 +18,10 @@ import {
   DURATION_CONCEPTS,
   EDGAR_COMPANIES,
   GOODWILL_PARTS,
+  NON_ADDITIVE_CONCEPTS,
   TAG_MAP,
 } from "./companies.mjs";
+import { extractQuarters, reconcileQuarters } from "./quarters.mjs";
 
 const UA = "Atlas Research (weisiang329-eng/Atlas) hello@houzscentury.com";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -116,7 +118,26 @@ async function fetchCompany(c) {
     if (y.Revenue === undefined && y.TotalAssets === undefined) delete perYear[fy];
   }
 
-  return { id: c.id, cik: c.cik, url, entityName: body.entityName, years: perYear };
+  // Quarterly lives in its own module: the annual path is a straight
+  // attribution, while quarters need YTD-differencing (see quarters.mjs).
+  const rawQuarters = extractQuarters(gaap, c, TAG_MAP, DURATION_CONCEPTS, NON_ADDITIVE_CONCEPTS);
+  // Quarters that contradict the audited annual figure are dropped, loudly.
+  const { quarters, dropped } = reconcileQuarters(perYear, rawQuarters);
+  for (const d of dropped) {
+    console.log(
+      `  ! ${c.id} FY${d.fy}: quarters sum ${d.sum.toFixed(0)} vs annual ` +
+        `${d.annual.toFixed(0)} — dropped`,
+    );
+  }
+
+  return {
+    id: c.id,
+    cik: c.cik,
+    url,
+    entityName: body.entityName,
+    years: perYear,
+    quarters,
+  };
 }
 
 const out = { provenance: null, companies: [] };
@@ -124,11 +145,15 @@ for (const c of EDGAR_COMPANIES) {
   process.stdout.write(`fetching ${c.id}... `);
   const r = await fetchCompany(c);
   const yrs = Object.keys(r.years).sort();
-  console.log(`${yrs.length} fiscal years (${yrs[0]} – ${yrs.at(-1)})`);
+  const qs = Object.keys(r.quarters).sort();
+  console.log(
+    `${yrs.length} fiscal years (${yrs[0]} – ${yrs.at(-1)}), ` +
+      `${qs.length} quarters` + (qs.length ? ` (${qs[0]} – ${qs.at(-1)})` : ""),
+  );
   out.companies.push(r);
   await sleep(300);
 }
-out.provenance = `SEC EDGAR companyfacts API (data.sec.gov), retrieved ${new Date().toISOString().slice(0, 10)}. Annual 10-K datapoints; latest filing wins per (concept, fiscal year). Values in millions USD (shares in millions).`;
+out.provenance = `SEC EDGAR companyfacts API (data.sec.gov), retrieved ${new Date().toISOString().slice(0, 10)}. Annual 10-K and quarterly 10-Q/10-K datapoints; latest filing wins per (concept, period). Quarterly flow figures are the reported 3-month value where published, otherwise derived by year-to-date differencing; quarters that cannot be derived are omitted. Values in millions USD (shares in millions).`;
 
 const path = join(dirname(fileURLToPath(import.meta.url)), "facts.json");
 writeFileSync(path, JSON.stringify(out, null, 1));

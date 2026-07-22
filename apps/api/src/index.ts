@@ -8,7 +8,7 @@
  */
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import postgres from "postgres";
+import postgres, { type Sql } from "postgres";
 import { createDb } from "./db/repo.ts";
 import { ensureSchema, MIGRATION_IDS } from "./db/migrate.ts";
 import { companies } from "./routes/companies.ts";
@@ -40,7 +40,18 @@ export interface Env {
   AGENT_DAILY_LIMIT?: string;
 }
 
-type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
+type AppEnv = {
+  Bindings: Env;
+  Variables: {
+    db: ReturnType<typeof createDb>;
+    /**
+     * The raw postgres.js client behind `db`. Exposed because bulk ingestion
+     * writes plain upserts with RETURNING, which is far clearer as SQL than as
+     * a query-builder chain. Same connection — not a second one.
+     */
+    sql: Sql;
+  };
+};
 
 const app = new Hono<AppEnv>();
 
@@ -76,6 +87,7 @@ app.use("*", async (c, next) => {
     fetch_types: false,
   });
   c.set("db", createDb(client));
+  c.set("sql", client);
   // Bring the schema up to date before serving. Runs once per Worker
   // instance; a new table never needs anyone to paste SQL into a dashboard.
   await ensureSchema(client);
