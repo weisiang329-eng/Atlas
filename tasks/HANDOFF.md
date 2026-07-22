@@ -249,7 +249,20 @@ Everything not yet done, exhaustively, by priority. Tick as you go.
 - [ ] `AGENT_DAILY_LIMIT` still runs on its default (50/IP/day); tighten if the
   agent starts costing real money.
 - [ ] **Observability**: enable `wrangler tail` review / an error sink; Supabase has logs.
-- [ ] **Secrets hygiene**: confirm no secret is in git; `.dev.vars` is gitignored.
+- [x] **Secrets hygiene — audited 2026-07-22, the repo is clean.**
+  All 136 commits scanned for `sk-ant-api03-…` keys and for Supabase pooler
+  URLs carrying a real password: **no match**. The only credential-shaped
+  strings anywhere are placeholders — `.dev.vars.example` (`PASSWORD`), the
+  runbook (`[PASSWORD]`), and a long-deleted `.env.example` pointing at
+  `atlas:atlas@localhost`. `.dev.vars`, `apps/api/.dev.vars`, `.env` and
+  `.env.local` are all gitignored, and no file matching `.dev.vars` / `.env` /
+  `*.pem` / `*.key` has ever been committed.
+
+  **This narrows the rotation task rather than cancelling it.** The DB
+  password and the Anthropic key were exposed in CHAT, not in git, so the
+  blast radius is the conversation transcript — not a public repository, and
+  not the deploy history. Rotation is still required (§7); it is simply not a
+  public-exposure emergency.
 - [ ] Consider Cloudflare **Access** even if login = B, to gate staging.
 
 ### 13.3 Frontend — pages still on MOCK or placeholder (wire to real data)
