@@ -23,6 +23,7 @@ import {
   type NavLeaf,
 } from "@/lib/nav-tree";
 import { useT } from "@/lib/i18n/use-locale";
+import { NavIcon } from "@/components/layout/nav-icon";
 import { cn } from "@/lib/cn";
 
 const STORAGE_KEY = "atlas.nav.expanded";
@@ -103,17 +104,16 @@ function ModuleRow({
             active ? "font-medium text-fg" : "text-muted group-hover:text-fg",
           )}
         >
-          {item.glyph ? (
-            <span
-              aria-hidden
-              className={cn(
-                "w-5 shrink-0 font-mono text-2xs font-medium transition-colors",
-                active || childActive ? "text-accent" : "text-faint",
-              )}
-            >
-              {item.glyph}
-            </span>
-          ) : null}
+          {/* A drawn icon rather than a two-letter monogram: twenty stacked
+              monograms read as a column of grey noise to be decoded, and they
+              competed with the labels they were supposed to support. */}
+          <NavIcon
+            name={item.icon}
+            className={cn(
+              "h-4 w-4 shrink-0 transition-colors",
+              active || childActive ? "text-accent" : "text-faint group-hover:text-muted",
+            )}
+          />
           <span className="truncate">{t(item.labelKey)}</span>
         </Link>
 

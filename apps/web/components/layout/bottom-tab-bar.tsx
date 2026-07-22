@@ -7,6 +7,7 @@ import { Drawer } from "@/components/ui/drawer";
 import { NavTree } from "@/components/layout/nav-tree";
 import { useT } from "@/lib/i18n/use-locale";
 import type { Dict } from "@/lib/i18n/dictionary";
+import { NavIcon } from "@/components/layout/nav-icon";
 import { cn } from "@/lib/cn";
 
 /**
@@ -20,17 +21,17 @@ import { cn } from "@/lib/cn";
 interface Tab {
   key: keyof Dict;
   href: string;
-  glyph: string;
+  icon: string;
 }
 
 // Mirrors the sidebar's "Daily" group so the two navigations agree about what
 // matters. Companies and Markets moved to More: on a phone the owner is far
 // more often checking a position than browsing coverage.
 const TABS: Tab[] = [
-  { key: "nav.home", href: "/", glyph: "HM" },
-  { key: "nav.ledger", href: "/ledger", glyph: "LG" },
-  { key: "nav.portfolio", href: "/portfolio", glyph: "PF" },
-  { key: "nav.watchlist", href: "/watchlist", glyph: "WL" },
+  { key: "nav.home", href: "/", icon: "home" },
+  { key: "nav.ledger", href: "/ledger", icon: "ledger" },
+  { key: "nav.portfolio", href: "/portfolio", icon: "portfolio" },
+  { key: "nav.watchlist", href: "/watchlist", icon: "watchlist" },
 ];
 
 function isActive(pathname: string, href: string): boolean {
@@ -70,7 +71,7 @@ export function BottomTabBar() {
               )}
             >
               <span aria-hidden className="font-mono text-xs font-semibold">
-                {tab.glyph}
+                <NavIcon name={tab.icon} className="h-[18px] w-[18px]" />
               </span>
               <span className="leading-none">{t(tab.key)}</span>
             </Link>

@@ -22,7 +22,8 @@ export interface NavLeaf {
   /** Fallback if the dictionary key is missing. */
   label: string;
   /** Two-letter monogram — quiet texture, and the collapsed-rail affordance. */
-  glyph?: string;
+  /** Key into the drawn icon set (components/layout/nav-icon.tsx). */
+  icon?: string;
   children?: NavLeaf[];
 }
 
@@ -37,30 +38,40 @@ export const NAV_TREE: NavSection[] = [
     title: "Daily",
     titleKey: "nav.daily",
     items: [
-      { href: "/", label: "Home", labelKey: "nav.home", glyph: "HM" },
+      { href: "/", label: "Home", labelKey: "nav.home", icon: "home" },
+      
+      
+      {
+        href: "/watchlist",
+        label: "Watchlist",
+        labelKey: "nav.watchlist",
+        icon: "watchlist",
+      },
+      { href: "/markets", label: "Markets", labelKey: "nav.markets", icon: "markets" },
+      { href: "/news", label: "News", labelKey: "nav.news", icon: "news" },
+    ],
+  },
+    {
+    title: "Positions",
+    titleKey: "nav.positions",
+    items: [
       {
         href: "/ledger",
         label: "Trade Ledger",
         labelKey: "nav.ledger",
-        glyph: "LG",
+        icon: "ledger",
       },
       {
         href: "/portfolio",
         label: "Portfolio",
         labelKey: "nav.portfolio",
-        glyph: "PF",
+        icon: "portfolio",
       },
-      {
-        href: "/watchlist",
-        label: "Watchlist",
-        labelKey: "nav.watchlist",
-        glyph: "WL",
-      },
-      { href: "/markets", label: "Markets", labelKey: "nav.markets", glyph: "MK" },
-      { href: "/news", label: "News", labelKey: "nav.news", glyph: "NW" },
+      { href: "/trading", label: "Trading", labelKey: "nav.trading", icon: "trading" },
+      { href: "/alerts", label: "Alerts", labelKey: "nav.alerts", icon: "alerts" },
     ],
   },
-  {
+{
     title: "Research",
     titleKey: "nav.researchGroup",
     items: [
@@ -68,13 +79,13 @@ export const NAV_TREE: NavSection[] = [
         href: "/companies",
         label: "Companies",
         labelKey: "nav.companies",
-        glyph: "CO",
+        icon: "companies",
       },
       {
         href: "/financials",
         label: "Financials",
         labelKey: "nav.financials",
-        glyph: "FN",
+        icon: "financials",
         children: [
           {
             href: "/financials/income-statement",
@@ -100,35 +111,44 @@ export const NAV_TREE: NavSection[] = [
           },
         ],
       },
-      { href: "/scores", label: "Rankings", labelKey: "nav.scores", glyph: "AS" },
+      { href: "/scores", label: "Rankings", labelKey: "nav.scores", icon: "scores" },
       {
         href: "/industries",
         label: "Industries",
         labelKey: "nav.industries",
-        glyph: "ID",
+        icon: "industries",
       },
       {
         href: "/value-chain",
         label: "Value Chain",
         labelKey: "nav.valueChain",
-        glyph: "VC",
+        icon: "valueChain",
       },
       {
         href: "/knowledge",
         label: "Knowledge",
         labelKey: "nav.knowledge",
-        glyph: "KG",
+        icon: "knowledge",
         children: [
           { href: "/knowledge/graph", label: "Graph", labelKey: "nav.graph" },
           { href: "/knowledge/heatmap", label: "Heatmap", labelKey: "nav.heatmap" },
           { href: "/knowledge/memory", label: "Memory", labelKey: "nav.memory" },
         ],
       },
+      
+      
+      
+    ],
+  },
+    {
+    title: "Output",
+    titleKey: "nav.output",
+    items: [
       {
         href: "/research",
         label: "Notes",
         labelKey: "nav.notes",
-        glyph: "RS",
+        icon: "notes",
         children: [
           { href: "/research/notes", label: "Notes", labelKey: "nav.notes" },
           {
@@ -144,28 +164,21 @@ export const NAV_TREE: NavSection[] = [
           },
         ],
       },
-      { href: "/reports", label: "Reports", labelKey: "nav.reports", glyph: "RP" },
-      { href: "/agent", label: "Analyst", labelKey: "nav.agent", glyph: "AI" },
+      { href: "/reports", label: "Reports", labelKey: "nav.reports", icon: "reports" },
+      { href: "/agent", label: "Analyst", labelKey: "nav.agent", icon: "agent" },
     ],
   },
-  {
-    title: "Execution",
-    titleKey: "nav.execution",
-    items: [
-      { href: "/trading", label: "Trading", labelKey: "nav.trading", glyph: "TR" },
-      { href: "/alerts", label: "Alerts", labelKey: "nav.alerts", glyph: "AL" },
-    ],
-  },
+
   {
     title: "Enterprise",
     titleKey: "nav.enterprise",
     items: [
-      { href: "/ceo", label: "CEO Dashboard", labelKey: "nav.ceo", glyph: "CE" },
+      { href: "/ceo", label: "CEO Dashboard", labelKey: "nav.ceo", icon: "ceo" },
       {
         href: "/erp",
         label: "ERP",
         labelKey: "nav.erp",
-        glyph: "ER",
+        icon: "erp",
         children: [
           {
             href: "/erp/manufacturing",
@@ -181,7 +194,7 @@ export const NAV_TREE: NavSection[] = [
           { href: "/erp/furniture", label: "Furniture", labelKey: "nav.furniture" },
         ],
       },
-      { href: "/board", label: "Board", labelKey: "nav.board", glyph: "BD" },
+      { href: "/board", label: "Board", labelKey: "nav.board", icon: "board" },
     ],
   },
   {
@@ -192,7 +205,7 @@ export const NAV_TREE: NavSection[] = [
         href: "/agents",
         label: "Agent Ops",
         labelKey: "nav.agentOps",
-        glyph: "AG",
+        icon: "agentOps",
         children: [
           { href: "/admin/ingest", label: "Ingestion", labelKey: "nav.ingest" },
           {
@@ -206,7 +219,7 @@ export const NAV_TREE: NavSection[] = [
         href: "/admin",
         label: "Admin",
         labelKey: "nav.admin",
-        glyph: "AD",
+        icon: "admin",
         children: [
           { href: "/admin/sources", label: "Data Sources", labelKey: "nav.sources" },
           { href: "/admin/ingest", label: "Ingestion", labelKey: "nav.ingest" },
@@ -217,7 +230,7 @@ export const NAV_TREE: NavSection[] = [
         href: "/settings",
         label: "Settings",
         labelKey: "nav.settings",
-        glyph: "ST",
+        icon: "settings",
       },
     ],
   },
