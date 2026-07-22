@@ -145,6 +145,16 @@ console.log("\n--- the database matches the written taxonomy ---");
   check("存储 rolls up its 2 makers", members.get("semis-memory").length, 2);
   check("DRAM has no company filed on it yet", members.get("memory-dram").length, 0);
 
+  // The web app is a STATIC EXPORT: a node absent from its id list is a page
+  // that does not exist, and the tree links to every node. This drifted once
+  // already — 14 nodes were added and every one of their pages 404'd while
+  // the build kept reporting the same page count.
+  const universe = readFileSync(join(api, "../web/lib/universe.ts"), "utf8");
+  const missingFromWeb = rows
+    .map((r) => r.id)
+    .filter((id) => !universe.includes(`"${id}"`));
+  check("every taxonomy node has a page in the static export", missingFromWeb, []);
+
   const breadcrumb = pathOf(rows, "memory-dram").map((n) => n.nameZh).join(" › ");
   check("the breadcrumb reads as designed", breadcrumb, "科技 › 半导体 › 存储 › DRAM");
 

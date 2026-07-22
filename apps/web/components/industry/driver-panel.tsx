@@ -95,6 +95,11 @@ function DriverCard({ d, zh }: { d: IndustryDriver; zh: boolean }) {
         {d.kind === "assumption" ? (
           <Badge tone="warning">{zh ? "假设" : "assumption"}</Badge>
         ) : null}
+        {/* A derived series is a SUBSTITUTE, and the badge is the first half
+            of saying so; `measures` below is the half that matters. */}
+        {d.seriesOrigin === "derived" ? (
+          <Badge tone="info">{zh ? "由财报推算" : "derived"}</Badge>
+        ) : null}
       </div>
 
       {d.whatItIs ? (
@@ -136,6 +141,19 @@ function DriverCard({ d, zh }: { d: IndustryDriver; zh: boolean }) {
               swap nobody was told about. */}
           {b.isProxy && b.proxyNote ? (
             <p className="text-warning">{b.proxyNote}</p>
+          ) : null}
+          {/* The same rule for the input side: a computed stand-in must say
+              what it is, or it quietly becomes the thing it replaced. */}
+          {d.derivedMeasures ? (
+            <p className="text-info">
+              {d.derivedMeasures}
+              {d.derivedFromCompanies.length > 0 ? (
+                <span className="text-faint">
+                  {zh ? " 计算自：" : " Computed from: "}
+                  {d.derivedFromCompanies.join(", ")}
+                </span>
+              ) : null}
+            </p>
           ) : null}
           {d.lagProfile.length > 0 ? (
             <p className="text-faint">
@@ -199,6 +217,15 @@ export function DriverPanel({ industryId }: { industryId: string }) {
           {zh
             ? `全部回测针对：${r.data.target.label}（${r.data.target.points.length} 个季度，按营收加权，共 ${r.data.target.companies.length} 家）。回归用的是变化率而非水平值 —— 两条同时上行的曲线在水平值上必然高度相关，却说明不了任何因果。`
             : `Every backtest runs against ${r.data.target.label} (${r.data.target.points.length} quarters, revenue-weighted across ${r.data.target.companies.length} companies). The regression is on changes, not levels — two series that both trend correlate at 0.9 in levels and mean nothing.`}
+          {/* A borrowed target is a weaker claim than an own one, and the
+              reader is the one who has to know that. */}
+          {r.data.target.borrowed ? (
+            <span className="text-warning">
+              {zh
+                ? ` 注意：这个节点还没有归属公司，利润率历史借用的是「${r.data.target.fromNodeName}」。`
+                : ` Note: no company is filed on this node, so the margin history is borrowed from ${r.data.target.fromNodeName}.`}
+            </span>
+          ) : null}
         </p>
       ) : null}
     </DataState>

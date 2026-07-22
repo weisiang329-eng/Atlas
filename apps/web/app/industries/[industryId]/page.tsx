@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/layout/app-shell";
 import { IndustryWorkspace } from "@/components/industry/industry-workspace";
-import { STATIC_INDUSTRIES } from "@/lib/universe";
+import { ALL_INDUSTRY_IDS } from "@/lib/universe";
 
 export const metadata: Metadata = { title: "Industry" };
 
-// Static export: pre-render every industry in the taxonomy snapshot.
+// Static export: EVERY node in the taxonomy, not just the seven that hold
+// companies. A node missing here is a page that does not exist — and the tree
+// links to all of them.
 export function generateStaticParams() {
-  return STATIC_INDUSTRIES.map((i) => ({ industryId: i.id }));
+  return ALL_INDUSTRY_IDS.map((industryId) => ({ industryId }));
 }
 
 export default async function IndustryPage({

@@ -53,3 +53,39 @@ export const STATIC_INDUSTRIES: StaticIndustry[] = [
   { id: "dc-power-cooling", name: "Data Center Power & Cooling", sector: "AI Infrastructure" },
   { id: "rubber-gloves", name: "Rubber & Medical Gloves", sector: "Healthcare Manufacturing" },
 ];
+
+/**
+ * Every OTHER node in the taxonomy — roots, chain segments, sub-industries.
+ *
+ * These have to be here or they do not exist. The site is a STATIC EXPORT, so
+ * `generateStaticParams` is the complete list of pages that will be written;
+ * an id missing from it is a link the tree renders and a 404 the visitor
+ * gets. Adding 14 nodes in the taxonomy PR silently did exactly that — the
+ * build kept reporting 256 pages and nobody noticed the new branches led
+ * nowhere.
+ *
+ * Mirrors `apps/api/seed/taxonomy.mjs`; `test-taxonomy.mjs` fails if the two
+ * drift, so this list cannot quietly fall behind the tree again.
+ */
+export const STATIC_TAXONOMY_NODES: string[] = [
+  "sector-technology",
+  "sector-healthcare",
+  "chain-semiconductors",
+  "chain-ai-infrastructure",
+  "chain-medical-consumables",
+  "memory-dram",
+  "memory-nand",
+  "memory-hbm",
+  "foundry-advanced",
+  "foundry-mature",
+  "equipment-frontend",
+  "equipment-backend",
+  "gloves-nitrile",
+  "gloves-natural",
+];
+
+/** Every industry page the static export must emit. */
+export const ALL_INDUSTRY_IDS: string[] = [
+  ...STATIC_INDUSTRIES.map((i) => i.id),
+  ...STATIC_TAXONOMY_NODES,
+];

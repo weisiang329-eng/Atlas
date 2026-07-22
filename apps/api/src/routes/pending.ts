@@ -27,6 +27,7 @@ export const pending = new Hono<AppEnv>();
 /** Ordered by what the owner should do first — cheapest real progress first. */
 const BLOCKER_ORDER = [
   "needs-extraction",
+  "needs-coverage",
   "needs-key",
   "paid",
   "unavailable",
@@ -37,6 +38,8 @@ const BLOCKER_ORDER = [
 const BLOCKER_ACTION: Record<string, string> = {
   "needs-extraction":
     "No permission needed and nothing to buy — the numbers are already in financial_fact. Write the derivation.",
+  "needs-coverage":
+    "The data is free and public — in the filings of companies Atlas does not track yet. This is a coverage decision, not a purchase.",
   "needs-key": "Register a FREE key and run `wrangler secret put`.",
   paid: "Deliberately not bought. See the substitute named on the source.",
   unavailable:

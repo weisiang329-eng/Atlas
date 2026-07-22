@@ -262,6 +262,12 @@ export interface IndustryDriver {
   /** True when it belongs to a descendant rather than the node being viewed. */
   inherited: boolean;
   hasSeries: boolean;
+  /** Where the series came from — these are not the same kind of number. */
+  seriesOrigin: "ingested" | "derived" | "none";
+  /** For a derivation: what it ACTUALLY measures. Rendered, never paraphrased. */
+  derivedMeasures: string | null;
+  derivedFromCompanies: string[];
+  derivedUnit: string | null;
   backtest: DriverBacktest;
   lagProfile: DriverLagProbe[];
 }
@@ -275,6 +281,12 @@ export interface IndustryDrivers {
     unit: string;
     points: { quarter: string; value: number }[];
     companies: string[];
+    derivedQuarters: number;
+    unplacedPeriods: number;
+    /** The node the margin history came from — a leaf may borrow its parent's. */
+    fromNodeId: string;
+    fromNodeName: string;
+    borrowed: boolean;
   } | null;
   drivers: IndustryDriver[];
 }
