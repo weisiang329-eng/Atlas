@@ -6,8 +6,31 @@ import { FilterBar } from "@/components/ui/filter-bar";
 import { DetailPanelLayout } from "@/components/layout/detail-panel-layout";
 import { Badge } from "@/components/ui/badge";
 import { StatGrid } from "@/components/ui/stat-grid";
+import { PlannedModule } from "@/components/ui/planned-module";
+import { RankedBars } from "@/components/chart/ranked-bars";
+import { useApiResource } from "@/lib/loaders/use-api";
+import { isApiConfigured } from "@/lib/api/client";
+import { MISSING } from "@/lib/format";
 import { cn } from "@/lib/cn";
-import type { CompanySummary } from "@/lib/types";
+import type { CompanySummary, ScoreRow } from "@/lib/types";
+
+/** Factor keys in methodology weight order — same order as /scores. */
+const FACTOR_KEYS = [
+  { key: "profitability", label: "Profitability" },
+  { key: "growth", label: "Growth" },
+  { key: "strength", label: "Strength" },
+  { key: "cash", label: "Cash" },
+] as const;
+
+/** Shared with the leaderboard so a grade never changes colour between pages. */
+function toneOfScore(
+  score: number | null,
+): "positive" | "warning" | "negative" | "neutral" {
+  if (score === null) return "neutral";
+  if (score >= 65) return "positive";
+  if (score >= 40) return "warning";
+  return "negative";
+}
 
 /**
  * Master–detail company browser: FilterBar + DetailPanelLayout. The list filters
@@ -30,6 +53,19 @@ export function CompaniesBrowser({ companies }: { companies: CompanySummary[] })
   }, [companies, query]);
 
   const selected = companies.find((c) => c.id === selectedId) ?? null;
+
+  /*
+   * One fetch for the whole leaderboard rather than one per selection: the
+   * universe is tens of companies, the response is already cached by the
+   * loader, and switching companies in the list then costs nothing.
+   */
+  const scores = useApiResource<ScoreRow[]>(
+    isApiConfigured() ? "/v1/scores" : null,
+  );
+  const scoreById = useMemo(
+    () => new Map((scores.data ?? []).map((s) => [s.id, s])),
+    [scores.data],
+  );
 
   return (
     <>
@@ -83,13 +119,26 @@ export function CompaniesBrowser({ companies }: { companies: CompanySummary[] })
             )}
           </ul>
         }
-        detail={selected ? <CompanyPreview company={selected} /> : null}
+        detail={
+          selected ? (
+            <CompanyPreview
+              company={selected}
+              score={scoreById.get(selected.id) ?? null}
+            />
+          ) : null
+        }
       />
     </>
   );
 }
 
-function CompanyPreview({ company }: { company: CompanySummary }) {
+function CompanyPreview({
+  company,
+  score,
+}: {
+  company: CompanySummary;
+  score: ScoreRow | null;
+}) {
   const monogram = company.ticker.slice(0, 2).toUpperCase();
   const facts: { label: string; value: string }[] = [
     { label: "Ticker", value: company.ticker },
@@ -106,9 +155,17 @@ function CompanyPreview({ company }: { company: CompanySummary }) {
             {monogram}
           </span>
           <div>
+            {/*
+             * This carried a hardcoded "Sample" badge on every company —
+             * including NASDAQ:AMD and every other real one in the coverage
+             * universe. Convention #1 reserves that label for clearly
+             * fictional entities; on a real issuer it is simply a false
+             * statement about the data. The grade badge belongs here instead:
+             * it is the one fact about a company this panel actually knows.
+             */}
             <div className="flex items-center gap-2">
               <h2 className="font-serif text-lg text-fg">{company.name}</h2>
-              <Badge tone="accent">Sample</Badge>
+              {score?.grade ? <Badge tone={toneOfScore(score.atlasScore)}>{score.grade}</Badge> : null}
             </div>
             <p className="mt-0.5 font-mono text-2xs text-muted">
               {company.exchange}: {company.ticker}
@@ -124,14 +181,53 @@ function CompanyPreview({ company }: { company: CompanySummary }) {
       </div>
 
       <div className="p-4">
-        <StatGrid
-          items={[
-            { label: "Atlas Score", value: "—" },
-            { label: "Market Cap", value: "—" },
-            { label: "Conviction", value: "—" },
-            { label: "Upside", value: "—" },
-          ]}
-        />
+        {/*
+         * These four tiles were the literal string "—", wired to nothing:
+         * Atlas Score read as missing for every company while /v1/scores had
+         * a score for it (AMD showed "—" here and 68 on the leaderboard), and
+         * Market Cap / Conviction / Upside have no source at all.
+         *
+         * So: show the score and its factors, which are real, and stop
+         * claiming three metrics the platform does not yet carry. Convention
+         * #1 — a module whose data does not exist states the blocker instead
+         * of rendering an empty tile that looks like a loading failure.
+         */}
+        {score ? (
+          <>
+            <StatGrid
+              columns={2}
+              items={[
+                {
+                  label: "Atlas Score",
+                  value: score.atlasScore === null ? MISSING : String(score.atlasScore),
+                  hint: score.grade ? `Grade ${score.grade}` : undefined,
+                },
+                {
+                  label: "As of",
+                  value: score.asOf ?? MISSING,
+                  hint: "latest annual filing",
+                },
+              ]}
+            />
+            <div className="mt-4 rounded-panel border border-border p-4">
+              <p className="eyebrow mb-3">Factor profile</p>
+              <RankedBars
+                bars={FACTOR_KEYS.map((f) => ({
+                  label: f.label,
+                  value: score.factors[f.key] ?? null,
+                }))}
+                ariaLabel={`${company.name} factor profile`}
+              />
+            </div>
+          </>
+        ) : (
+          <PlannedModule
+            title="No Atlas Score yet"
+            body="This company is in the coverage universe but has no scored annual filings, so it has no score, grade or factor profile to show."
+            fields={["Atlas Score", "Grade", "Profitability", "Growth", "Strength", "Cash"]}
+            requires="Annual facts ingested for this company — the score is computed from filings, never estimated."
+          />
+        )}
         <dl className="mt-4 divide-y divide-border rounded-panel border border-border">
           {facts.map((f) => (
             <div

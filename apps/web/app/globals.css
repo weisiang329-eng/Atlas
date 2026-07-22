@@ -26,12 +26,22 @@
   --surface: #0e131c;
   --surface-2: #131a26;
   --surface-3: #171f2e;
-  --border: #202a3a;
   --border-soft: #182231;
-  --border-strong: #2c3a50;
   --fg: #e7ebf2;
   --muted: #8c96a8;
-  --faint: #5b657a;
+  /*
+   * `--faint` carries every structural label in the product: table headers,
+   * eyebrows, units, timestamps. It was #5b657a, which measures 3.36:1 against
+   * --bg — and because it is used at 10-11px, it needed 4.5:1, not the 3:1
+   * large-text allowance. The labels that give a dense screen its structure
+   * were the least legible thing on it, which reads as "flat and murky".
+   * #7c89a6 measures 5.61:1 (verified in-browser), keeping the same cool hue.
+   */
+  --faint: #7c89a6;
+  /* Hairlines were doing the same disappearing act; one step up separates
+     panels and rows without the grid becoming the loudest thing on screen. */
+  --border: #253044;
+  --border-strong: #35455e;
   --accent: #f2b13d;
   --accent-dim: #7a5c1f;
   --positive: #3fb96b;

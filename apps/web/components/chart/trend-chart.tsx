@@ -3,6 +3,31 @@ export interface SeriesPoint {
   value: number;
 }
 
+/**
+ * Axis-label budget.
+ *
+ * The viewBox is 640 units wide but the SVG scales to its container, and the
+ * narrowest place this chart is used — a third-width dashboard panel — renders
+ * at ~400px, a scale of 0.625. A "2019-09" label measures 28.9px there, so the
+ * budget has to be set for the narrow case: five labels leave ~67px of air,
+ * eight overlapped by 13.9px (measured in-browser).
+ */
+const MAX_TICKS = 5;
+
+/**
+ * Evenly-spaced label indices, always including the first and last so the
+ * reader can see the range the chart covers. Returning a Set keeps the render
+ * a simple membership test rather than modulo arithmetic that drifts and
+ * collides near the right edge.
+ */
+function tickIndices(length: number): Set<number> {
+  const n = Math.min(MAX_TICKS, length);
+  if (n <= 1) return new Set([0]);
+  return new Set(
+    Array.from({ length: n }, (_, k) => Math.round((k * (length - 1)) / (n - 1))),
+  );
+}
+
 interface TrendChartProps {
   data: SeriesPoint[];
   height?: number;
@@ -36,6 +61,7 @@ export function TrendChart({
   const innerW = W - pad.l - pad.r;
   const innerH = H - pad.t - pad.b;
 
+  const ticks = tickIndices(data.length);
   const values = data.map((d) => d.value);
   const max = Math.max(...values);
   const min = Math.min(...values, 0);
@@ -99,19 +125,31 @@ export function TrendChart({
         }
       />
       <circle cx={last.x} cy={last.y} r={3.5} fill="var(--accent)" />
-      {data.map((d, i) => (
-        <text
-          key={d.label}
-          x={pts[i]!.x}
-          y={H - 6}
-          textAnchor="middle"
-          fill="var(--faint)"
-          fontSize={11}
-          fontFamily="var(--font-mono)"
-        >
-          {d.label}
-        </text>
-      ))}
+      {/*
+       * Thin the axis labels.
+       *
+       * This used to label every point, which is fine for the 4-8 points a
+       * financial statement chart carries and unreadable for a monthly series:
+       * a 60-month cycle rendered sixty 11px labels into one grey smear along
+       * the axis. Keep at most MAX_TICKS, always including the first and last
+       * so the reader can still see the range the chart covers.
+       */}
+      {data.map((d, i) => {
+        if (!ticks.has(i)) return null;
+        return (
+          <text
+            key={d.label}
+            x={pts[i]!.x}
+            y={H - 6}
+            textAnchor={i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"}
+            fill="var(--faint)"
+            fontSize={11}
+            fontFamily="var(--font-mono)"
+          >
+            {d.label}
+          </text>
+        );
+      })}
     </svg>
   );
 }

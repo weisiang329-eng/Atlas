@@ -148,6 +148,25 @@ first; and re-run every test that loads a file you edited. Relative imports in
 `allowImportingTsExtensions` set, so the two resolvers agree and this class of
 break cannot recur.
 
+**2026-07-22 — an untested guard shipped a 500 on user input.**
+*What:* `GET /v1/companies/:id/statements/toString` returned **500** in
+production, as did `constructor`, `__proto__`, `valueOf` and every other
+`Object.prototype` key. A 404/400 was intended.
+*Why:* `isStatementType` was written as `s in SPECS`, and `in` walks the
+prototype chain, so those keys passed the guard. `SPECS[type]` then handed back
+`Object.prototype.toString` instead of a `RowSpec[]`, and the `for…of` threw.
+Typecheck could not see it — the type predicate `s is StatementType` asserted
+the very thing that was false — and no test exercised the engine at all.
+*Cost:* none observed; the endpoint is read-only and unauthenticated, so the
+exposure was noise in the logs rather than data. It was found by writing the
+first unit test for `domain/statements`, not by a user.
+*Now prevented by:* `Object.hasOwn`, plus `seed/test-statements.mjs`, which
+asserts prototype keys are rejected. The general lesson is the one worth
+keeping: **a type predicate is a claim the compiler trusts, not one it
+verifies** — every hand-written `x is T` guard needs a test, because inside it
+TypeScript is actively unable to help. A sweep found no other bare `in` guards
+in `apps/api/src`.
+
 ## 8. Handoff readiness
 
 Assume you vanish mid-task and a stranger continues tomorrow.

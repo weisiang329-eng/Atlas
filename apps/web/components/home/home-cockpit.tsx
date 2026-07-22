@@ -13,7 +13,10 @@
  */
 import Link from "next/link";
 import { ChartContainer } from "@/components/chart/chart-container";
+import { TrendChart } from "@/components/chart/trend-chart";
+import { Sparkline } from "@/components/chart/sparkline";
 import { StatGrid } from "@/components/ui/stat-grid";
+import { fmtChange, fmtNumber, toneClass } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { useDecisions } from "@/lib/loaders/use-research";
@@ -142,21 +145,59 @@ export function HomeCockpit() {
           }
         >
           {gloves.data ? (
-            <dl className="flex flex-col gap-3">
-              {gloves.data.series.map((s) => (
-                <div
-                  key={s.key}
-                  className="flex items-baseline justify-between gap-3 rounded bg-surface-3 px-3 py-2"
-                >
-                  <dt className="min-w-0 truncate text-sm text-muted">
-                    {s.label}
-                  </dt>
-                  <dd className="num shrink-0 text-sm text-fg">
-                    {s.points.at(-1)?.value ?? "—"}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <div className="flex flex-col gap-4">
+              {/*
+               * `cycle` was computed and never drawn, so a chart-sized panel
+               * held two list rows and 380px of void — the single biggest
+               * empty area on the dashboard. The signal IS a time series;
+               * plot it, and let the latest reading sit on top as the number
+               * a reader takes away.
+               */}
+              {cycle && cycle.points.length > 1 ? (
+                <>
+                  <div className="flex items-baseline gap-3">
+                    <span className="num text-2xl text-fg">
+                      {fmtNumber(cycle.latest)}
+                    </span>
+                    <span className={`num text-xs ${toneClass(cycle.changeYoYPct)}`}>
+                      {fmtChange(cycle.changeYoYPct)} YoY
+                    </span>
+                  </div>
+                  <TrendChart
+                    data={cycle.points.map((p) => ({
+                      label: p.date.slice(0, 7),
+                      value: p.value,
+                    }))}
+                    ariaLabel="Glove margin cycle signal"
+                    height={140}
+                  />
+                </>
+              ) : null}
+
+              <dl className="flex flex-col gap-2">
+                {gloves.data.series.map((s) => (
+                  <div
+                    key={s.key}
+                    className="flex items-center justify-between gap-3 rounded bg-surface-3 px-3 py-2"
+                  >
+                    <dt className="min-w-0 flex-1 truncate text-xs text-muted">
+                      {s.label}
+                    </dt>
+                    {/* A row of numbers with no shape hides the trend that
+                        makes the number mean anything. */}
+                    <Sparkline
+                      values={s.points.slice(-24).map((p) => p.value)}
+                      ariaLabel={`${s.label} trend`}
+                      width={72}
+                      height={20}
+                    />
+                    <dd className="num shrink-0 text-sm text-fg">
+                      {fmtNumber(s.points.at(-1)?.value ?? null)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           ) : null}
         </ChartContainer>
       </div>

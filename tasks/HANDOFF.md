@@ -279,7 +279,19 @@ graph, `/reports/company/[id]`, Agent. **Still not real:**
 - [ ] **P006 v2** — glove value chain (raw-material → manufacturing → distribution) once upstream suppliers are added; interactive flow diagram.
 - [ ] **P026 Phase 2 v2 / Phase 3** — per-company capacity/utilisation metrics; brent/gas/FX daily series (git-clone glove-tracker for the big `_*_max.sql` dumps); port the cron scrapers to Workers Cron; cycle-signal inferences.
 - [ ] **P024** — automation: scheduled report generation + data-quality checks via Workers Cron (needs deploy).
-- [ ] **Tests** — unit tests for the engines (`domain/ratios`, `scoring`, `statements`, `valuechain`); today only `db:test` + typecheck + build gate CI.
+- [x] **Tests** — the four calculation engines are covered: `seed/test-ratios.mjs`,
+  `test-scoring.mjs`, `test-statements.mjs`, `test-valuechain.mjs`, all wired into
+  `npm run db:test` (11 suites) and therefore into CI. They pin the *documented*
+  model, not just the code: factor weights (30/25/25/20) and the grade cuts are
+  asserted against `docs/INVESTMENT-METHODOLOGY.md`, so changing a threshold
+  without changing the document now fails the build — convention #0 became a
+  mechanism instead of a promise. The honesty properties are pinned too: missing
+  inputs are reweighted rather than imputed, ratios are `undefined` (never 0 or
+  NaN), and expenses render negative from positive magnitudes.
+  Writing them found a live production bug (a 500 on `statements/toString`) —
+  post-mortem in `docs/METHODOLOGY.md` §7.
+- [ ] **Tests (remaining)** — `domain/presenters`, `domain/industry`,
+  `domain/graph`, `domain/fees`, and the route layer have no direct coverage.
 
 ### 13.5 Blocked — needs an owner-supplied resource
 - [ ] **P027 real-time markets** — market-data API key (`MARKET_DATA_KEY`, Polygon/Finnhub). US equities only; no Bursa retail feed. Then: quotes adapter, price history, WebSocket/Durable-Objects fan-out, candle charts, watchlist/alerts go live.

@@ -31,8 +31,16 @@ const SPECS: Record<StatementType, RowSpec[]> = {
   "cash-flow": CASHFLOW_SPEC,
 };
 
+/**
+ * This used `s in SPECS`, and `in` walks the prototype chain: "toString",
+ * "constructor" and "__proto__" all passed the guard, so
+ * `/v1/companies/:id/statements/toString` reached `SPECS[type]`, got
+ * `Object.prototype.toString` instead of a RowSpec[], and threw on the
+ * for-of — a 500 on unauthenticated user-controlled input where a 404 was
+ * intended. `Object.hasOwn` only sees the three real keys.
+ */
 export function isStatementType(s: string): s is StatementType {
-  return s in SPECS;
+  return Object.hasOwn(SPECS, s);
 }
 
 function rowValue(spec: RowSpec, facts: FactMap): number | null {
