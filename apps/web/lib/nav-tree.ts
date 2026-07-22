@@ -202,7 +202,17 @@ export const NAV_TREE: NavSection[] = [
           },
         ],
       },
-      { href: "/admin", label: "Admin", labelKey: "nav.admin", glyph: "AD" },
+      {
+        href: "/admin",
+        label: "Admin",
+        labelKey: "nav.admin",
+        glyph: "AD",
+        children: [
+          { href: "/admin/sources", label: "Data Sources", labelKey: "nav.sources" },
+          { href: "/admin/ingest", label: "Ingestion", labelKey: "nav.ingest" },
+          { href: "/admin/automation", label: "Automation", labelKey: "nav.automation" },
+        ],
+      },
       {
         href: "/settings",
         label: "Settings",

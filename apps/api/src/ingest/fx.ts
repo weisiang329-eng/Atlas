@@ -12,6 +12,8 @@
  * direction the ledger stores (trade currency → base).
  */
 
+import { politeFetch } from "./sources";
+
 const BNM_URL = "https://api.bnm.gov.my/public/exchange-rate";
 
 /** The currencies Atlas trades in. MYR is the base and never converted. */
@@ -48,7 +50,7 @@ export interface FxQuote {
  * invented one.
  */
 export async function fetchBnmRates(): Promise<FxQuote[]> {
-  const res = await fetch(BNM_URL, {
+  const res = await politeFetch("bnm", BNM_URL, {
     headers: {
       // BNM requires this Accept header; without it the API returns 406.
       Accept: "application/vnd.BNM.API.v1+json",
