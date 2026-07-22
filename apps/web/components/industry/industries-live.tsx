@@ -25,6 +25,7 @@ import { RankedBars } from "@/components/chart/ranked-bars";
 import { DonutChart } from "@/components/chart/donut";
 import { Sparkline } from "@/components/chart/sparkline";
 import { DataTable, type Column } from "@/components/data/data-table";
+import { TaxonomyTree } from "@/components/industry/taxonomy-tree";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { isApiConfigured } from "@/lib/api/client";
 import { useLocale } from "@/lib/i18n/use-locale";
@@ -35,7 +36,13 @@ import { MISSING, fmtChange, fmtNumber, toneClass } from "@/lib/format";
 interface IndustryRow {
   id: string;
   name: string;
+  nameZh?: string | null;
   sector: string;
+  parentId?: string | null;
+  level?: number | null;
+  /** Companies filed exactly here. 0 on every pure grouping node. */
+  directCompanyCount?: number;
+  /** Companies at or below — a parent must never read as empty. */
   companyCount?: number;
   scoredCount?: number;
   avgScore?: number | null;
@@ -59,7 +66,22 @@ export function IndustriesLive() {
   const zh = locale === "zh";
   const live = isApiConfigured();
   const r = useApiResource<IndustryRow[]>("/v1/industries", ready(STATIC_INDUSTRIES));
-  const rows = r.data ?? [];
+  const all = r.data ?? [];
+
+  /*
+   * Since the taxonomy became a tree, membership ROLLS UP: a company under
+   * DRAM is also counted at 存储, 半导体 and 科技. Summing every node would
+   * therefore report the universe three or four times over, and the donut
+   * would show 60 companies where 17 exist.
+   *
+   * Every aggregate below is computed over the nodes companies are actually
+   * FILED on. The tree itself is rendered separately, where roll-up is the
+   * point rather than a double count.
+   */
+  const rows =
+    all.some((x) => x.directCompanyCount !== undefined)
+      ? all.filter((x) => (x.directCompanyCount ?? 0) > 0)
+      : all;
 
   const totalCompanies = rows.reduce((n, x) => n + (x.companyCount ?? 0), 0);
   const scoredRows = rows.filter((x) => x.avgScore !== null && x.avgScore !== undefined);
@@ -261,6 +283,18 @@ export function IndustriesLive() {
             )}
           </ChartContainer>
         </div>
+
+        <SectionHeading
+          title={zh ? "行业树" : "Industry taxonomy"}
+          description={
+            zh
+              ? "按驱动因素划分，不是按产品分类：驱动因素相同就不再细分，所以深度天然不齐。数字含其下所有公司。"
+              : "Split by drivers, not by what a company makes — a branch stops as soon as its drivers are homogeneous, so depth is uneven by design. Counts include everything below a node."
+          }
+        />
+        <Panel className="mb-6 p-4">
+          <TaxonomyTree />
+        </Panel>
 
         <SectionHeading
           title={zh ? "全部行业" : "All industries"}

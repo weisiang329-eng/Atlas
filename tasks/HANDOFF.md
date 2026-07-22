@@ -314,6 +314,31 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
 - [ ] After wiring each, delete the corresponding `apps/web/lib/mock/*` entry.
 
 ### 13.4 Buildable next — no external blocker (server-side value)
+- [x] **Industry taxonomy is a tree (2026-07-23)** — step 1 of
+  `docs/INDUSTRY-INTELLIGENCE.md` §7. `industry` gained `parent_id`, `level`
+  and `name_zh`; 21 nodes (2 roots · 3 chain segments · the 7 industries · 9
+  sub-industries) ship in migration `0007_industry_tree.sql`, so the deployed
+  Worker applies them on its next cold start. `apps/api/seed/taxonomy.mjs` is
+  the written source of truth and `seed/test-taxonomy.mjs` fails the build if
+  the database drifts from it.
+  - **Membership rolls up** (`domain/taxonomy.ts`): 半导体 reports the 7
+    companies filed under 存储/代工/设备. Without it every node above a leaf
+    reads as an empty industry. The industries page computes its aggregates
+    over *filed* nodes only — summing every node would have reported the
+    17-company universe three times over.
+  - `GET /v1/industries/tree` is new; `/v1/industries` gained `path`,
+    `parentId`, `level`, `directCompanyCount`; `/v1/industries/:id` gained
+    `path` and `children`. Breadcrumb renders 科技 › 半导体 › 存储 › DRAM and
+    **never the level number** — that is schema vocabulary.
+  - **Open decision for the owner:** companies still sit on the seven L3
+    nodes. The design says a company is filed on a LEAF, but Micron makes
+    DRAM, NAND *and* HBM, so re-filing is a judgement call, not a migration.
+    Roll-up means nothing is blocked by leaving it.
+  - **Next (§7 step 2):** `industry_driver` — 3–5 drivers per leaf, each with
+    phase / lag / elasticity / who-it-hits. The doc is explicit that **the
+    owner reviews that list**, because it decides whether the model is right.
+    Then the free feeds (FRED, EIA, BNM) behind it — FRED and EIA still need
+    the keys in §13.10.
 - [x] **P022 v2** — quarterly EDGAR ingestion is live. `POST /v1/ingest/edgar`
   (optionally `?company=<id>`) pulls SEC companyfacts through `politeFetch`
   and writes 402 quarters / ~8,560 facts for the seven US names. Flow figures

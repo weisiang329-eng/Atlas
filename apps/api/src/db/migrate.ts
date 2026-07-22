@@ -27,6 +27,7 @@ import agents0003 from "../../drizzle/0003_agent_console.sql";
 import industry0004 from "../../drizzle/0004_industry_knowledge.sql";
 import industrySeed0005 from "../../drizzle/0005_industry_seed.sql";
 import newsFx0006 from "../../drizzle/0006_news_fx.sql";
+import industryTree0007 from "../../drizzle/0007_industry_tree.sql";
 
 /**
  * Ordered. Never renumber or edit a shipped migration — append a new one.
@@ -50,6 +51,10 @@ const MIGRATIONS: { id: string; sql: string; sentinel: string }[] = [
   // written to be idempotent and simply replays harmlessly if ever re-run.
   { id: "0005_industry_seed", sql: industrySeed0005, sentinel: "__none__" },
   { id: "0006_news_fx", sql: newsFx0006, sentinel: "news_item" },
+  // Schema + reference data, like 0005. No table to sentinel on: every
+  // statement is `ADD COLUMN IF NOT EXISTS` / `ON CONFLICT DO UPDATE` /
+  // `UPDATE ... WHERE id =`, so a replay is a no-op.
+  { id: "0007_industry_tree", sql: industryTree0007, sentinel: "__none__" },
 ];
 
 /** Arbitrary but fixed — the lock key every Atlas Worker agrees on. */

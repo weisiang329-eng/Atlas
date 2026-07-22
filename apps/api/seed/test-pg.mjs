@@ -18,6 +18,10 @@ const migrations = [
   "drizzle/0002_pms.sql",
   "drizzle/0003_agent_console.sql",
   "drizzle/0004_industry_knowledge.sql",
+  // 0005/0006 are reference data and the news/FX tables — neither is exercised
+  // by this suite. 0007 is, because it turns the taxonomy into a tree and the
+  // seeds below upsert onto it.
+  "drizzle/0007_industry_tree.sql",
 ];
 const seeds = [
   "seed/seed.sql",
@@ -51,7 +55,14 @@ const one = async (sql) => (await db.query(sql)).rows[0];
 
 console.log("\n--- verification ---");
 check("companies", (await one("SELECT count(*)::int n FROM company")).n, (v) => v === 17);
-check("industries", (await one("SELECT count(*)::int n FROM industry")).n, (v) => v === 7);
+// 21 = the 7 industries + 2 roots + 3 chain segments + 9 sub-industries. The
+// tree's shape is asserted in test-taxonomy.mjs; this only guards the count.
+check("industry nodes", (await one("SELECT count(*)::int n FROM industry")).n, (v) => v === 21);
+check(
+  "the 7 company-bearing industries are unchanged",
+  (await one("SELECT count(*)::int n FROM industry WHERE level = 3")).n,
+  (v) => v === 7,
+);
 check("relationships", (await one("SELECT count(*)::int n FROM relationship")).n, (v) => v === 23);
 check("industry_metric points", (await one("SELECT count(*)::int n FROM industry_metric")).n, (v) => v === 59);
 check(
