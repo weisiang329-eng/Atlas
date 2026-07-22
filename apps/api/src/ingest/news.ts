@@ -11,6 +11,8 @@
  * financial engine may read a number from here.
  */
 
+import { politeFetch } from "./sources";
+
 export interface RawNewsItem {
   title: string;
   link: string;
@@ -137,7 +139,9 @@ export async function fetchNews(symbol: string): Promise<RawNewsItem[]> {
   url.searchParams.set("region", "US");
   url.searchParams.set("lang", "en-US");
 
-  const res = await fetch(url.toString(), {
+  // Through the throttle: a ten-ticker sweep is exactly the shape of request
+  // burst that gets an IP rate-limited.
+  const res = await politeFetch("yahoo-finance-rss", url.toString(), {
     headers: { "User-Agent": "Atlas Research Platform" },
   });
   if (!res.ok) throw new Error(`Yahoo Finance RSS ${res.status}`);

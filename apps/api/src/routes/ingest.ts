@@ -13,6 +13,7 @@ import { createDb, listCompanies } from "../db/repo";
 import { newsItem, pmsFxRate } from "../db/schema";
 import { fetchBnmRates } from "../ingest/fx";
 import { dedupe, fetchNews, tagItem, type TaggingSubject } from "../ingest/news";
+import { DATA_SOURCES } from "../ingest/sources";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
@@ -216,4 +217,35 @@ ingest.get("/probe", async (c) => {
   );
 
   return c.json({ results });
+});
+
+/**
+ * The source registry, with live key detection.
+ *
+ * One place that answers "what do we pull from, what is it limited to, and
+ * what is still waiting on me" — previously that lived across chat messages,
+ * which is exactly where it gets lost.
+ */
+ingest.get("/sources", async (c) => {
+  const env = c.env as unknown as Record<string, string | undefined>;
+
+  return c.json({
+    sources: DATA_SOURCES.map((s) => ({
+      ...s,
+      // A source is only really connected when its key is actually present on
+      // the Worker — the registry states intent, the env states reality.
+      keyPresent: s.secretName
+        ? Boolean(env[s.secretName] && env[s.secretName]!.length > 0)
+        : null,
+    })),
+    summary: {
+      connected: DATA_SOURCES.filter((s) => s.status === "connected").length,
+      awaitingKey: DATA_SOURCES.filter(
+        (s) =>
+          s.status === "awaiting-key" &&
+          !(s.secretName && env[s.secretName]),
+      ).length,
+      rejected: DATA_SOURCES.filter((s) => s.status === "rejected").length,
+    },
+  });
 });
