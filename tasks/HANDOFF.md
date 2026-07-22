@@ -9,7 +9,7 @@
 | [`docs/CODEBASE-MAP.md`](../docs/CODEBASE-MAP.md) | Where everything lives and why |
 | [`docs/METHODOLOGY.md`](../docs/METHODOLOGY.md) | How we work: worktree → PR → review → merge → deploy |
 
-You do not need any prior chat context. Last updated 2026-07-21.
+You do not need any prior chat context. Last updated 2026-07-23.
 
 ---
 
@@ -24,50 +24,46 @@ autonomous research agents (see the roadmap).
 
 ## 2. Status in one paragraph
 
-The platform is **fully built and verified locally**, delivered as **18 stacked
-pull requests (#26–#43), all CI-green, none merged yet, and not yet deployed.**
-Stage 1 (core intelligence) and Stage 2 (investment MVP) are complete, plus a
-Claude AI analyst. The database was migrated from Cloudflare D1 to **Supabase
-Postgres** (owner's choice). The only remaining work to go live is the
-**owner-only deploy** (Cloudflare + Supabase auth) and one **pending decision**
-(how login works). Everything else buildable-without-external-resources is done.
+**Live and deployed** at the URLs in §7, on `main` — the "18 stacked PRs, none
+merged" era ended 2026-07-21. Stage 1 (core intelligence), Stage 2 (investment
+MVP), the Claude analyst, the trade ledger and the industry-intelligence layer
+are all merged. **What is running in production is older than `main`:** the
+Worker self-migrates its schema on a cold start, but the code and the web build
+only change when someone deploys, and nothing has been deployed since
+2026-07-21. Everything buildable without an external key, a subscription or a
+deploy is done; what is left is in `GET /v1/pending` and §13.
 
-## 3. Repo & getting all the code
+### What landed 2026-07-23 (PRs #82–#90)
+
+| | |
+| --- | --- |
+| **News** | `/news` wired to the real feed; the mock that quoted MARGMA on glove ASP is deleted |
+| **Industry tree** | 21-node taxonomy, split by drivers; membership rolls up; breadcrumbs never print a level number |
+| **Drivers** | Claims with phase/lag/elasticity + a joint backtest that can say NO — and did: the latex claim is **contradicted** on 2019–2026 data |
+| **Driver list** | §3's lists encoded — 32 drivers across 10 leaves, each naming the feed it needs |
+| **Quarter alignment** | US industries had **empty** quarterly histories (no `report_date` anywhere); 存储 recovered 68 quarters |
+| **Sourcing policy** | [ADR](../adr/ADR-Data-Sourcing-Cost.md): free at the margin, no per-industry subscriptions — convention #8 |
+| **Derived series** | Inventory days + capex computed from stored filings; 5 drivers became testable for free |
+| **Share-count gate** | It was deleting stock splits, not errors — 32 correct facts were being dropped on every regeneration |
+
+**Three findings from that day worth reading before trusting anything:** the
+glove latex claim does not survive its own backtest (§ INDUSTRY-INTELLIGENCE
+§5); every US industry's quarterly margin history was silently empty; and 14
+taxonomy pages 404'd in production while the build reported success. All three
+were found by *running the thing*, not by tests passing.
+
+## 3. Repo
 
 - **GitHub:** `weisiang329-eng/Atlas` · **local clone:** `Desktop/Atlas`
-- **The branch `feat/supabase-postgres` contains the ENTIRE project** (all 18
-  PRs are stacked; its tip = the complete, final code with Supabase Postgres).
-  To work on everything: `git checkout feat/supabase-postgres && git pull`.
-- **PR #43** targets `main` and also contains the entire stack — **merging #43
-  into `main` lands all the code in one merge.** **PR #26** (branch
-  `docs/management-plans`) holds the planning/handoff docs (this file included);
-  it touches only `management/`, `tasks/`, `prompts/`, so it merges cleanly
-  alongside #43. **After merging #43 + #26, `main` has everything.**
+- Everything is on `main`. The old stacked-PR instructions (#26–#43, “check
+  out feat/supabase-postgres to get everything”) are obsolete: that stack
+  merged 2026-07-21 and those branches are deleted. PRs #44–#90 followed it.
+- Work happens in a worktree per task — see `docs/METHODOLOGY.md`.
 
-## 4. The 18-PR stack (merge order = ascending)
+## 4. History
 
-| PR | Branch | Delivers |
-| --- | --- | --- |
-| #26 | docs/management-plans | All planning docs, this handoff, runbook, execution status |
-| #27 | feat/backend-foundation | Hono API + financial engine + AI-infra seed (originally D1) |
-| #28 | feat/web-live-wiring | Frontend wired to live API (all financials/companies pages) |
-| #29 | feat/glove-sector | Glove sector: 7 MY makers, 555 Bursa quarterlies |
-| #30 | feat/edgar-ingestion | SEC EDGAR ingestion (105 annual periods, 2,441 facts) |
-| #31 | feat/glove-industry-intel | P026 Phase 2: ASP/NBR series + margin cycle signal |
-| #32 | feat/company-intel-p005 | P005 company overview + profile |
-| #33 | feat/scoring-p010 | P010 Atlas Score (4-factor engine + rankings) |
-| #34 | feat/knowledge-graph-p007 | P007 knowledge graph (supply chain) |
-| #35 | feat/home-p009 | P009 investment cockpit (Home) |
-| #36 | feat/watchlist-p011 | P011 watchlist |
-| #37 | feat/reports-p013 | P013 auto company reports |
-| #38 | feat/agent-p020 | P020 Claude research analyst |
-| #39 | feat/portfolio-p012 | P012 portfolio |
-| #40 | feat/value-chain-p006 | P006 AI-hardware value chain |
-| #41 | feat/research-p008 | P008 research notes + decision journal |
-| #42 | feat/company-relations | Relations tab on company pages |
-| **#43** | **feat/supabase-postgres** | **DB migrated D1 → Supabase Postgres (tip = everything)** |
-
-> The old Codex PR **#4** (Node+Prisma scaffold) is superseded — close it.
+The original 18-PR stack and its merge order are in the git log, not here; a
+handoff should say what IS, not narrate how it arrived. Recent work: §2.
 
 ## 5. Architecture / stack
 
