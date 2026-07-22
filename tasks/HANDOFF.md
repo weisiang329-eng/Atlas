@@ -582,8 +582,13 @@ Measured 2026-07-23: **32 drivers · 2 testable · 30 blocked.**
 | 4 | [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | `ALPHAVANTAGE_API_KEY` | Backup quote source |
 
 **DECIDED 2026-07-23 — we do not subscribe to TrendForce / DRAMeXchange /
-SEMI.** One research subscription per industry would cost more than everything
-else in this platform combined, and the reasoning is not only about price:
+SEMI**, and the general rule is now an ADR:
+[`adr/ADR-Data-Sourcing-Cost.md`](../adr/ADR-Data-Sourcing-Cost.md) — sources
+must be free **at the margin**, because a per-industry subscription model
+makes 100 industries impossible and 10 uncomfortable. It is convention #8 in
+`CLAUDE.md`. One research subscription per industry would cost more than
+everything else in this platform combined, and the reasoning is not only about
+price:
 
 - **Price series are the LAGGING half of the memory model.** §3 says it
   outright — "price is lagging confirmation; inventory is the leading signal."
