@@ -26,6 +26,7 @@ import pms0002 from "../../drizzle/0002_pms.sql";
 import agents0003 from "../../drizzle/0003_agent_console.sql";
 import industry0004 from "../../drizzle/0004_industry_knowledge.sql";
 import industrySeed0005 from "../../drizzle/0005_industry_seed.sql";
+import newsFx0006 from "../../drizzle/0006_news_fx.sql";
 
 /**
  * Ordered. Never renumber or edit a shipped migration — append a new one.
@@ -48,6 +49,7 @@ const MIGRATIONS: { id: string; sql: string; sentinel: string }[] = [
   // Reference data, not a table — no sentinel can prove it applied, so it is
   // written to be idempotent and simply replays harmlessly if ever re-run.
   { id: "0005_industry_seed", sql: industrySeed0005, sentinel: "__none__" },
+  { id: "0006_news_fx", sql: newsFx0006, sentinel: "news_item" },
 ];
 
 /** Arbitrary but fixed — the lock key every Atlas Worker agrees on. */

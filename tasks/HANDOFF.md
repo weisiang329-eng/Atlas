@@ -328,6 +328,43 @@ swapped — new paint on old bones. That is why the app still looked dated.
   verifiable; *looks* are not. Until that is fixed, a human must eyeball each
   rebuilt page on a preview deployment.
 
+### 13.11 External data sources — what is connected, and the waiting list
+
+**Reachability was measured, not assumed.** `GET /v1/ingest/probe` fetches every
+candidate source *from the Worker* and reports the status. This matters: a
+source that works from a laptop can still fail in production, and one did —
+Google News RSS returns **503 to Cloudflare Workers specifically**, the only
+one of eight free sources that blocks datacentre egress. Re-run the probe before
+adding any source.
+
+**Connected — free, no key, working in production:**
+
+| Source | Serves | Notes |
+| --- | --- | --- |
+| **BNM** (Bank Negara Malaysia) | The ledger's FX anchor | Middle rate + the dealer half-spread, stored separately (PORTFOLIO-ACCOUNTING §5). USD/MYR verified live. |
+| **Yahoo Finance RSS** | News Research Analyst, `/news` | Ticker-scoped, so a feed cannot drift onto an unrelated company the way a keyword search can. |
+| **SEC EDGAR** (`data.sec.gov`) | Company financials | Already the basis of US coverage. |
+| **SEC EDGAR filings atom + full-text** | Company/Industry analysts | Probe-verified reachable; not yet wired to a route. |
+| **World Bank** | Macro indicators for industry KPIs | Probe-verified; not yet wired. |
+| **Frankfurter** | FX cross-check against BNM | Probe-verified; not yet wired. |
+
+**Rejected:** Google News RSS — 503 from Workers. Superseded by Yahoo Finance
+RSS, which is a better fit anyway.
+
+**WAITING ON THE OWNER — free tiers that need a key.** Register, then
+`wrangler secret put <NAME>`; nothing below is faked in the meantime.
+
+| Priority | Service | Secret | Free tier | What it unblocks |
+| --- | --- | --- | --- | --- |
+| **1** | [Finnhub](https://finnhub.io/register) | `FINNHUB_API_KEY` | 60 calls/min | **P027 in one stroke:** live quotes → unrealised P&L in the ledger, valuation multiples in the Atlas Score (its biggest stated gap), watchlist alerts, price charts |
+| **2** | [FRED](https://fredaccount.stlouisfed.org/apikeys) | `FRED_API_KEY` | unlimited | Commodity and macro series feeding the industry KPI database |
+| 3 | [EIA](https://www.eia.gov/opendata/register.php) | `EIA_API_KEY` | free | Energy prices — data-centre power, glove production cost |
+| 4 | [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | `ALPHAVANTAGE_API_KEY` | 25/day | Backup quote source |
+
+**Out of scope (paid):** Bloomberg · Reuters · TrendForce / DRAMeXchange
+(memory pricing) · Drewry / Freightos (shipping) · IATA (aviation). **Bursa
+Malaysia has no free retail feed at all** — Malaysian quotes stay manual.
+
 ### 13.10 Portfolio accounting / trade book (PMS)
 Model: `docs/PORTFOLIO-ACCOUNTING.md`. Foundation merged in PR #53.
 - [x] Schema (0002), FIFO matcher, fee schedules per market, FX P&L split, 33 engine assertions in CI.
