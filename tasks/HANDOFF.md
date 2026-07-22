@@ -553,6 +553,41 @@ adding any source.
 **Rejected:** Google News RSS — 503 from Workers. Superseded by Yahoo Finance
 RSS, which is a better fit anyway.
 
+### Derived series (2026-07-23) — five drivers became testable, for free
+
+`domain/derived-series.ts` computes driver series from filings already stored
+(tier 4 of [`adr/ADR-Data-Sourcing-Cost.md`](../adr/ADR-Data-Sourcing-Cost.md)):
+**inventory days** (Inventory ÷ COGS × 91) and **capex**, on the memory leaves
+and equipment. Each derivation carries a `measures` string that the UI renders
+verbatim, because a substitute that stops saying what it is has become the
+thing it replaced.
+
+First results, from Micron + SK hynix against 存储's margin (n=61,
+2011Q2–2026Q2): inventory days **−1.89 pp per +10%**, maker capex **−0.65**,
+both `weak` (R²=0.078). Right signs, thin fits — the honest reading is a real
+but noisy relationship, not a confirmed one.
+
+Two mechanisms this needed:
+- **Targets borrow upward.** DRAM holds no companies, so its margin history
+  comes from 存储 and the response says `borrowed: true` with the node name.
+  Equipment walks further: ASML *is* filed under 半导体设备 but Atlas holds no
+  ASML quarterlies, so membership alone was not enough — the walk continues
+  until a node actually has a history.
+- **0012 corrected 0011's classification.** `needs-extraction` had become a
+  comfortable place to file anything not obviously paid; writing the code
+  proved most of it wrong. Now: 1 needs extraction (a real unmapped XBRL tag),
+  3 need **coverage** (hyperscaler capex — free data, companies not tracked),
+  6 more are `unavailable` (utilisation, bit growth, HBM supply, GPU shipments
+  are earnings *commentary*, not structured filings).
+
+**Caught by observation, not by tests — and it had already shipped:** the web
+app is a static export, and `/industries/[id]` only pre-rendered the seven
+industries in `STATIC_INDUSTRIES`. The taxonomy PR added 14 nodes, the tree
+links to all of them, and **every one of those pages 404'd in production**
+while the build kept reporting the same page count. `ALL_INDUSTRY_IDS` now
+drives `generateStaticParams`, and `test-taxonomy.mjs` fails if a node is
+missing from it.
+
 ### THE PENDING LIST LIVES AT `GET /v1/pending` — this section is a summary
 
 It used to live in three places (here, the source registry, and free text
