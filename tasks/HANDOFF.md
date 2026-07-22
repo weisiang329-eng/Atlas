@@ -293,7 +293,37 @@ graph, `/reports/company/[id]`, Agent. **Still not real:**
     the company's median) are in `reconcileQuarters` but are not catching
     these three; fixing it means tightening the median band or bounding EPS
     directly. Everything from FY12 onward is clean.
-- [ ] **P022 v2** — IFRS ingestion for ASML & TSMC (20-F); they're on manual seed now.
+- [ ] **P022 v2** — ASML & TSMC ingestion (still on manual seed). **Probed SEC
+  companyfacts 2026-07-22; the task is not what the line above assumed:**
+
+  | | taxonomy | currency | forms | coverage |
+  | --- | --- | --- | --- | --- |
+  | ASML (CIK 937966) | **us-gaap**, no `ifrs-full` at all | **EUR** | 20-F, 20-F/A | 2008–2025 |
+  | TSMC (CIK 1046179) | **ifrs-full** (334 tags) | **TWD** | 20-F, 6-K | — |
+
+  So ASML needs no IFRS work; it is blocked only by two hardcoded assumptions
+  in the existing pipeline. TSMC needs both.
+
+  Three things must change in `src/ingest/edgar-*.ts`, and the currency one is
+  the dangerous one:
+
+  1. **Form filter.** `extractTag`/`extractTagQuarterly` accept only `10-K`
+     and `10-Q`. Foreign private issuers file `20-F` (annual) and `6-K`
+     (interim). Nothing is extracted today because of this line alone.
+  2. **Currency.** The unit lookup is `units?.USD ?? units?.shares`, and the
+     period rows hardcode `'USD'` / `'USD millions'`. **Reading EUR or TWD
+     values into a USD-labelled period would be the worst defect this
+     platform can produce** — a plausible number that is wrong by a factor of
+     the exchange rate, silently poisoning every ratio, score and chart.
+     Reporting currency must come from the filing and be stored per period;
+     `financial_period.currency` already exists for this.
+  3. **IFRS tag map** for TSMC only: `Revenue` /
+     `RevenueFromContractsWithCustomers`, and the `ifrs-full` equivalents of
+     the rest of `TAG_MAP`.
+
+  Also note TSMC's quarterly comes via **6-K**, which is not a structured
+  quarterly report the way a 10-Q is — expect the reconciliation gate in
+  `reconcileQuarters` to drop years, and check that before trusting output.
 - [ ] **P010 v2** — cross-sectional percentile factor scores; persist `score_history` (versioning); valuation multiples once price lands.
 - [ ] **P021** — agent long-term memory: Supabase **pgvector** over research notes / entity profiles; semantic search tool for the agent.
 - [ ] **P023** — decision-outcome tracking: add outcome fields to the decision journal + a review view (feeds learning).
