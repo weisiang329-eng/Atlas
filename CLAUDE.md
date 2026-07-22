@@ -68,6 +68,15 @@ research agents.
 7. **Adopted design-handoff pages need `"use client"`** when they pass render
    functions to client components (the `Column.render` API), and metadata then
    moves to a sibling `layout.tsx` — Next.js forbids both in one file.
+8. **Data sources must be free at the margin.** Adding an industry must add no
+   recurring cost, so sourcing goes: company filings → government statistics →
+   exchange open data → derived. **Per-industry research subscriptions
+   (TrendForce, SEMI, Drewry, IATA…) are banned** — their cost scales with
+   coverage and they mostly sell the *lagging* half of a model. When something
+   can only be bought, Atlas does not model it and the driver says so
+   (`blocker: paid`, with the substitute named). A substitute is never
+   relabelled as the thing it replaces. Full reasoning and the costs this
+   accepts: [`adr/ADR-Data-Sourcing-Cost.md`](adr/ADR-Data-Sourcing-Cost.md).
 
 ## Commands
 
