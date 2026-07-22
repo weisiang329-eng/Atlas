@@ -21,7 +21,7 @@ import { StatGrid } from "@/components/ui/stat-grid";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { DataState } from "@/components/ui/data-state";
 import { ChartContainer } from "@/components/chart/chart-container";
-import { BarSeries } from "@/components/chart/bar-series";
+import { RankedBars } from "@/components/chart/ranked-bars";
 import { DonutChart } from "@/components/chart/donut";
 import { Sparkline } from "@/components/chart/sparkline";
 import { DataTable, type Column } from "@/components/data/data-table";
@@ -86,10 +86,16 @@ export function IndustriesLive() {
     }));
 
   // Average score by industry, ranked — the one chart that ranks the taxonomy.
+  // Full names, not truncated: horizontal bars give each label its own line.
   const scoreBars = scoredRows
     .slice()
     .sort((a, b) => (b.avgScore ?? 0) - (a.avgScore ?? 0))
-    .map((x) => ({ label: x.name.replace(/ *\(.*\)/, "").slice(0, 14), value: x.avgScore ?? 0 }));
+    .map((x) => ({
+      label: x.name,
+      value: x.avgScore ?? null,
+      hint: `${x.companyCount ?? 0} ${zh ? "家" : "cos"}`,
+      href: `/industries/${x.id}`,
+    }));
 
   const columns: Column<IndustryRow>[] = [
     {
@@ -215,7 +221,7 @@ export function IndustriesLive() {
             }
           >
             {scoreBars.length > 0 ? (
-              <BarSeries data={scoreBars} ariaLabel="Average Atlas Score by industry" height={200} />
+              <RankedBars bars={scoreBars} ariaLabel="Average Atlas Score by industry" />
             ) : (
               <p className="py-10 text-center text-xs text-faint">
                 {zh ? "尚无已评分公司" : "No scored companies yet"}

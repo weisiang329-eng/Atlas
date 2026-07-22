@@ -13,7 +13,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataState } from "@/components/ui/data-state";
 import { ChartContainer } from "@/components/chart/chart-container";
-import { BarSeries } from "@/components/chart/bar-series";
+import { RankedBars } from "@/components/chart/ranked-bars";
 import { DonutChart } from "@/components/chart/donut";
 import { DataTable, type Column } from "@/components/data/data-table";
 import { FactorCell } from "@/components/scores/factor-bar";
@@ -124,7 +124,10 @@ export function RankingsLive() {
       .filter((v): v is number => v !== null && v !== undefined);
     return {
       label: zh ? f.zh : f.en,
-      value: vals.length === 0 ? 0 : Math.round(vals.reduce((a, b) => a + b, 0) / vals.length),
+      value: vals.length === 0 ? null : Math.round(vals.reduce((a, b) => a + b, 0) / vals.length),
+      // The weight is the reason this factor moves the score at all, so it
+      // belongs next to the average rather than buried in the subtitle.
+      hint: `${f.weight}%`,
     };
   });
 
@@ -160,7 +163,7 @@ export function RankingsLive() {
       <div className="mb-6 grid gap-6 lg:grid-cols-[1fr_2fr]">
         <ChartContainer
           title={zh ? "评级分布" : "Grade distribution"}
-          subtitle={zh ? "覆盖universe的评级构成" : "How the covered universe splits"}
+          subtitle={zh ? "覆盖范围内的评级构成" : "How the covered universe splits"}
         >
           {gradeSegments.length > 0 ? (
             <div className="flex flex-col items-center gap-4">
@@ -193,8 +196,8 @@ export function RankingsLive() {
           title={zh ? "各因子平均分" : "Average score by factor"}
           subtitle={
             zh
-              ? `权重：${FACTORS.map((f) => `${f.zh} ${f.weight}%`).join(" · ")}`
-              : `Weights: ${FACTORS.map((f) => `${f.en} ${f.weight}%`).join(" · ")}`
+              ? "覆盖公司的因子均值，右侧为该因子在总分中的权重"
+              : "Universe average per factor; the figure on the right is its weight in the total"
           }
           footer={
             zh
@@ -202,7 +205,7 @@ export function RankingsLive() {
               : "The weakest factor tells you what this ranking is really measuring"
           }
         >
-          <BarSeries data={factorBars} ariaLabel="Average score by factor" height={200} />
+          <RankedBars bars={factorBars} ariaLabel="Average score by factor" />
         </ChartContainer>
       </div>
 

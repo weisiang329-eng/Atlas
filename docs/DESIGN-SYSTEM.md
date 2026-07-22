@@ -205,9 +205,36 @@ it once.
 | Data doesn't exist | `PlannedModule` | A fake table |
 | Loading | `Skeleton` family | A spinner |
 | Page header | `PageHeader` | A bare `<h1>` |
+| Ranked comparison | `RankedBars` | `BarSeries` with long category names |
 
 Every async view goes through `<DataState>`: skeleton → error → empty → data.
 No view is allowed to render nothing while it waits.
+
+### Charts: pick the orientation from the label, not the taste
+
+`BarSeries` puts labels under a vertical axis, so it only works when they are
+short — `Q1`, `FY24`, `Jan`. Category names are not short: seven industries
+rendered as vertical bars produced
+`AI AcceleratorSemiconductorData Center Po` — one unreadable string.
+
+**Named categories go in `RankedBars`** (horizontal, one label per line,
+value at the end of the bar, sorted best-first). A chart the reader cannot
+take a number off is decoration, so `RankedBars` always prints its values.
+
+### Axis tick budget
+
+`TrendChart` shows **at most 5 x-axis labels**, evenly spaced, always
+including the first and last. Not a stylistic choice — a measured one:
+
+| Ticks | Narrowest use (400px panel, 0.625 scale) | Result |
+| --- | --- | --- |
+| all points (60+) | — | solid grey smear |
+| 8 | 28.9px label, 15px pitch | **overlaps by 13.9px** |
+| 5 | 28.9px label, 73.8px pitch | 44.9px clear |
+
+The budget must be set for the **narrowest** panel a chart appears in, not the
+widest, because the SVG scales to its container while the font does not.
+Verify with the overlap check in §8 rather than by eye.
 
 ---
 
@@ -243,3 +270,49 @@ noise between the user and their money.
 2. If genuinely new, add it **here first**, then implement it.
 3. Never introduce a raw hex, a one-off date format, or a bespoke table.
 4. A PR that changes a shared component states what else it affects.
+
+---
+
+## 9. Verifying a visual change — look at it
+
+A green typecheck says nothing about whether a screen is legible. Both label
+collisions fixed in this document passed typecheck, build and CI.
+
+### Render a page to a PNG
+
+```bash
+CHROME="/c/Program Files/Google/Chrome/Application/chrome.exe"
+"$CHROME" --headless=new --disable-gpu --hide-scrollbars \
+  --user-data-dir=/tmp/atlas-shot \   # own profile, or it hangs on a lock
+  --window-size=1440,1400 --virtual-time-budget=20000 \
+  --screenshot=out.png "https://<preview>.pages.dev/scores"
+```
+
+Two traps, both of which have already produced a wrong conclusion here:
+
+- **Every run needs its own `--user-data-dir`.** Sharing one makes the second
+  invocation block on the profile lock until it is killed.
+- **`--window-size` cannot go below the OS minimum window width.** Asking for
+  390 lays the page out at ~500 and crops the capture to 390, which looks
+  exactly like broken mobile CSS. For phone widths, frame the page in a
+  390px-wide `<iframe>` on a desktop-sized harness page and shoot that.
+
+### Check for label collisions instead of squinting
+
+Run in the page (DevTools, or the Chrome MCP `javascript_tool`). It reports
+the smallest gap between adjacent axis labels; negative means they overlap.
+
+```js
+[...document.querySelectorAll('svg')].map(svg => {
+  const t = [...svg.querySelectorAll('text')];
+  if (t.length < 2) return null;
+  const b = t.map(e => e.getBoundingClientRect()).sort((x, y) => x.left - y.left);
+  let gap = Infinity;
+  for (let i = 1; i < b.length; i++) gap = Math.min(gap, b[i].left - b[i - 1].right);
+  return { chart: svg.getAttribute('aria-label'), gap, ok: gap >= 0 };
+}).filter(Boolean)
+```
+
+Wrap the same snippet in a same-origin `<iframe>` loop to sweep several routes
+in one pass. Contrast is checked the same way — compute the ratio, don't judge
+it. `--faint` looked fine and measured 3.36:1 against `--bg` at 11px.
