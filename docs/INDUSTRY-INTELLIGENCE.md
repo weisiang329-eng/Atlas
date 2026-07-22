@@ -80,7 +80,10 @@ company belongs to both, so putting them at the same level of one tree is a
 contradiction that will not resolve.
 
 Companies carry tags — `#中概` `#港股` `#美国上市` `#马来西亚` — alongside
-exactly one position in the industry tree. Geography drives FX exposure and
+exactly one position in the industry tree. That position is on a LEAF
+(DRAM, 丁腈手套), never on an L3 like 半导体 — classify too coarsely and the
+drivers no longer apply to the companies filed under them, which defeats the
+whole model. Geography drives FX exposure and
 policy risk; it does not drive the industry's economics.
 
 ---
@@ -254,6 +257,43 @@ Estimated volume across all seven industries: **10–30 events per month**,
 30–100× cheaper than daily and every one worth reading. Plus a **weekly
 digest** (4 calls/month) assembled from events already fired — the cadence a
 human actually reads at.
+
+### Controls are ON/OFF, not a three-step autonomy dial
+
+The console currently offers 提议 / 半自动 / 全自动 per analyst. That gradient
+is borrowed from a different problem and should be removed.
+
+Graduated autonomy exists for agents that **act** — place an order, assign a
+task, change a record. The steps buy you "let it propose, I approve, then it
+executes". **A research agent does not act; it writes knowledge.** Every row
+it writes already carries a source, a confidence and a timestamp, and is
+reviewable, editable and deletable after the fact. Gating it *before* the
+write adds friction without adding safety.
+
+So: one switch per analyst — **on, it researches; off, it does not** — plus
+the existing global kill switch, which is a different thing (one analyst
+resting vs everything stopping).
+
+**What the dial was actually protecting is cost**, and it protected it
+badly — "半自动" does not tell anyone how much anything will cost. Replace it
+with an explicit budget:
+
+```
+行业研究分析师   [开]   本月 120 / 500 次调用
+```
+
+Saying "at most this much this month" is honest in a way that a vague middle
+setting is not.
+
+### Every entity mention is a link
+
+A company named on an industry page, in a news item, or inside a driver's
+`whoItHits` must navigate to that company. The same for industries and
+drivers, in both directions.
+
+This is what makes the knowledge graph usable rather than merely stored: a
+graph you cannot walk is a picture of a graph. It is also the cheapest
+feature here — the ids are already on every record.
 
 ### Backtesting is the honesty mechanism
 
