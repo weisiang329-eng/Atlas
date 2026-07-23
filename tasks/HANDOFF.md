@@ -327,8 +327,13 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
 - [ ] `companies/[companyId]/products` — needs a `company_product` table + data (P005 v2).
 - [ ] `companies/[companyId]/management` — needs `company_management` table + data (P005 v2).
 - [ ] `companies/[companyId]/valuation` — needs valuation multiples (needs price → P027) (P010 v2).
-- [ ] `companies/[companyId]/documents` — mock; needs filings in R2 + a documents table.
-- [ ] `companies/[companyId]/timeline` — mock; needs an events table.
+- [x] `companies/[companyId]/documents` — **honest now (PR #100).** Was a fixed
+  fabricated filing list shown on every real company; now a `<PlannedModule>`
+  stating the shape + blocker (filings in R2 + a source_document/filing table).
+- [x] `companies/[companyId]/timeline` — **honest now (PR #100).** Was four
+  invented dated events (incl. an "Overweight" rating action) on every company;
+  now a `<PlannedModule>` (needs a company_event table). `mock/timeline.ts` and
+  `mock/documents.ts` deleted.
 - [ ] `research/reports`, `research/evidence`, `research/versions`, `research/hypotheses` — mock; part of P008 v2 (source-linked, versioned, needs write-auth).
 - [ ] `reports/` (library) + `reports/[reportId]` — mock library; make it list the real per-company reports (`/reports/company/[id]`) + saved reports.
 - [ ] `knowledge/heatmap`, `knowledge/decision-tree` — mock viz; wire heatmap to real exposure, decision-tree to P008 decisions.
@@ -586,7 +591,8 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
 
 ### 13.7 Tech-debt / cleanup
 - [ ] `apps/web/lib/mock/*` — delete each module as its page is wired (§13.3).
-  `mock/news.ts` is gone (2026-07-22); 24 modules remain. When deleting one,
+  `mock/news.ts` is gone (2026-07-22); `mock/timeline.ts` + `mock/documents.ts`
+  gone (2026-07-23, PR #100); 22 modules remain. When deleting one,
   check for other importers — `related-news.tsx` was dead code hanging off the
   news mock and only surfaced because the mock went first.
 - [ ] Remove the superseded `tasks/handoff-2026-07-21.md` once everyone uses this file.
