@@ -24,6 +24,7 @@ import { ingest } from "./routes/ingest.ts";
 import { news } from "./routes/news.ts";
 import { drivers } from "./routes/drivers.ts";
 import { pending } from "./routes/pending.ts";
+import { runNewsIngest } from "./ingest/run-news.ts";
 
 export interface Env {
   /**
@@ -133,4 +134,45 @@ app.onError((err, c) => {
   return c.json({ error: "The request could not be completed." }, 500);
 });
 
-export default app;
+/**
+ * Scheduled refresh of the news feed (Workers Cron; see `wrangler.toml`
+ * `[triggers]`). Until this existed, the feed was only as fresh as the last
+ * manual `POST /v1/ingest/news`, which is why the /news page prints "last
+ * pulled" — HANDOFF §13.3 follow-up (a).
+ *
+ * It opens its own connection because a Cron invocation has no request and so
+ * no per-request middleware ran — same pooler settings as the request path.
+ * `ensureSchema` first, for the same reason the middleware runs it: a Worker
+ * instance that cold-starts on a Cron tick must not write against a stale
+ * schema. Errors are logged, never thrown: a failed tick should retry next
+ * schedule, not crash the Worker.
+ */
+async function scheduled(
+  _event: ScheduledController,
+  env: Env,
+): Promise<void> {
+  const client = postgres(env.DATABASE_URL, {
+    prepare: false,
+    max: 1,
+    idle_timeout: 10,
+    fetch_types: false,
+  });
+  // Awaiting keeps the Cron invocation alive until the work is done; the
+  // runtime does not kill a scheduled handler while its promise is pending.
+  try {
+    await ensureSchema(client);
+    const result = await runNewsIngest(createDb(client));
+    console.log("scheduled news ingest:", JSON.stringify(result));
+  } catch (err) {
+    console.error("scheduled news ingest failed:", err);
+  } finally {
+    await client.end({ timeout: 5 });
+  }
+}
+
+export default {
+  // Preserve Hono's `this` binding by delegating rather than passing app.fetch.
+  fetch: (req: Request, env: Env, ctx: ExecutionContext) =>
+    app.fetch(req, env, ctx),
+  scheduled,
+} satisfies ExportedHandler<Env>;

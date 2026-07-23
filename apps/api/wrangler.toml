@@ -25,6 +25,13 @@ ALLOWED_ORIGINS = "https://atlas-web-2yd.pages.dev,*.atlas-web-2yd.pages.dev"
 [observability]
 enabled = true
 
+# Scheduled news refresh (src/index.ts `scheduled`). Every six hours: the feed
+# is a monitoring surface, not a market data feed, and Yahoo RSS is polled per
+# ticker through the throttle — six-hourly keeps it fresh without hammering a
+# free source. Before this, the feed only refreshed on a manual pull.
+[triggers]
+crons = ["0 */6 * * *"]
+
 # Bundle migration SQL as text modules so the Worker can apply its own schema.
 # The Worker already holds DATABASE_URL; making it self-migrating means a new
 # table never requires anyone to paste SQL into a dashboard by hand.
