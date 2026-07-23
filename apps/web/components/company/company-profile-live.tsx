@@ -13,6 +13,7 @@ import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { StatGrid } from "@/components/ui/stat-grid";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataState } from "@/components/ui/data-state";
+import { CompanyNews } from "@/components/company/company-news";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { ready, type Resource } from "@/lib/resource";
 import { getStaticCompany } from "@/lib/universe";
@@ -151,6 +152,8 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
           <p className="mt-2 text-2xs text-faint">{s.note}</p>
         </div>
       ) : null}
+
+      <CompanyNews companyId={companyId} />
     </>
   );
 }
