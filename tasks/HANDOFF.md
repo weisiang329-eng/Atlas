@@ -606,8 +606,20 @@ missing English key fails the build — the guard is automatic.
 - [x] Foundation: dictionaries, `LocaleProvider`/`useT`, pre-paint locale script, Settings switcher.
 - [x] Shell: sidebar/drawer nav, bottom tab bar, topbar.
 - [x] Page headers: Home, Companies, Rankings, Watchlist, Portfolio; Home cockpit body.
-- [ ] Live page bodies: Companies list/detail tabs, all `/financials/*`, Industries, Value Chain, Knowledge, Research, Reports, Agent.
-- [ ] Adopted module pages (ERP, CEO, Board, Trading, Markets, News, Alerts, Admin, Agent Ops, Memory, Learning) — most already ship Chinese copy from the design handoff; move it into the dictionary so English works too.
+- [x] Live page bodies — **DONE 2026-07-23 (PRs #104–#108).** Bilingual across
+  Companies (profile/overview/financials), all `/financials/*`, Industries +
+  Value Chain, Knowledge (graph/relations), Scores, Agent chat, Research
+  (notes/decisions/overview), Portfolio, Watchlist, and the `report/*` family.
+  Every one follows the `useLocale` + `zh ? … : …` pattern; data-driven values
+  (company names, tickers, API prose, stored note/decision text, fictional
+  report mock content) are deliberately left as-is — they are content, not UI
+  copy. `factor-bar.tsx` and four `report/*` files had no static strings and
+  were correctly left untouched.
+- [ ] Adopted module pages (ERP, CEO, Board, Trading, Markets, Alerts, Admin,
+  Agent Ops, Memory, Learning) — the **Stage-3 / planned** module pages. Most
+  already ship Chinese copy from the design handoff; the English side is what's
+  missing. Lower priority since these modules are themselves not built yet
+  (blocked on owner data / later stages).
 - [x] Shared UI chrome — **DONE (PR #102 + #103).** `DataState` loading/empty/
   error, `PlannedModule` badges/labels, `DataTable` search + pagination
   (Prev/Next, range "共 N"), `CommandSearch` (trigger, placeholder, empty,
