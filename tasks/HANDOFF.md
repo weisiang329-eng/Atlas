@@ -617,17 +617,48 @@ The Aurora token layer and the NEW module pages came from the handoff, but the
 already-live pages kept their Sprint-000 **layout** and only had utility classes
 swapped — new paint on old bones. That is why the app still looked dated.
 - [x] Home — rebuilt on the handoff's composition (KPI strip → wide/narrow pair → even pair), wired to real data, marketing card grid removed.
-- [ ] Companies list — adopt the handoff's browse composition.
+- [~] Companies list — **audited 2026-07-23: already a solid modern master-detail
+  composition** (`FilterBar` + `DetailPanelLayout`, list + preview, Aurora
+  tokens, active/focus states, monograms). It exceeds the spec's plain
+  DataTable. This item was **stale** — Companies is not the "old bones" problem;
+  do not rebuild it just to tick a box.
 - [ ] Company detail — masthead + tab layout per the handoff.
 - [ ] Rankings/Scores — leaderboard composition.
 - [ ] Watchlist / Portfolio — card+table composition.
 - [ ] Financials family — statement layout.
 - [ ] Industries / Value Chain / Knowledge — workspace compositions.
-- [ ] **Visual verification is unresolved:** the automation browser reports
-  `innerWidth = 0` and CDP screenshots time out, so rendered appearance cannot
-  be checked from the agent session. Structure, data and computed CSS are
-  verifiable; *looks* are not. Until that is fixed, a human must eyeball each
-  rebuilt page on a preview deployment.
+- **Re-audit before rebuilding.** All these pages are thin (~19-line) wrappers
+  delegating to `*Live` components that already use the modern composition
+  primitives (`StatGrid`/`Panel`/`WorkspaceLayout`/`DetailPanelLayout`). At
+  least Companies has already been rebuilt since this list was written. Check
+  each `*Live` component's actual composition against the design before assuming
+  it needs work.
+
+**Verification — what the agent session CAN and CANNOT check (measured
+2026-07-23, corrects the old "innerWidth = 0" claim):**
+- ✅ **Structure, hierarchy, computed CSS, responsive** — `read_page`,
+  `javascript_tool` and `resize_window` all work against the local dev server.
+  Viewport reports **1280×720** (not 0); grid columns, gaps, max-widths and the
+  full a11y tree are readable. So *structural conformance to a spec is
+  verifiable* — a rebuilt page can be confirmed to have the KPI strip, the grid,
+  the masthead, the right spacing tokens.
+- ❌ **Pixel screenshots** still time out (`computer{action:"screenshot"}` after
+  30 s). So *aesthetic* judgement — does it actually look good — still needs a
+  human eye on a preview deployment.
+- ❌ **Real data compositions** cannot be seen locally: pointing the dev server
+  at the **live API** gets the request **CORS-blocked** (`ALLOWED_ORIGINS` is
+  the Pages domain, not localhost), so data-dependent pages (scores, financials,
+  populated tables) collapse to their error/empty state. Seeing a leaderboard or
+  a statement table full of real rows needs a **local API**, which needs the
+  Supabase `DATABASE_URL` (owner-gated). Pages with a static-universe fallback
+  (Companies list, PlannedModule pages) render without it.
+
+**Practical consequence:** an agent can faithfully implement a page to the
+design spec and verify its *structure* — but cannot self-certify that it looks
+right or see it full of real data. The remaining rebuilds are best done either
+(a) with the owner eyeballing each on a preview deploy, or (b) after the owner
+grants local API/DB access so real-data compositions render. Do not churn
+already-modern pages blind.
 
 ### 13.11 External data sources — what is connected, and the waiting list
 
