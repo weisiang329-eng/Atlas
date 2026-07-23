@@ -11,18 +11,25 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataState } from "@/components/ui/data-state";
 import { useApiResource } from "@/lib/loaders/use-api";
+import { useLocale } from "@/lib/i18n/use-locale";
 import { isApiConfigured } from "@/lib/api/client";
 import type { ValueChain } from "@/lib/types";
 
 export function ValueChainLive() {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const live = isApiConfigured();
   const r = useApiResource<ValueChain>(live ? "/v1/industries/value-chain" : null);
 
   if (!live) {
     return (
       <EmptyState
-        title="API not configured"
-        body="Set NEXT_PUBLIC_API_BASE_URL at build time to load the value chain."
+        title={zh ? "API 未配置" : "API not configured"}
+        body={
+          zh
+            ? "在构建时设置 NEXT_PUBLIC_API_BASE_URL 以加载价值链。"
+            : "Set NEXT_PUBLIC_API_BASE_URL at build time to load the value chain."
+        }
       />
     );
   }
@@ -36,8 +43,9 @@ export function ValueChainLive() {
       {chain ? (
         <>
           <p className="mb-4 text-sm text-muted">
-            The AI-hardware stack, upstream to downstream. Arrows below are real
-            supply relationships between covered companies.
+            {zh
+              ? "AI 硬件产业栈，从上游到下游。下方箭头是覆盖公司之间真实的供应关系。"
+              : "The AI-hardware stack, upstream to downstream. Arrows below are real supply relationships between covered companies."}
           </p>
 
           <div className="flex flex-col gap-3">
@@ -64,8 +72,12 @@ export function ValueChainLive() {
                     </div>
                     <span className="text-2xs text-faint">
                       {edgeCount(stage.industryId) > 0
-                        ? `supplies ${edgeCount(stage.industryId)} downstream`
-                        : "downstream stage"}
+                        ? zh
+                          ? `供应 ${edgeCount(stage.industryId)} 家下游`
+                          : `supplies ${edgeCount(stage.industryId)} downstream`
+                        : zh
+                          ? "下游环节"
+                          : "downstream stage"}
                     </span>
                   </div>
                   <PanelBody className="py-3">
@@ -81,7 +93,7 @@ export function ValueChainLive() {
                         </Link>
                       ))}
                       {stage.companies.length === 0 ? (
-                        <span className="text-sm text-faint">No covered companies.</span>
+                        <span className="text-sm text-faint">{zh ? "暂无覆盖公司。" : "No covered companies."}</span>
                       ) : null}
                     </div>
                   </PanelBody>
@@ -91,7 +103,7 @@ export function ValueChainLive() {
           </div>
 
           <div className="mt-6">
-            <PanelHeader eyebrow="Supply links" title="Who supplies whom" />
+            <PanelHeader eyebrow={zh ? "供应链关系" : "Supply links"} title={zh ? "谁供应谁" : "Who supplies whom"} />
             <Panel className="mt-3">
               <PanelBody className="p-0">
                 <ul className="divide-y divide-border">
