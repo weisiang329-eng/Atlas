@@ -103,6 +103,78 @@ export interface TaggingSubject {
 }
 
 /**
+ * Curated match aliases, keyed by ticker (stable across renames).
+ *
+ * These are the cases suffix-stripping below cannot reach: "TSMC" is a
+ * substring of neither the legal name "Taiwan Semiconductor Mfg." nor the
+ * ticker "TSM", yet it is what every headline calls the company. Kept small and
+ * hand-verified against the covered roster — a loose alias is a precision leak,
+ * and precision is the property this module exists to protect.
+ */
+export const NEWS_ALIASES: Record<string, string[]> = {
+  TSM: ["TSMC"],
+  "000660": ["SK Hynix", "Hynix"],
+};
+
+/** Trailing legal-entity forms a headline routinely drops. */
+const LEGAL_SUFFIX =
+  /\s+(corporation|corp|incorporated|inc|company|co|limited|ltd|plc|llc|lp|nv|se|ag|sa|berhad|bhd|holdings?|group|mfg|manufacturing)$/i;
+
+/** Trailing descriptors a headline routinely drops ("Micron", not "Micron Technology"). */
+const DESCRIPTOR_SUFFIX =
+  /\s+(technolog(?:y|ies)|networks?|systems?|semiconductors?|electronics|industries)$/i;
+
+/**
+ * Lone tokens too generic to carry a company tag on their own. A one-word
+ * remainder that lands here is kept for further stripping but never added as a
+ * term — "Taiwan" must not tag TSMC on a headline about the country.
+ */
+const STOPWORDS = new Set([
+  "taiwan", "advanced", "applied", "general", "american", "national", "united",
+  "global", "micro", "first", "pacific", "industries", "holdings", "group",
+  "technology", "networks", "systems", "the",
+]);
+
+/**
+ * Every string that should tag one company: its legal name, its ticker, any
+ * curated aliases, and the name with trailing legal/descriptor forms peeled off
+ * one at a time. Peeling is what lets "Nvidia" match "NVIDIA Corporation" and
+ * "Micron" match "Micron Technology" — the single most common recall miss on
+ * the live feed. A one-word remainder that is a stopword (or under three
+ * characters) is dropped, so stripping never manufactures a term generic enough
+ * to false-positive. The word-boundary matcher in `tagItem` still guards every
+ * term that survives.
+ */
+export function companyTerms(
+  name: string,
+  ticker: string | null,
+  aliases: string[] = [],
+): string[] {
+  const terms = new Set<string>();
+  const add = (t: string): void => {
+    const s = t.trim();
+    if (s.length >= 2) terms.add(s);
+  };
+  add(name);
+  if (ticker) add(ticker);
+  for (const a of aliases) add(a);
+
+  // Normalise punctuation so "Mfg." and "Mfg" strip the same way.
+  let base = name.replace(/[.,]/g, " ").replace(/\s+/g, " ").trim();
+  for (let i = 0; i < 4; i += 1) {
+    const m = LEGAL_SUFFIX.exec(base) ?? DESCRIPTOR_SUFFIX.exec(base);
+    if (!m) break;
+    base = base.slice(0, m.index).trim();
+    if (!base) break;
+    const loneGeneric =
+      !base.includes(" ") &&
+      (STOPWORDS.has(base.toLowerCase()) || base.length < 3);
+    if (!loneGeneric) add(base);
+  }
+  return [...terms];
+}
+
+/**
  * Tag an item to the entities it mentions.
  *
  * Word-boundary matching, because a substring match turns "AMD" into a hit on

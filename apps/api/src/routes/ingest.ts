@@ -13,7 +13,14 @@ import type { Env } from "../index.ts";
 import { createDb, listCompanies } from "../db/repo.ts";
 import { newsItem, pmsFxRate } from "../db/schema.ts";
 import { fetchBnmRates } from "../ingest/fx.ts";
-import { dedupe, fetchNews, tagItem, type TaggingSubject } from "../ingest/news.ts";
+import {
+  dedupe,
+  fetchNews,
+  tagItem,
+  companyTerms,
+  NEWS_ALIASES,
+  type TaggingSubject,
+} from "../ingest/news.ts";
 import { DATA_SOURCES } from "../ingest/sources.ts";
 import { ingestEdgarQuarters } from "../ingest/edgar.ts";
 
@@ -77,8 +84,10 @@ ingest.post("/news", async (c) => {
 
   const subjects: TaggingSubject[] = companies.map((co) => ({
     companyId: co.id,
-    // Ticker and full name; the short name too when it differs usefully.
-    terms: [co.name, co.ticker].filter(Boolean) as string[],
+    // Legal name, ticker, curated aliases, and the name with trailing legal /
+    // descriptor forms peeled off — so "Nvidia" and "Micron" tag as readily as
+    // the full legal name a headline never uses.
+    terms: companyTerms(co.name, co.ticker ?? null, NEWS_ALIASES[co.ticker ?? ""] ?? []),
     industryId: co.industryId ?? null,
   }));
 

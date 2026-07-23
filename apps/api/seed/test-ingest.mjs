@@ -11,7 +11,7 @@
  * never be promoted into a company tag, and a missing publisher must never be
  * invented.
  */
-import { parseRss, tagItem, dedupe } from "../src/ingest/news.ts";
+import { parseRss, tagItem, dedupe, companyTerms, NEWS_ALIASES } from "../src/ingest/news.ts";
 import { hostOf, presentNewsItem, presentNewsFeed } from "../src/domain/news.ts";
 
 let failures = 0;
@@ -64,6 +64,51 @@ console.log("\n--- tagging precision (the part that must not be sloppy) ---");
   check("punctuation boundaries work", t("Shares of AMD, Intel fall").companyIds, ["amd"]);
   check("two companies in one headline both tag", t("AMD and Micron Technology partner").companyIds.sort(), ["amd","micron"]);
   check("an untagged headline stays untagged", t("Weather forecast for Tuesday").companyIds, []);
+}
+
+console.log("\n--- term generation: recall without a precision leak ---");
+{
+  const has = (terms, t) => terms.some((x) => x.toLowerCase() === t.toLowerCase());
+
+  // Suffix stripping is what closes the biggest live recall gap: headlines say
+  // the short name, the roster stores the legal one.
+  check("legal suffix peeled: NVIDIA", companyTerms("NVIDIA Corporation", "NVDA"), (ts) => has(ts, "NVIDIA"));
+  check("legal suffix peeled: Intel", companyTerms("Intel Corporation", "INTC"), (ts) => has(ts, "Intel"));
+  check("holdings peeled: Vertiv", companyTerms("Vertiv Holdings", "VRT"), (ts) => has(ts, "Vertiv"));
+  check("holding peeled: ASML", companyTerms("ASML Holding", "ASML"), (ts) => has(ts, "ASML"));
+  check("descriptor peeled: Micron", companyTerms("Micron Technology", "MU"), (ts) => has(ts, "Micron"));
+  check("descriptor peeled: Arista", companyTerms("Arista Networks", "ANET"), (ts) => has(ts, "Arista"));
+
+  // The name + ticker are always kept.
+  check("legal name is always a term", companyTerms("Micron Technology", "MU"), (ts) => has(ts, "Micron Technology"));
+  check("ticker is always a term", companyTerms("Micron Technology", "MU"), (ts) => has(ts, "MU"));
+
+  // Aliases reach what stripping cannot.
+  check("alias reaches TSMC", companyTerms("Taiwan Semiconductor Mfg.", "TSM", NEWS_ALIASES["TSM"]), (ts) => has(ts, "TSMC"));
+  check("mid-strip phrase kept for TSMC", companyTerms("Taiwan Semiconductor Mfg.", "TSM"), (ts) => has(ts, "Taiwan Semiconductor"));
+  check("alias reaches Hynix", companyTerms("SK hynix", "000660", NEWS_ALIASES["000660"]), (ts) => has(ts, "Hynix"));
+
+  // The precision guard: stripping must NOT manufacture a generic lone token.
+  check("stripping stops before the bare stopword 'Taiwan'", companyTerms("Taiwan Semiconductor Mfg.", "TSM"), (ts) => !has(ts, "Taiwan"));
+  check("AMD gains no over-broad term ('Advanced' never appears)", companyTerms("Advanced Micro Devices", "AMD"), (ts) => !has(ts, "Advanced"));
+
+  // End-to-end: the generated terms tag the short-name headlines that used to
+  // slip through, and still refuse the dangerous substrings.
+  const roster = [
+    { companyId: "nvidia", terms: companyTerms("NVIDIA Corporation", "NVDA"), industryId: "semis-accelerators" },
+    { companyId: "micron", terms: companyTerms("Micron Technology", "MU"), industryId: "semis-memory" },
+    { companyId: "intel", terms: companyTerms("Intel Corporation", "INTC"), industryId: "semis-foundry" },
+    { companyId: "tsmc", terms: companyTerms("Taiwan Semiconductor Mfg.", "TSM", NEWS_ALIASES["TSM"]), industryId: "semis-foundry" },
+  ];
+  const tg = (title) => tagItem({ title, link: "l", publisher: null, publishedAt: null, query: "q" }, roster).companyIds;
+  check("short name 'Nvidia' now tags (was a miss)", tg("Nvidia beats on data-center revenue"), ["nvidia"]);
+  check("short name 'Micron' now tags (was a miss)", tg("Micron guides higher on HBM demand"), ["micron"]);
+  check("press form 'TSMC' now tags (was a miss)", tg("TSMC raises capex outlook"), ["tsmc"]);
+  // Word boundaries still hold for the new short terms — the property that
+  // makes stripping safe to ship. 'Intel' must not ride on 'intelligence',
+  // and 'Micron' must not ride on the plural unit 'microns'.
+  check("'Intel' does not tag on the word 'intelligence'", tg("Artificial intelligence demand surges"), []);
+  check("'Micron' does not tag on the plural unit 'microns'", tg("Feature sizes measured in microns"), []);
 }
 
 console.log("\n--- de-duplication unions tags rather than overwriting ---");
