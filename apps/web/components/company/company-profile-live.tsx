@@ -15,15 +15,18 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { DataState } from "@/components/ui/data-state";
 import { CompanyNews } from "@/components/company/company-news";
 import { useApiResource } from "@/lib/loaders/use-api";
+import { useLocale } from "@/lib/i18n/use-locale";
 import { ready, type Resource } from "@/lib/resource";
 import { getStaticCompany } from "@/lib/universe";
 import type { CompanyProfile, ScoreResult } from "@/lib/types";
 
 function useCompanyProfile(companyId: string): Resource<CompanyProfile> {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const stub = getStaticCompany(companyId);
   const fallback: CompanyProfile = {
     id: companyId,
-    name: stub?.name ?? "Unknown company",
+    name: stub?.name ?? (zh ? "未知公司" : "Unknown company"),
     ticker: stub?.ticker ?? "—",
     exchange: stub?.exchange ?? "—",
     segment: stub?.segment ?? "—",
@@ -47,39 +50,45 @@ const dash = (v: string | number | null | undefined) =>
 // --- Overview ---------------------------------------------------------------
 
 export function CompanyOverviewLive({ companyId }: { companyId: string }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const r = useCompanyProfile(companyId);
   const c = r.data;
   const score = useApiResource<ScoreResult>(`/v1/companies/${companyId}/score`);
   const s = score.data;
 
   const facts = [
-    { label: "Segment", value: dash(c?.segment) },
-    { label: "Exchange", value: dash(c?.exchange) },
-    { label: "Ticker", value: dash(c?.ticker) },
-    { label: "Country", value: dash(c?.country) },
-    { label: "Founded", value: dash(c?.foundedYear) },
-    { label: "Headquarters", value: dash(c?.headquarters) },
+    { label: zh ? "板块" : "Segment", value: dash(c?.segment) },
+    { label: zh ? "交易所" : "Exchange", value: dash(c?.exchange) },
+    { label: zh ? "代码" : "Ticker", value: dash(c?.ticker) },
+    { label: zh ? "国家/地区" : "Country", value: dash(c?.country) },
+    { label: zh ? "成立年份" : "Founded", value: dash(c?.foundedYear) },
+    { label: zh ? "总部" : "Headquarters", value: dash(c?.headquarters) },
   ];
 
   return (
     <>
       <SectionHeading
-        title="Overview"
-        description="Snapshot of the investment case. Atlas Score is a systematic factor score from fundamentals — not investment advice. Price and market cap arrive with market data (P027)."
+        title={zh ? "总览" : "Overview"}
+        description={
+          zh
+            ? "投资逻辑速览。Atlas 评分是基于基本面的系统化因子评分，并非投资建议。股价与市值将随市场数据一并提供（P027）。"
+            : "Snapshot of the investment case. Atlas Score is a systematic factor score from fundamentals — not investment advice. Price and market cap arrive with market data (P027)."
+        }
       />
 
       <div className="mb-6">
         <StatGrid
           items={[
             {
-              label: "Atlas Score",
+              label: zh ? "Atlas 评分" : "Atlas Score",
               value: s?.atlasScore === null || s?.atlasScore === undefined ? "—" : `${s.atlasScore}`,
-              hint: s?.grade && s.grade !== "—" ? `Grade ${s.grade} · as of ${s.asOf}` : undefined,
+              hint: s?.grade && s.grade !== "—" ? (zh ? `评级 ${s.grade} · 截至 ${s.asOf}` : `Grade ${s.grade} · as of ${s.asOf}`) : undefined,
             },
             ...(s?.factors ?? []).slice(0, 3).map((f) => ({
               label: f.label,
               value: f.score === null ? "—" : String(Math.round(f.score)),
-              hint: `weight ${Math.round(f.weight * 100)}%`,
+              hint: zh ? `权重 ${Math.round(f.weight * 100)}%` : `weight ${Math.round(f.weight * 100)}%`,
             })),
           ]}
         />
@@ -87,15 +96,19 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <PanelHeader eyebrow="Business" title="What this company does" />
+          <PanelHeader eyebrow={zh ? "业务" : "Business"} title={zh ? "公司业务概览" : "What this company does"} />
           <PanelBody>
             <DataState status={r.status}>
               {c?.description ? (
                 <p className="text-sm leading-relaxed text-fg">{c.description}</p>
               ) : (
                 <EmptyState
-                  title="No business summary yet"
-                  body="A sourced description of the company's business will render here."
+                  title={zh ? "暂无业务概述" : "No business summary yet"}
+                  body={
+                    zh
+                      ? "此处将显示来源可溯的公司业务描述。"
+                      : "A sourced description of the company's business will render here."
+                  }
                 />
               )}
             </DataState>
@@ -103,7 +116,7 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
         </Panel>
 
         <Panel>
-          <PanelHeader eyebrow="Reference" title="Key facts" />
+          <PanelHeader eyebrow={zh ? "参考" : "Reference"} title={zh ? "关键信息" : "Key facts"} />
           <PanelBody className="p-0">
             <dl className="divide-y divide-border">
               {facts.map((f) => (
@@ -122,7 +135,7 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
 
       {s && s.factors.length > 0 ? (
         <div className="mt-6">
-          <PanelHeader eyebrow="Atlas Score" title="Factor breakdown" />
+          <PanelHeader eyebrow={zh ? "Atlas 评分" : "Atlas Score"} title={zh ? "因子拆解" : "Factor breakdown"} />
           <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {s.factors.map((f) => (
               <Panel key={f.key}>
@@ -161,20 +174,22 @@ export function CompanyOverviewLive({ companyId }: { companyId: string }) {
 // --- Profile ----------------------------------------------------------------
 
 export function CompanyProfileLive({ companyId }: { companyId: string }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const r = useCompanyProfile(companyId);
   const c = r.data;
 
   const rows: { label: string; value: React.ReactNode }[] = [
-    { label: "Legal name", value: dash(c?.name) },
-    { label: "Ticker", value: dash(c?.ticker) },
-    { label: "Exchange", value: dash(c?.exchange) },
-    { label: "Primary segment", value: dash(c?.segment) },
-    { label: "Country", value: dash(c?.country) },
-    { label: "Founded", value: dash(c?.foundedYear) },
-    { label: "Headquarters", value: dash(c?.headquarters) },
-    { label: "Reporting currency", value: dash(c?.reportingCurrency) },
+    { label: zh ? "法定名称" : "Legal name", value: dash(c?.name) },
+    { label: zh ? "代码" : "Ticker", value: dash(c?.ticker) },
+    { label: zh ? "交易所" : "Exchange", value: dash(c?.exchange) },
+    { label: zh ? "主营板块" : "Primary segment", value: dash(c?.segment) },
+    { label: zh ? "国家/地区" : "Country", value: dash(c?.country) },
+    { label: zh ? "成立年份" : "Founded", value: dash(c?.foundedYear) },
+    { label: zh ? "总部" : "Headquarters", value: dash(c?.headquarters) },
+    { label: zh ? "报告货币" : "Reporting currency", value: dash(c?.reportingCurrency) },
     {
-      label: "Website",
+      label: zh ? "网站" : "Website",
       value: c?.website ? (
         <a
           href={c.website}
@@ -189,7 +204,7 @@ export function CompanyProfileLive({ companyId }: { companyId: string }) {
       ),
     },
     {
-      label: "Industry",
+      label: zh ? "行业" : "Industry",
       value: c?.industryId ? (
         <Link href={`/industries/${c.industryId}`} className="text-accent hover:underline">
           {c.industryId}
@@ -203,8 +218,12 @@ export function CompanyProfileLive({ companyId }: { companyId: string }) {
   return (
     <>
       <SectionHeading
-        title="Profile"
-        description="Company identity and reference attributes, from the coverage database with source metadata."
+        title={zh ? "档案" : "Profile"}
+        description={
+          zh
+            ? "公司身份与参考属性，来自覆盖数据库并附有来源元数据。"
+            : "Company identity and reference attributes, from the coverage database with source metadata."
+        }
       />
       <DataState status={r.status}>
         <Panel>
