@@ -18,6 +18,7 @@ import { Panel, PanelBody } from "@/components/ui/panel";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataState } from "@/components/ui/data-state";
 import { useApiResource } from "@/lib/loaders/use-api";
+import { useLocale } from "@/lib/i18n/use-locale";
 import { isApiConfigured } from "@/lib/api/client";
 import type {
   CompanyFinancials,
@@ -37,6 +38,8 @@ const grpTone = (g: string): "positive" | "warning" | "negative" | "neutral" => 
 };
 
 export function CompanyReport({ companyId }: { companyId: string }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const live = isApiConfigured();
   const profile = useApiResource<CompanyProfile>(live ? `/v1/companies/${companyId}` : null);
   const fin = useApiResource<CompanyFinancials>(live ? `/v1/companies/${companyId}/financials` : null);
@@ -46,8 +49,12 @@ export function CompanyReport({ companyId }: { companyId: string }) {
   if (!live) {
     return (
       <EmptyState
-        title="API not configured"
-        body="Set NEXT_PUBLIC_API_BASE_URL at build time to generate live company reports."
+        title={zh ? "API 未配置" : "API not configured"}
+        body={
+          zh
+            ? "请在构建时设置 NEXT_PUBLIC_API_BASE_URL 以生成实时公司报告。"
+            : "Set NEXT_PUBLIC_API_BASE_URL at build time to generate live company reports."
+        }
       />
     );
   }
@@ -63,7 +70,7 @@ export function CompanyReport({ companyId }: { companyId: string }) {
       <div className="max-w-3xl">
         {/* Header */}
         <header className="mb-6">
-          <p className="eyebrow mb-1">Atlas company report</p>
+          <p className="eyebrow mb-1">{zh ? "Atlas 公司报告" : "Atlas company report"}</p>
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-serif text-2xl font-semibold text-fg">
               {p?.name ?? companyId}
@@ -73,48 +80,50 @@ export function CompanyReport({ companyId }: { companyId: string }) {
             </span>
             {s?.grade && s.grade !== "—" ? (
               <Badge tone={grpTone(s.grade)}>
-                Atlas Score {s.atlasScore} · {s.grade}
+                {zh ? "Atlas 评分" : "Atlas Score"} {s.atlasScore} · {s.grade}
               </Badge>
             ) : null}
           </div>
           <p className="mt-1 text-2xs text-faint">
-            Auto-generated from sourced data. Not investment advice. As of{" "}
+            {zh
+              ? "由来源数据自动生成。非投资建议。截至 "
+              : "Auto-generated from sourced data. Not investment advice. As of "}
             {f?.periods?.[f.periods.length - 1] ?? "—"}.
           </p>
         </header>
 
         <div className="space-y-7">
           {/* Business */}
-          <ReportSection id="business" title="Business" eyebrow="Overview">
+          <ReportSection id="business" title={zh ? "业务" : "Business"} eyebrow={zh ? "概览" : "Overview"}>
             {p?.description ? (
               <p className="text-sm leading-relaxed text-fg">{p.description}</p>
             ) : (
-              <p className="text-sm text-muted">No business summary on file.</p>
+              <p className="text-sm text-muted">{zh ? "暂无业务简介。" : "No business summary on file."}</p>
             )}
             <div className="mt-4">
               <StatGrid
                 items={[
-                  { label: "Segment", value: p?.segment ?? "—" },
-                  { label: "Country", value: p?.country ?? "—" },
-                  { label: "Founded", value: p?.foundedYear ? String(p.foundedYear) : "—" },
-                  { label: "Currency", value: p?.reportingCurrency ?? "—" },
+                  { label: zh ? "板块" : "Segment", value: p?.segment ?? "—" },
+                  { label: zh ? "国家/地区" : "Country", value: p?.country ?? "—" },
+                  { label: zh ? "成立年份" : "Founded", value: p?.foundedYear ? String(p.foundedYear) : "—" },
+                  { label: zh ? "货币" : "Currency", value: p?.reportingCurrency ?? "—" },
                 ]}
               />
             </div>
           </ReportSection>
 
           {/* Financial snapshot */}
-          <ReportSection id="financials" title="Financial snapshot" eyebrow="P004">
-            <DataState status={fin.status} empty={<p className="text-sm text-muted">No financial coverage.</p>}>
+          <ReportSection id="financials" title={zh ? "财务快照" : "Financial snapshot"} eyebrow="P004">
+            <DataState status={fin.status} empty={<p className="text-sm text-muted">{zh ? "暂无财务数据。" : "No financial coverage."}</p>}>
               {f ? (
                 <>
                   <div className="mb-4">
                     <StatGrid
                       items={[
-                        { label: `Revenue (${f.periods.at(-1)})`, value: fmtNumber(latest(f.trends.revenue)?.value), hint: f.unit },
-                        { label: "Net income", value: fmtNumber(latest(f.trends.netIncome)?.value), hint: f.unit },
-                        { label: "Free cash flow", value: fmtNumber(latest(f.trends.freeCashFlow)?.value), hint: f.unit },
-                        { label: "Coverage", value: `${f.periods.length} yrs`, hint: f.periods[0] },
+                        { label: zh ? `营收（${f.periods.at(-1)}）` : `Revenue (${f.periods.at(-1)})`, value: fmtNumber(latest(f.trends.revenue)?.value), hint: f.unit },
+                        { label: zh ? "净利润" : "Net income", value: fmtNumber(latest(f.trends.netIncome)?.value), hint: f.unit },
+                        { label: zh ? "自由现金流" : "Free cash flow", value: fmtNumber(latest(f.trends.freeCashFlow)?.value), hint: f.unit },
+                        { label: zh ? "覆盖年限" : "Coverage", value: zh ? `${f.periods.length} 年` : `${f.periods.length} yrs`, hint: f.periods[0] },
                       ]}
                     />
                   </div>
@@ -123,7 +132,7 @@ export function CompanyReport({ companyId }: { companyId: string }) {
                       periods={f.periods}
                       rows={f.statements.incomeStatement}
                       unit={f.unit}
-                      caption={`${p?.name ?? ""} — income statement`}
+                      caption={zh ? `${p?.name ?? ""} — 利润表` : `${p?.name ?? ""} — income statement`}
                     />
                   </Panel>
                 </>
@@ -132,8 +141,8 @@ export function CompanyReport({ companyId }: { companyId: string }) {
           </ReportSection>
 
           {/* Atlas Score */}
-          <ReportSection id="score" title="Atlas Score" eyebrow="P010 · systematic factors">
-            <DataState status={score.status} empty={<p className="text-sm text-muted">Not enough data to score.</p>}>
+          <ReportSection id="score" title={zh ? "Atlas 评分" : "Atlas Score"} eyebrow={zh ? "P010 · 系统性因子" : "P010 · systematic factors"}>
+            <DataState status={score.status} empty={<p className="text-sm text-muted">{zh ? "数据不足以评分。" : "Not enough data to score."}</p>}>
               {s ? (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {s.factors.map((factor) => (
@@ -150,7 +159,7 @@ export function CompanyReport({ companyId }: { companyId: string }) {
           </ReportSection>
 
           {/* Relationships */}
-          <ReportSection id="relationships" title="Supply chain & competition" eyebrow="P007">
+          <ReportSection id="relationships" title={zh ? "供应链与竞争" : "Supply chain & competition"} eyebrow="P007">
             {rels.length > 0 ? (
               <Panel>
                 <PanelBody className="p-0">
@@ -170,7 +179,7 @@ export function CompanyReport({ companyId }: { companyId: string }) {
                 </PanelBody>
               </Panel>
             ) : (
-              <p className="text-sm text-muted">No mapped relationships.</p>
+              <p className="text-sm text-muted">{zh ? "暂无关联关系。" : "No mapped relationships."}</p>
             )}
           </ReportSection>
         </div>

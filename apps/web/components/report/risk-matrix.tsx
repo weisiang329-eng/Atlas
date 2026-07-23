@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/lib/i18n/use-locale";
 import type { Level, Risk } from "@/lib/mock/reports";
 
 const RANK: Record<Level, number> = { Low: 1, Medium: 2, High: 3 };
@@ -17,6 +20,10 @@ function cellTone(impact: Level, likelihood: Level): string {
  * posture at a glance. A labelled list follows for detail.
  */
 export function RiskMatrix({ risks }: { risks: Risk[] }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
+  const lvl = (l: Level): string =>
+    zh ? (l === "High" ? "高" : l === "Medium" ? "中" : "低") : l;
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto">
@@ -24,14 +31,14 @@ export function RiskMatrix({ risks }: { risks: Risk[] }) {
           <div className="flex">
             <div className="w-24 shrink-0" />
             <div className="flex-1 pb-1 text-center font-mono text-2xs uppercase tracking-wide text-faint">
-              Likelihood →
+              {zh ? "可能性 →" : "Likelihood →"}
             </div>
           </div>
           <div className="flex">
             {/* impact axis label */}
             <div className="flex w-24 shrink-0 items-center justify-center">
               <span className="font-mono text-2xs uppercase tracking-wide text-faint [writing-mode:vertical-rl] rotate-180">
-                Impact →
+                {zh ? "影响 →" : "Impact →"}
               </span>
             </div>
             <div className="flex-1">
@@ -42,7 +49,7 @@ export function RiskMatrix({ risks }: { risks: Risk[] }) {
                     key={c}
                     className="px-2 pb-1 text-center font-mono text-2xs text-faint"
                   >
-                    {c}
+                    {lvl(c)}
                   </div>
                 ))}
               </div>
@@ -90,7 +97,9 @@ export function RiskMatrix({ risks }: { risks: Risk[] }) {
           >
             <span className="font-medium text-fg">{r.title}</span>
             <span className="font-mono text-2xs text-faint">
-              L: {r.likelihood} · I: {r.impact}
+              {zh
+                ? `可能性：${lvl(r.likelihood)} · 影响：${lvl(r.impact)}`
+                : `L: ${r.likelihood} · I: ${r.impact}`}
             </span>
             <span className="w-full text-xs text-muted sm:w-auto sm:flex-1">
               {r.note}
