@@ -530,6 +530,15 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
 - [ ] **P006 v2** — glove value chain (raw-material → manufacturing → distribution) once upstream suppliers are added; interactive flow diagram.
 - [ ] **P026 Phase 2 v2 / Phase 3** — per-company capacity/utilisation metrics; brent/gas/FX daily series (git-clone glove-tracker for the big `_*_max.sql` dumps); port the cron scrapers to Workers Cron; cycle-signal inferences.
 - [ ] **P024** — automation: scheduled report generation + data-quality checks via Workers Cron (needs deploy).
+- [ ] **Autonomous Industry agent** — the owner asked whether the Industry
+  Research Analyst can keep industry knowledge fresh on a schedule. It can't
+  today (read-only tools, unscheduled). **Design written first, deliberately, before any
+  build:** [`adr/ADR-Autonomous-Industry-Agent.md`](../adr/ADR-Autonomous-Industry-Agent.md).
+  The crux is convention #1: an LLM writing industry facts is the platform's
+  biggest fabrication risk, so writes are typed by trust — Tier A (transcribed
+  from a fetched source, auto-commit), Tier B (agent inference → human review
+  queue), Tier C (recalled paid data → forbidden). Provenance enforced by the
+  tool (fetch-receipt), not the prompt. Awaiting owner review before P1.
 - [x] **Tests** — the four calculation engines are covered: `seed/test-ratios.mjs`,
   `test-scoring.mjs`, `test-statements.mjs`, `test-valuechain.mjs`, all wired into
   `npm run db:test` (11 suites) and therefore into CI. They pin the *documented*
