@@ -14,6 +14,7 @@ import { DataState } from "@/components/ui/data-state";
 import { ChartContainer } from "@/components/chart/chart-container";
 import { RelationshipGraph } from "@/components/viz/relationship-graph";
 import { useApiResource } from "@/lib/loaders/use-api";
+import { useLocale } from "@/lib/i18n/use-locale";
 import { isApiConfigured } from "@/lib/api/client";
 import { ready } from "@/lib/resource";
 import { STATIC_UNIVERSE } from "@/lib/universe";
@@ -48,6 +49,8 @@ export function GraphLive({
   /** When true, render the fixed subject's graph with no company selector. */
   lockSubject?: boolean;
 }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const live = isApiConfigured();
   const companiesR = useApiResource<CompanySummary[]>(
     live && !lockSubject ? "/v1/companies" : null,
@@ -60,8 +63,12 @@ export function GraphLive({
   if (!live) {
     return (
       <EmptyState
-        title="API not configured"
-        body="Set NEXT_PUBLIC_API_BASE_URL at build time to load the live relationship graph."
+        title={zh ? "API 未配置" : "API not configured"}
+        body={
+          zh
+            ? "在构建时设置 NEXT_PUBLIC_API_BASE_URL 以加载实时关系图谱。"
+            : "Set NEXT_PUBLIC_API_BASE_URL at build time to load the live relationship graph."
+        }
       />
     );
   }
@@ -72,8 +79,8 @@ export function GraphLive({
     <>
       {lockSubject ? null : (
         <div className="mb-4 flex items-center gap-2 rounded border border-border-soft bg-surface-3 px-3 py-2">
-          <span className="text-2xs uppercase tracking-wide text-faint">Subject</span>
-          <label className="sr-only" htmlFor="graph-subject">Graph subject</label>
+          <span className="text-2xs uppercase tracking-wide text-faint">{zh ? "主体" : "Subject"}</span>
+          <label className="sr-only" htmlFor="graph-subject">{zh ? "图谱主体" : "Graph subject"}</label>
           <select
             id="graph-subject"
             value={subject}
@@ -91,25 +98,38 @@ export function GraphLive({
 
       <DataState
         status={r.status}
-        empty={<EmptyState title="No relationships mapped" body="This company has no graph edges yet." />}
+        empty={
+          <EmptyState
+            title={zh ? "暂无关系图谱" : "No relationships mapped"}
+            body={zh ? "该公司暂无关系连线。" : "This company has no graph edges yet."}
+          />
+        }
       >
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <ChartContainer
-              title="Relationship graph"
-              subtitle={g ? `${g.subject.name} · suppliers, customers, competitors` : "—"}
+              title={zh ? "关系图谱" : "Relationship graph"}
+              subtitle={
+                g
+                  ? `${g.subject.name} · ${zh ? "供应商、客户、竞争对手" : "suppliers, customers, competitors"}`
+                  : "—"
+              }
               height={380}
-              footer="Source-linked industry structure"
+              footer={zh ? "来源关联的行业结构" : "Source-linked industry structure"}
             >
               {g && g.nodes.length > 1 ? (
                 <RelationshipGraph
                   nodes={g.nodes}
                   edges={g.edges}
-                  ariaLabel={`Relationship graph for ${g.subject.name}`}
+                  ariaLabel={
+                    zh
+                      ? `${g.subject.name} 的关系图谱`
+                      : `Relationship graph for ${g.subject.name}`
+                  }
                 />
               ) : (
                 <div className="grid h-full place-items-center text-sm text-muted">
-                  No mapped relationships.
+                  {zh ? "暂无已映射的关系。" : "No mapped relationships."}
                 </div>
               )}
             </ChartContainer>
