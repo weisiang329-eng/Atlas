@@ -7,6 +7,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { NAV_GROUPS, FINANCIAL_TABS, RESEARCH_TABS } from "@/lib/nav";
 import { REPORT_INDEX } from "@/lib/mock/reports";
 import { STATIC_UNIVERSE } from "@/lib/universe";
+import { useLocale } from "@/lib/i18n/use-locale";
 import { cn } from "@/lib/cn";
 
 interface Command {
@@ -53,6 +54,8 @@ function buildIndex(): Command[] {
  */
 export function CommandSearch() {
   const router = useRouter();
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const index = useMemo(buildIndex, []);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -110,10 +113,10 @@ export function CommandSearch() {
         type="button"
         onClick={() => setOpen(true)}
         className="flex items-center gap-2 rounded border border-border bg-surface px-2.5 py-1.5 font-mono text-2xs text-faint transition-colors hover:text-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-        aria-label="Open command search"
+        aria-label={zh ? "打开命令搜索" : "Open command search"}
       >
         <span aria-hidden>&#9906;</span>
-        <span className="hidden sm:inline">Search</span>
+        <span className="hidden sm:inline">{zh ? "搜索" : "Search"}</span>
         <kbd className="hidden rounded border border-border px-1 text-faint sm:inline">
           &#8984;K
         </kbd>
@@ -128,18 +131,20 @@ export function CommandSearch() {
               setQuery(v);
               setActive(0);
             }}
-            placeholder="Search companies, reports, workspaces…"
-            aria-label="Command search"
+            placeholder={
+              zh ? "搜索公司、报告、工作区…" : "Search companies, reports, workspaces…"
+            }
+            aria-label={zh ? "命令搜索" : "Command search"}
           />
         </div>
         <div
           className="max-h-80 overflow-y-auto p-2"
           role="listbox"
-          aria-label="Results"
+          aria-label={zh ? "结果" : "Results"}
         >
           {results.length === 0 ? (
             <p className="px-3 py-6 text-center text-sm text-muted">
-              No matches for “{query}”.
+              {zh ? `没有匹配“${query}”的结果。` : `No matches for “${query}”.`}
             </p>
           ) : (
             results.map((cmd, i) => (
@@ -171,8 +176,8 @@ export function CommandSearch() {
           )}
         </div>
         <div className="flex items-center justify-between border-t border-border px-3 py-2 font-mono text-2xs text-faint">
-          <span>↑↓ to move · ↵ to open</span>
-          <span>esc to close</span>
+          <span>{zh ? "↑↓ 移动 · ↵ 打开" : "↑↓ to move · ↵ to open"}</span>
+          <span>{zh ? "esc 关闭" : "esc to close"}</span>
         </div>
         </div>
       </Dialog>
