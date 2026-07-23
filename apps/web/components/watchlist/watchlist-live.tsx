@@ -15,6 +15,7 @@ import { useApiResource } from "@/lib/loaders/use-api";
 import { isApiConfigured } from "@/lib/api/client";
 import { useWatchlist } from "@/lib/loaders/use-watchlist";
 import { getStaticCompany } from "@/lib/universe";
+import { useLocale } from "@/lib/i18n/use-locale";
 import type { ScoreRow } from "@/lib/types";
 
 function tone(s: number | null): "positive" | "warning" | "negative" | "neutral" {
@@ -24,45 +25,47 @@ function tone(s: number | null): "positive" | "warning" | "negative" | "neutral"
   return "negative";
 }
 
-const columns: Column<ScoreRow>[] = [
-  {
-    key: "atlasScore",
-    header: "Score",
-    numeric: true,
-    sortable: true,
-    render: (r) => (
-      <span className="inline-flex items-center gap-2">
-        <Badge tone={tone(r.atlasScore)}>{r.atlasScore ?? "—"}</Badge>
-        <span className="text-faint">{r.grade}</span>
-      </span>
-    ),
-  },
-  {
-    key: "name",
-    header: "Company",
-    sortable: true,
-    render: (r) => (
-      <Link href={`/companies/${r.id}/overview`} className="text-fg hover:text-accent">
-        {r.name}
-      </Link>
-    ),
-  },
-  { key: "ticker", header: "Ticker", sortable: true },
-  { key: "segment", header: "Segment" },
-  { key: "country", header: "Country" },
-  { key: "asOf", header: "As of" },
-];
-
 export function WatchlistLive() {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const { ids } = useWatchlist();
   const live = isApiConfigured();
   const r = useApiResource<ScoreRow[]>(live ? "/v1/scores" : null);
 
+  const columns: Column<ScoreRow>[] = [
+    {
+      key: "atlasScore",
+      header: zh ? "评分" : "Score",
+      numeric: true,
+      sortable: true,
+      render: (r) => (
+        <span className="inline-flex items-center gap-2">
+          <Badge tone={tone(r.atlasScore)}>{r.atlasScore ?? "—"}</Badge>
+          <span className="text-faint">{r.grade}</span>
+        </span>
+      ),
+    },
+    {
+      key: "name",
+      header: zh ? "公司" : "Company",
+      sortable: true,
+      render: (r) => (
+        <Link href={`/companies/${r.id}/overview`} className="text-fg hover:text-accent">
+          {r.name}
+        </Link>
+      ),
+    },
+    { key: "ticker", header: zh ? "代码" : "Ticker", sortable: true },
+    { key: "segment", header: zh ? "板块" : "Segment" },
+    { key: "country", header: zh ? "国家/地区" : "Country" },
+    { key: "asOf", header: zh ? "截至" : "As of" },
+  ];
+
   if (ids.length === 0) {
     return (
       <EmptyState
-        title="Your watchlist is empty"
-        body="Open any company and tap ☆ Watchlist to follow it. Followed companies appear here with their Atlas Score."
+        title={zh ? "自选股为空" : "Your watchlist is empty"}
+        body={zh ? "打开任意公司并点击 ☆ 自选即可关注。关注的公司会连同其 Atlas 评分显示在这里。" : "Open any company and tap ☆ Watchlist to follow it. Followed companies appear here with their Atlas Score."}
       />
     );
   }
@@ -91,8 +94,8 @@ export function WatchlistLive() {
   return (
     <>
       <div className="mb-4 flex items-center gap-2">
-        <Badge tone="accent">Watching</Badge>
-        <span className="text-xs text-muted">{ids.length} companies</span>
+        <Badge tone="accent">{zh ? "关注中" : "Watching"}</Badge>
+        <span className="text-xs text-muted">{zh ? `${ids.length} 家公司` : `${ids.length} companies`}</span>
       </div>
       <DataState status={live ? r.status : "ready"}>
         <Panel className="overflow-hidden">
@@ -102,7 +105,7 @@ export function WatchlistLive() {
             columns={columns}
             rows={rows}
             getRowId={(row) => row.id}
-            caption="Watchlist"
+            caption={zh ? "自选股" : "Watchlist"}
           />
         </Panel>
       </DataState>

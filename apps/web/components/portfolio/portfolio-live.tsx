@@ -18,6 +18,7 @@ import { DataTable, type Column } from "@/components/data/data-table";
 import { useApiResource } from "@/lib/loaders/use-api";
 import { isApiConfigured } from "@/lib/api/client";
 import { usePortfolio, type Holding } from "@/lib/loaders/use-portfolio";
+import { useLocale } from "@/lib/i18n/use-locale";
 import type { ScoreRow } from "@/lib/types";
 
 /** Minimal shape the add-holding selector needs. */
@@ -44,6 +45,8 @@ function AddHoldingForm({
   companies: Pickable[];
   onAdd: (h: Holding) => void;
 }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const [id, setId] = useState(companies[0]?.id ?? "");
   const [shares, setShares] = useState("");
   const [cost, setCost] = useState("");
@@ -62,7 +65,7 @@ function AddHoldingForm({
       className="flex flex-wrap items-end gap-3"
     >
       <label className="flex flex-col gap-1 text-xs text-muted">
-        Company
+        {zh ? "公司" : "Company"}
         <select
           value={id}
           onChange={(e) => setId(e.target.value)}
@@ -76,7 +79,7 @@ function AddHoldingForm({
         </select>
       </label>
       <label className="flex flex-col gap-1 text-xs text-muted">
-        Shares
+        {zh ? "股数" : "Shares"}
         <input
           value={shares}
           onChange={(e) => setShares(e.target.value)}
@@ -86,7 +89,7 @@ function AddHoldingForm({
         />
       </label>
       <label className="flex flex-col gap-1 text-xs text-muted">
-        Avg cost / share
+        {zh ? "每股均价" : "Avg cost / share"}
         <input
           value={cost}
           onChange={(e) => setCost(e.target.value)}
@@ -99,13 +102,15 @@ function AddHoldingForm({
         type="submit"
         className="rounded border border-accent-dim bg-surface-2 px-4 py-1.5 text-sm text-accent"
       >
-        Add / update
+        {zh ? "添加 / 更新" : "Add / update"}
       </button>
     </form>
   );
 }
 
 export function PortfolioLive() {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const { holdings, upsert, remove } = usePortfolio();
   const live = isApiConfigured();
   const scores = useApiResource<ScoreRow[]>(live ? "/v1/scores" : null);
@@ -114,7 +119,7 @@ export function PortfolioLive() {
   const columns: Column<Row>[] = [
     {
       key: "name",
-      header: "Company",
+      header: zh ? "公司" : "Company",
       sortable: true,
       render: (r) => (
         <Link href={`/companies/${r.id}/overview`} className="text-fg hover:text-accent">
@@ -122,14 +127,14 @@ export function PortfolioLive() {
         </Link>
       ),
     },
-    { key: "ticker", header: "Ticker", sortable: true },
-    { key: "shares", header: "Shares", numeric: true, sortable: true, render: (r) => money(r.shares) },
-    { key: "avgCost", header: "Avg cost", numeric: true, render: (r) => fmtNumber(r.avgCost, 2) },
-    { key: "costValue", header: "Cost basis", numeric: true, sortable: true, render: (r) => money(r.costValue) },
-    { key: "weight", header: "Weight", numeric: true, sortable: true, render: (r) => `${r.weight.toFixed(1)}%` },
+    { key: "ticker", header: zh ? "代码" : "Ticker", sortable: true },
+    { key: "shares", header: zh ? "股数" : "Shares", numeric: true, sortable: true, render: (r) => money(r.shares) },
+    { key: "avgCost", header: zh ? "均价" : "Avg cost", numeric: true, render: (r) => fmtNumber(r.avgCost, 2) },
+    { key: "costValue", header: zh ? "持仓成本" : "Cost basis", numeric: true, sortable: true, render: (r) => money(r.costValue) },
+    { key: "weight", header: zh ? "权重" : "Weight", numeric: true, sortable: true, render: (r) => `${r.weight.toFixed(1)}%` },
     {
       key: "atlasScore",
-      header: "Score",
+      header: zh ? "评分" : "Score",
       numeric: true,
       sortable: true,
       render: (r) => <Badge tone={scoreTone(r.atlasScore)}>{r.atlasScore ?? "—"}</Badge>,
@@ -138,7 +143,7 @@ export function PortfolioLive() {
       key: "remove",
       header: "",
       render: (r) => (
-        <button type="button" onClick={() => remove(r.id)} className="text-faint hover:text-negative" aria-label={`Remove ${r.name}`}>
+        <button type="button" onClick={() => remove(r.id)} className="text-faint hover:text-negative" aria-label={zh ? `移除 ${r.name}` : `Remove ${r.name}`}>
           ✕
         </button>
       ),
@@ -148,8 +153,8 @@ export function PortfolioLive() {
   if (!live) {
     return (
       <EmptyState
-        title="API not configured"
-        body="Set NEXT_PUBLIC_API_BASE_URL at build time to build a portfolio with live Atlas Scores."
+        title={zh ? "API 未配置" : "API not configured"}
+        body={zh ? "在构建时设置 NEXT_PUBLIC_API_BASE_URL，即可基于实时 Atlas 评分构建投资组合。" : "Set NEXT_PUBLIC_API_BASE_URL at build time to build a portfolio with live Atlas Scores."}
       />
     );
   }
@@ -190,38 +195,39 @@ export function PortfolioLive() {
   return (
     <div className="flex flex-col gap-6">
       <Panel>
-        <PanelHeader eyebrow="Positions" title="Add a holding" />
+        <PanelHeader eyebrow={zh ? "持仓" : "Positions"} title={zh ? "添加持仓" : "Add a holding"} />
         <PanelBody>
           <DataState status={scores.status}>
             <AddHoldingForm companies={universe} onAdd={upsert} />
             <p className="mt-2 text-2xs text-faint">
-              Stored locally in your browser. Cost basis only — market value and
-              P&amp;L arrive with live prices (P027).
+              {zh
+                ? "保存在本浏览器本地。仅为持仓成本口径——市值与盈亏将随实时价格（P027）一并提供。"
+                : "Stored locally in your browser. Cost basis only — market value and P&L arrive with live prices (P027)."}
             </p>
           </DataState>
         </PanelBody>
       </Panel>
 
       {holdings.length === 0 ? (
-        <EmptyState title="No holdings yet" body="Add a position above to see cost-weighted exposure and quality." />
+        <EmptyState title={zh ? "暂无持仓" : "No holdings yet"} body={zh ? "在上方添加一个仓位，即可查看按成本加权的敞口与质量。" : "Add a position above to see cost-weighted exposure and quality."} />
       ) : (
         <>
           <StatGrid
             items={[
-              { label: "Positions", value: String(rows.length) },
-              { label: "Cost basis", value: money(totalCost), hint: "sum of shares × avg cost" },
-              { label: "Weighted Atlas Score", value: weightedScore === null ? "—" : String(weightedScore), hint: "cost-weighted" },
-              { label: "Top holding", value: rows[0] ? `${rows[0].weight.toFixed(0)}%` : "—", hint: rows[0]?.ticker },
+              { label: zh ? "持仓数" : "Positions", value: String(rows.length) },
+              { label: zh ? "持仓成本" : "Cost basis", value: money(totalCost), hint: zh ? "股数 × 均价之和" : "sum of shares × avg cost" },
+              { label: zh ? "加权 Atlas 评分" : "Weighted Atlas Score", value: weightedScore === null ? "—" : String(weightedScore), hint: zh ? "按成本加权" : "cost-weighted" },
+              { label: zh ? "最大持仓" : "Top holding", value: rows[0] ? `${rows[0].weight.toFixed(0)}%` : "—", hint: rows[0]?.ticker },
             ]}
           />
 
           <Panel className="overflow-hidden">
             <DataTable
-        mobileCards columnPickerId="portfolio" columns={columns} rows={rows} getRowId={(r) => r.id} caption="Holdings" />
+        mobileCards columnPickerId="portfolio" columns={columns} rows={rows} getRowId={(r) => r.id} caption={zh ? "持仓" : "Holdings"} />
           </Panel>
 
           <Panel>
-            <PanelHeader eyebrow="Exposure" title="By segment (cost weight)" />
+            <PanelHeader eyebrow={zh ? "敞口" : "Exposure"} title={zh ? "按板块（成本权重）" : "By segment (cost weight)"} />
             <PanelBody>
               <div className="space-y-2">
                 {exposure.map(([seg, w]) => (
