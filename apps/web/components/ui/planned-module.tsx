@@ -1,4 +1,7 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import { useLocale } from "@/lib/i18n/use-locale";
 
 interface PlannedModuleProps {
   /** What this module will show once its data lands. */
@@ -28,11 +31,13 @@ export function PlannedModule({
   requires,
   program,
 }: PlannedModuleProps) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   return (
     <div className="rounded-panel border border-dashed border-border bg-surface-3 px-5 py-8 sm:px-8 sm:py-10">
       <div className="mx-auto flex max-w-xl flex-col items-center gap-3 text-center">
         <div className="flex items-center gap-2">
-          <Badge tone="neutral">Awaiting data</Badge>
+          <Badge tone="neutral">{zh ? "待数据" : "Awaiting data"}</Badge>
           {program ? <Badge tone="accent">{program}</Badge> : null}
         </div>
         <h3 className="font-serif text-lg text-fg">{title}</h3>
@@ -42,7 +47,7 @@ export function PlannedModule({
       {fields?.length ? (
         <div className="mx-auto mt-7 max-w-xl">
           <p className="mb-2 font-mono text-2xs uppercase tracking-[0.08em] text-faint">
-            Will render
+            {zh ? "将呈现" : "Will render"}
           </p>
           <ul className="flex flex-wrap justify-center gap-1.5">
             {fields.map((f) => (
@@ -59,14 +64,15 @@ export function PlannedModule({
 
       <div className="mx-auto mt-7 max-w-xl rounded border border-border-soft bg-surface px-4 py-3">
         <p className="mb-1 font-mono text-2xs uppercase tracking-[0.08em] text-faint">
-          Blocked on
+          {zh ? "阻塞于" : "Blocked on"}
         </p>
         <p className="text-sm text-fg">{requires}</p>
       </div>
 
       <p className="mx-auto mt-5 max-w-xl text-center text-2xs text-faint">
-        Atlas never fabricates figures for a real company — this module stays
-        empty until sourced data exists.
+        {zh
+          ? "Atlas 绝不为真实公司编造数字 —— 在有来源数据前，此模块保持空白。"
+          : "Atlas never fabricates figures for a real company — this module stays empty until sourced data exists."}
       </p>
     </div>
   );
