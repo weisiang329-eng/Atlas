@@ -312,15 +312,18 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
     a covered company; the NVDA feed carries SpaceX and Moderna pieces. So
     `query` is rendered as provenance ("from the NVDA feed"), never as a tag,
     and the page shows the 30/100 ratio instead of hiding the 70.
-  - **Follow-ups this leaves open:** (a) nothing schedules
-    `POST /v1/ingest/news`, so the feed is only as fresh as the last manual
-    pull — the page prints "last pulled" for exactly that reason; a Workers
-    Cron trigger needs `export default { fetch, scheduled }` in
-    `src/index.ts`. (b) `GET /v1/news?company=<id>` exists and is verified —
-    a per-company news panel on the company page is now a small job.
-    (c) Tagging recall is untuned: `Advanced Micro Devices`/`AMD` matches, but
-    a headline saying only "Nvidia" does not match `NVIDIA Corporation`
-    (the full-name term needs the corporate suffix stripped).
+  - **Follow-ups — all three closed 2026-07-23:**
+    - [x] **(a) Scheduled refresh (PR #98).** `src/index.ts` now exports
+      `{ fetch, scheduled }`; the pull moved to `ingest/run-news.ts` so the
+      manual `POST /v1/ingest/news` and the Cron tick run the identical path.
+      `wrangler.toml [triggers] crons = ["0 */6 * * *"]`. Takes effect on the
+      next deploy — Cron does not fire against the current prod build.
+    - [x] **(b) Per-company news panel (PR #97).** `CompanyNews` on the company
+      overview reads `GET /v1/news?company=<id>`.
+    - [x] **(c) Tagging recall (PR #96).** `companyTerms` peels legal /
+      descriptor suffixes and `NEWS_ALIASES` covers TSMC / Hynix, so "Nvidia",
+      "Micron" and "TSMC" tag as readily as the legal name; word boundaries
+      keep precision.
 - [ ] `companies/[companyId]/products` — needs a `company_product` table + data (P005 v2).
 - [ ] `companies/[companyId]/management` — needs `company_management` table + data (P005 v2).
 - [ ] `companies/[companyId]/valuation` — needs valuation multiples (needs price → P027) (P010 v2).

@@ -10,17 +10,10 @@ import { Hono } from "hono";
 import { desc } from "drizzle-orm";
 import type { Sql } from "postgres";
 import type { Env } from "../index.ts";
-import { createDb, listCompanies } from "../db/repo.ts";
-import { newsItem, pmsFxRate } from "../db/schema.ts";
+import { createDb } from "../db/repo.ts";
+import { pmsFxRate } from "../db/schema.ts";
 import { fetchBnmRates } from "../ingest/fx.ts";
-import {
-  dedupe,
-  fetchNews,
-  tagItem,
-  companyTerms,
-  NEWS_ALIASES,
-  type TaggingSubject,
-} from "../ingest/news.ts";
+import { runNewsIngest } from "../ingest/run-news.ts";
 import { DATA_SOURCES } from "../ingest/sources.ts";
 import { ingestEdgarQuarters } from "../ingest/edgar.ts";
 
@@ -72,76 +65,15 @@ ingest.get("/fx", async (c) => {
 });
 
 /**
- * Pull and tag news for the coverage universe.
+ * Pull and tag news for the coverage universe (manual trigger).
  *
- * One query per company plus a couple of industry-level queries. Google's feed
- * is capped per query, so a handful of narrow queries returns more usable
- * coverage than one broad one.
+ * The pull itself lives in `ingest/run-news.ts` so the Workers Cron trigger in
+ * `index.ts` runs the identical path — a feed refreshed by hand and a feed
+ * refreshed on a schedule must never drift.
  */
 ingest.post("/news", async (c) => {
-  const db = c.get("db");
-  const companies = await listCompanies(db);
-
-  const subjects: TaggingSubject[] = companies.map((co) => ({
-    companyId: co.id,
-    // Legal name, ticker, curated aliases, and the name with trailing legal /
-    // descriptor forms peeled off — so "Nvidia" and "Micron" tag as readily as
-    // the full legal name a headline never uses.
-    terms: companyTerms(co.name, co.ticker ?? null, NEWS_ALIASES[co.ticker ?? ""] ?? []),
-    industryId: co.industryId ?? null,
-  }));
-
-  // Ticker-scoped feeds. Only US-listed names have a Yahoo feed that resolves
-  // cleanly; Bursa tickers are skipped rather than queried and silently
-  // returning another market's company.
-  const queries = companies
-    .filter((co) => co.exchange !== "Bursa Malaysia" && co.ticker)
-    .map((co) => co.ticker!);
-
-  const collected = [];
-  const failures: string[] = [];
-  for (const q of queries) {
-    try {
-      const raw = await fetchNews(q);
-      collected.push(...raw.map((r) => tagItem(r, subjects)));
-    } catch (e) {
-      // One dead query must not lose the whole run; report which failed AND
-      // why — a bare list of names cannot be diagnosed.
-      const why = e instanceof Error ? e.message : String(e);
-      failures.push(`${q} :: ${why}`);
-    }
-  }
-
-  const items = dedupe(collected);
-  let stored = 0;
-  for (const i of items) {
-    const id = `yf:${i.link.slice(-64)}`;
-    await db
-      .insert(newsItem)
-      .values({
-        id,
-        title: i.title,
-        link: i.link,
-        publisher: i.publisher,
-        publishedAt: i.publishedAt ? new Date(i.publishedAt) : null,
-        query: i.query,
-        companyIds: i.companyIds.join(",") || null,
-        industryIds: i.industryIds.join(",") || null,
-      })
-      .onConflictDoNothing();
-    stored += 1;
-  }
-
-  const tagged = items.filter((i) => i.companyIds.length > 0).length;
-  return c.json({
-    source: "Yahoo Finance RSS (ticker-scoped)",
-    queries: queries.length,
-    failedQueries: failures,
-    fetched: collected.length,
-    unique: items.length,
-    tagged,
-    stored,
-  });
+  const result = await runNewsIngest(c.get("db"));
+  return c.json(result);
 });
 
 /*
