@@ -538,7 +538,19 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
   biggest fabrication risk, so writes are typed by trust — Tier A (transcribed
   from a fetched source, auto-commit), Tier B (agent inference → human review
   queue), Tier C (recalled paid data → forbidden). Provenance enforced by the
-  tool (fetch-receipt), not the prompt. Awaiting owner review before P1.
+  tool (fetch-receipt), not the prompt.
+  - [x] **P1a — the sourced-write guard (PR #111).** `src/agent/sourced-writes.ts`:
+    `isWritableSource` (paid/rejected/unverified/derived can never be written
+    from), `contentSupports` (a value must appear as a number token in the
+    fetched content), `metricWriteFromReceipt` (returns the `source` +
+    `industry_metric` rows, or throws `FabricationGuardError`), and
+    `fetchForWrite` (fetch only from the allowlist). `seed/test-agent-writes.mjs`
+    proves the guard: an unsourced value is refused, a paid-source write is
+    refused. Pure + tested; no autonomy, no schedule, no DB writes yet.
+  - [ ] **P1b — manual trigger.** An endpoint that `fetchForWrite`s a real free
+    source (SEC/FRED) and inserts the guarded rows, with a PGlite insert test.
+    Needs network to actually run; first useful FRED run needs `FRED_API_KEY`.
+  - [ ] **P2** — Tier-B staging table + review queue. **P3** — schedule. **P4** — widen.
 - [x] **Tests** — the four calculation engines are covered: `seed/test-ratios.mjs`,
   `test-scoring.mjs`, `test-statements.mjs`, `test-valuechain.mjs`, all wired into
   `npm run db:test` (11 suites) and therefore into CI. They pin the *documented*
