@@ -33,7 +33,14 @@ only change when someone deploys, and nothing has been deployed since
 2026-07-21. Everything buildable without an external key, a subscription or a
 deploy is done; what is left is in `GET /v1/pending` and §13.
 
-### What landed 2026-07-23 (PRs #82–#90)
+> ⚠️ **The owner is testing the LIVE site and seeing the OLD build.** On
+> 2026-07-23 they clicked a `/news` item that didn't navigate and asked why
+> there was no China news — both are the DELETED mock (`#` links, US/TW/MY
+> only), still live because nothing has deployed since 2026-07-21. Every
+> "why is it still sample data / why doesn't it click" question resolves on
+> deploy. **This is the single most valuable action outstanding.**
+
+### What landed 2026-07-23 (PRs #82–#93)
 
 | | |
 | --- | --- |
@@ -45,6 +52,8 @@ deploy is done; what is left is in `GET /v1/pending` and §13.
 | **Sourcing policy** | [ADR](../adr/ADR-Data-Sourcing-Cost.md): free at the margin, no per-industry subscriptions — convention #8 |
 | **Derived series** | Inventory days + capex computed from stored filings; 5 drivers became testable for free |
 | **Share-count gate** | It was deleting stock splits, not errors — 32 correct facts were being dropped on every regeneration |
+| **Percentile scoring** | P010 v2 — a relative rank ("97th /17") alongside the absolute score; owner thresholds untouched |
+| **Domain tests** | graph + cycle-signal covered (supply direction, honest YoY); db:test now 22 suites |
 
 **Three findings from that day worth reading before trusting anything:** the
 glove latex claim does not survive its own backtest (§ INDUSTRY-INTELLIGENCE
@@ -308,6 +317,24 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
 - [ ] `alerts/` — placeholder (ComingSoon); needs P011 alerts (price/metric/news rules) → depends on P027 prices.
 - [ ] `admin/` — placeholder; build if/when multi-user (depends on login B).
 - [ ] After wiring each, delete the corresponding `apps/web/lib/mock/*` entry.
+
+**Owner feedback on `/news` (2026-07-23) — two decisions pending:**
+1. **A news item does not open a detail view.** By design, the new page links a
+   headline OUT to the source article (Atlas stores only title + link, not the
+   body — copyright/storage, see `ingest/news.ts`), and links a company chip
+   INTO that company's page. There is no in-app "news detail". If the owner
+   wants an internal detail view (e.g. one company's news history plus Atlas's
+   own tags/analysis), that is a new feature to scope — it was raised, not yet
+   decided.
+2. **No China news, because no Chinese company is covered.** The feed is
+   ticker-scoped to the 17 covered names (US semis + TSMC/ASML/SK hynix + MY
+   gloves); none is mainland-China- or HK-listed. The geography tag vocabulary
+   (`#中概` `#港股` …) already exists in `INDUSTRY-INTELLIGENCE.md` but no
+   company uses it. Adding Chinese names is a **coverage decision (owner picks
+   the list)**. Caveat per the sourcing ADR: a name with a US ADR gets filings
+   (SEC) and news (ticker feed) for free; a pure A-share/HK name has **no free
+   real-time quote** (same wall as Bursa), so it can carry financials + news
+   but not live price.
 
 ### 13.4 Buildable next — no external blocker (server-side value)
 - [x] **Industry taxonomy is a tree (2026-07-23)** — step 1 of
