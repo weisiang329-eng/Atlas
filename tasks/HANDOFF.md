@@ -491,8 +491,18 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
   NaN), and expenses render negative from positive magnitudes.
   Writing them found a live production bug (a 500 on `statements/toString`) —
   post-mortem in `docs/METHODOLOGY.md` §7.
-- [ ] **Tests (remaining)** — `domain/presenters`, `domain/industry`,
-  `domain/graph`, `domain/fees`, and the route layer have no direct coverage.
+- [x] **Tests — the untested domain modules now covered (2026-07-23).**
+  `test-graph.mjs` and `test-industry-signals.mjs` cover the two that had none:
+  the knowledge-graph builder (supply DIRECTION — a customer must never read as
+  a supplier, the exact inverse-arrow bug) and the cycle signal (YoY compares
+  to a point ~a year back, not an arbitrary neighbour; the ASP÷cost ratio is
+  only built from an overlapping price+cost pair and refuses a divide-by-zero).
+  `presenters` and `fees` were already covered by earlier PRs.
+- [ ] **Tests (remaining)** — the ROUTE layer has no dedicated HTTP-level suite.
+  Most routes ARE exercised end-to-end by the domain suites that mount them via
+  Hono (test-percentile, test-derived, test-taxonomy, test-fiscal all hit real
+  routes against PGlite), but there is no suite whose job is the route contract
+  itself. `domain/matching` is covered via test-pms.
 
 ### 13.5 Blocked — needs an owner-supplied resource
 - [ ] **P027 real-time markets** — market-data API key (`MARKET_DATA_KEY`, Polygon/Finnhub). US equities only; no Bursa retail feed. Then: quotes adapter, price history, WebSocket/Durable-Objects fan-out, candle charts, watchlist/alerts go live.
