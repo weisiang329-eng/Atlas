@@ -1,4 +1,7 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import { useLocale } from "@/lib/i18n/use-locale";
 import type { EvidenceItem, Level } from "@/lib/mock/reports";
 
 const CONF: Record<Level, "positive" | "warning" | "neutral"> = {
@@ -9,12 +12,19 @@ const CONF: Record<Level, "positive" | "warning" | "neutral"> = {
 
 /** Evidence log — every claim linked to a source, type, confidence and date. */
 export function EvidenceTable({ items }: { items: EvidenceItem[] }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
+  const lvl = (l: Level): string =>
+    zh ? (l === "High" ? "高" : l === "Medium" ? "中" : "低") : l;
   return (
     <div className="overflow-x-auto rounded-panel border border-border">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-border">
-            {["Claim", "Source", "Type", "Confidence", "Date"].map((h) => (
+            {(zh
+              ? ["论点", "来源", "类型", "置信度", "日期"]
+              : ["Claim", "Source", "Type", "Confidence", "Date"]
+            ).map((h) => (
               <th
                 key={h}
                 scope="col"
@@ -32,7 +42,7 @@ export function EvidenceTable({ items }: { items: EvidenceItem[] }) {
               <td className="px-3 py-[var(--cell-py)] text-muted">{e.source}</td>
               <td className="px-3 py-[var(--cell-py)] text-muted">{e.type}</td>
               <td className="px-3 py-[var(--cell-py)]">
-                <Badge tone={CONF[e.confidence]}>{e.confidence}</Badge>
+                <Badge tone={CONF[e.confidence]}>{lvl(e.confidence)}</Badge>
               </td>
               <td className="whitespace-nowrap px-3 py-[var(--cell-py)] font-mono text-2xs text-faint">
                 {e.date}

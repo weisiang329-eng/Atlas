@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/lib/i18n/use-locale";
 import type { DecisionLens } from "@/lib/mock/reports";
 
 /**
@@ -12,12 +15,14 @@ export function ExecutiveSummaryCard({
   summary: string;
   lens: DecisionLens;
 }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const items: { label: string; value: string; highlight?: boolean }[] = [
-    { label: "What changed", value: lens.changed },
-    { label: "Why", value: lens.why },
-    { label: "Who is affected", value: lens.affected },
-    { label: "Evidence", value: lens.evidence },
-    { label: "Next decision", value: lens.next, highlight: true },
+    { label: zh ? "有何变化" : "What changed", value: lens.changed },
+    { label: zh ? "为何" : "Why", value: lens.why },
+    { label: zh ? "影响对象" : "Who is affected", value: lens.affected },
+    { label: zh ? "证据" : "Evidence", value: lens.evidence },
+    { label: zh ? "下一步决策" : "Next decision", value: lens.next, highlight: true },
   ];
 
   return (

@@ -5,19 +5,23 @@ import Link from "next/link";
 import { FilterBar, type FilterOption } from "@/components/ui/filter-bar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useLocale } from "@/lib/i18n/use-locale";
 import type { ReportTypeMeta } from "@/lib/mock/reports";
-
-const FILTERS: FilterOption[] = [
-  { label: "All", value: "all" },
-  { label: "Draft", value: "Draft" },
-  { label: "Review", value: "In review" },
-  { label: "Final", value: "Final" },
-];
 
 /** Client browser for the report library: FilterBar (search + status) over cards. */
 export function ReportsBrowser({ items }: { items: ReportTypeMeta[] }) {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
+
+  // Filter values must match report.status data; only the labels localize.
+  const FILTERS: FilterOption[] = [
+    { label: zh ? "全部" : "All", value: "all" },
+    { label: zh ? "草稿" : "Draft", value: "Draft" },
+    { label: zh ? "审核" : "Review", value: "In review" },
+    { label: zh ? "定稿" : "Final", value: "Final" },
+  ];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -35,7 +39,7 @@ export function ReportsBrowser({ items }: { items: ReportTypeMeta[] }) {
       <FilterBar
         search={query}
         onSearch={setQuery}
-        placeholder="Search reports"
+        placeholder={zh ? "搜索报告" : "Search reports"}
         filters={FILTERS}
         active={status}
         onFilter={setStatus}
@@ -44,8 +48,12 @@ export function ReportsBrowser({ items }: { items: ReportTypeMeta[] }) {
 
       {filtered.length === 0 ? (
         <EmptyState
-          title="No matching reports"
-          body="Try a different search term or status filter."
+          title={zh ? "没有匹配的报告" : "No matching reports"}
+          body={
+            zh
+              ? "请尝试其他搜索词或状态筛选。"
+              : "Try a different search term or status filter."
+          }
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -64,7 +72,7 @@ export function ReportsBrowser({ items }: { items: ReportTypeMeta[] }) {
                 {r.summaryLine}
               </p>
               <span className="mt-4 inline-flex items-center gap-1 font-mono text-2xs uppercase tracking-wide text-accent">
-                Open report
+                {zh ? "打开报告" : "Open report"}
                 <span className="transition-transform group-hover:translate-x-0.5">
                   &rarr;
                 </span>
