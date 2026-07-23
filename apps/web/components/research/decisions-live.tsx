@@ -12,12 +12,23 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useDecisions, type Decision } from "@/lib/loaders/use-research";
 import { STATIC_UNIVERSE, getStaticCompany } from "@/lib/universe";
+import { useLocale } from "@/lib/i18n/use-locale";
 import { fmtDate } from "@/lib/format";
 
 const convictionTone = (c: Decision["conviction"]): "positive" | "warning" | "neutral" =>
   c === "high" ? "positive" : c === "medium" ? "warning" : "neutral";
 
 export function DecisionsLive() {
+  const { locale } = useLocale();
+  const zh = locale === "zh";
+  const convictionLabel = (c: Decision["conviction"]): string =>
+    zh
+      ? c === "high"
+        ? "高信念"
+        : c === "medium"
+          ? "中信念"
+          : "低信念"
+      : `${c} conviction`;
   const { items, add, remove } = useDecisions();
   const [decision, setDecision] = useState("");
   const [rationale, setRationale] = useState("");
@@ -27,7 +38,7 @@ export function DecisionsLive() {
   return (
     <div className="flex flex-col gap-6">
       <Panel>
-        <PanelHeader eyebrow="New" title="Log a decision" />
+        <PanelHeader eyebrow={zh ? "新建" : "New"} title={zh ? "记录决策" : "Log a decision"} />
         <PanelBody>
           <form
             onSubmit={(e) => {
@@ -51,7 +62,7 @@ export function DecisionsLive() {
               <input
                 value={decision}
                 onChange={(e) => setDecision(e.target.value)}
-                placeholder="The decision (e.g. 'Add to NVDA', 'Avoid gloves')"
+                placeholder={zh ? "决策内容（例如「加仓 NVDA」「回避手套股」）" : "The decision (e.g. 'Add to NVDA', 'Avoid gloves')"}
                 className="flex-1 rounded border border-border-soft bg-surface-3 px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
               />
               <select
@@ -59,16 +70,16 @@ export function DecisionsLive() {
                 onChange={(e) => setConviction(e.target.value as Decision["conviction"])}
                 className="rounded border border-border-soft bg-surface-3 px-2 py-2 text-sm text-fg outline-none"
               >
-                <option value="low">Low conviction</option>
-                <option value="medium">Medium conviction</option>
-                <option value="high">High conviction</option>
+                <option value="low">{zh ? "低信念" : "Low conviction"}</option>
+                <option value="medium">{zh ? "中信念" : "Medium conviction"}</option>
+                <option value="high">{zh ? "高信念" : "High conviction"}</option>
               </select>
               <select
                 value={companyId}
                 onChange={(e) => setCompanyId(e.target.value)}
                 className="rounded border border-border-soft bg-surface-3 px-2 py-2 text-sm text-fg outline-none"
               >
-                <option value="">No company</option>
+                <option value="">{zh ? "不关联公司" : "No company"}</option>
                 {STATIC_UNIVERSE.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.ticker} · {c.name}
@@ -79,13 +90,13 @@ export function DecisionsLive() {
             <textarea
               value={rationale}
               onChange={(e) => setRationale(e.target.value)}
-              placeholder="Why? What has to be true for this to be right?"
+              placeholder={zh ? "为什么？要让这个判断成立，什么必须为真？" : "Why? What has to be true for this to be right?"}
               rows={3}
               className="rounded border border-border-soft bg-surface-3 px-3 py-2 text-sm text-fg outline-none focus:border-accent-dim"
             />
             <div>
               <button type="submit" className="rounded border border-accent-dim bg-surface-2 px-4 py-2 text-sm text-accent">
-                Log decision
+                {zh ? "记录决策" : "Log decision"}
               </button>
             </div>
           </form>
@@ -93,7 +104,7 @@ export function DecisionsLive() {
       </Panel>
 
       {items.length === 0 ? (
-        <EmptyState title="No decisions logged" body="Record decisions and their rationale to review against outcomes later." />
+        <EmptyState title={zh ? "尚未记录决策" : "No decisions logged"} body={zh ? "记录决策及其理由，以便日后对照结果复盘。" : "Record decisions and their rationale to review against outcomes later."} />
       ) : (
         <div className="flex flex-col gap-3">
           {items.map((d) => {
@@ -105,7 +116,7 @@ export function DecisionsLive() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-serif text-base font-semibold text-fg">{d.decision}</h3>
-                        <Badge tone={convictionTone(d.conviction)}>{d.conviction} conviction</Badge>
+                        <Badge tone={convictionTone(d.conviction)}>{convictionLabel(d.conviction)}</Badge>
                         {co ? (
                           <Link href={`/companies/${co.id}/overview`}>
                             <Badge tone="accent">{co.ticker}</Badge>
@@ -115,7 +126,7 @@ export function DecisionsLive() {
                       {d.rationale ? <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{d.rationale}</p> : null}
                       <p className="mt-2 text-2xs text-faint">{fmtDate(d.date)}</p>
                     </div>
-                    <button type="button" onClick={() => remove(d.id)} className="text-faint hover:text-negative" aria-label="Delete decision">
+                    <button type="button" onClick={() => remove(d.id)} className="text-faint hover:text-negative" aria-label={zh ? "删除决策" : "Delete decision"}>
                       ✕
                     </button>
                   </div>
