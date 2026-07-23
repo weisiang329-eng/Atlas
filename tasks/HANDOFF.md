@@ -39,6 +39,13 @@ deploy is done; what is left is in `GET /v1/pending` and §13.
 > only), still live because nothing has deployed since 2026-07-21. Every
 > "why is it still sample data / why doesn't it click" question resolves on
 > deploy. **This is the single most valuable action outstanding.**
+>
+> **Deploying is now one command.** `main` is verified deployable-green
+> (typecheck + `db:test` + web build all pass as of 2026-07-23). Because the
+> environment already exists, an update needs no Supabase SQL and no secrets —
+> the Worker self-migrates. Run `npx wrangler login` once, then
+> `.\scripts\redeploy.ps1`. Full detail:
+> [`management/deployment/redeploy-update.md`](../management/deployment/redeploy-update.md).
 
 ### What landed 2026-07-23 (PRs #82–#93)
 
@@ -123,7 +130,13 @@ There is **no local Postgres**; for live local dev put `DATABASE_URL` +
   `ANTHROPIC_API_KEY`) are set on the Worker; `/v1/agent/status` reports
   `configured: true`.
 
-Full step-by-step for a fresh environment: **`management/deployment/production-runbook.md`**.
+**Updating the LIVE environment (the common case):** one command —
+`npx wrangler login` once, then `.\scripts\redeploy.ps1`. No Supabase SQL, no
+secrets (the Worker self-migrates). See
+**`management/deployment/redeploy-update.md`**.
+
+Full step-by-step for a **fresh** environment (once only):
+**`management/deployment/production-runbook.md`**.
 
 **Supabase project:** `fsbcltowqpfniodzaslo` (owner's). It is **not** reachable
 from the Supabase MCP connector used previously (different org — that connector
@@ -178,7 +191,9 @@ Full detail + v1 designs + unblock requirements:
 
 - **This file** — take-over guide.
 - `management/roadmap/execution-status-2026-07-21.md` — every remaining program.
-- `management/deployment/production-runbook.md` — how to deploy.
+- `management/deployment/redeploy-update.md` — update the LIVE env in one
+  command (`scripts/redeploy.ps1`); the common case.
+- `management/deployment/production-runbook.md` — how to deploy a fresh env.
 - `management/programs/*.md` — per-program specs (P004/P005/P020/P022/P026…).
 - `prompts/full-modular-design-v1.md` — the architect prompt to design all
   remaining modules (incl. brand guide, IA, markets & trading).
