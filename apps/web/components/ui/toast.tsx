@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@/lib/cn";
+import { useLocale } from "@/lib/i18n/use-locale";
 
 export type ToastTone = "info" | "positive" | "warning" | "negative";
 
@@ -45,6 +46,7 @@ const TONE_ACCENT: Record<ToastTone, string> = {
  * from anywhere. Notifications stack bottom-right and are announced politely.
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const { locale } = useLocale();
   const [toasts, setToasts] = useState<Toast[]>([]);
   const idRef = useRef(0);
 
@@ -63,7 +65,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-full max-w-sm flex-col gap-2"
         role="region"
-        aria-label="Notifications"
+        aria-label={locale === "zh" ? "通知" : "Notifications"}
       >
         {toasts.map((t) => (
           <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
@@ -80,6 +82,7 @@ function ToastItem({
   toast: Toast;
   onDismiss: (id: number) => void;
 }) {
+  const { locale } = useLocale();
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -109,7 +112,7 @@ function ToastItem({
         <button
           type="button"
           onClick={() => onDismiss(toast.id)}
-          aria-label="Dismiss notification"
+          aria-label={locale === "zh" ? "关闭通知" : "Dismiss notification"}
           className="grid h-6 w-6 shrink-0 place-items-center rounded text-muted hover:bg-surface-2 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
           &times;

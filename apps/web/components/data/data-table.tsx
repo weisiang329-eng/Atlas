@@ -6,7 +6,7 @@ import {
   ColumnPicker,
   useColumnVisibility,
 } from "@/components/data/column-picker";
-import { useT } from "@/lib/i18n/use-locale";
+import { useLocale } from "@/lib/i18n/use-locale";
 import { cn } from "@/lib/cn";
 
 export interface Column<T> {
@@ -65,11 +65,12 @@ export function DataTable<T>({
   caption,
   onRowClick,
   searchable = false,
-  searchPlaceholder = "Search",
+  searchPlaceholder,
   mobileCards = false,
   columnPickerId,
 }: DataTableProps<T>) {
-  const t = useT();
+  const { t, locale } = useLocale();
+  const zh = locale === "zh";
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<{ key: string; dir: "asc" | "desc" } | null>(
@@ -174,7 +175,7 @@ export function DataTable<T>({
                   setQuery(v);
                   setPage(0);
                 }}
-                placeholder={searchPlaceholder}
+                placeholder={searchPlaceholder ?? (zh ? "搜索" : "Search")}
                 right={`${sortedRows.length} / ${rows.length}`}
               />
             </div>
@@ -357,7 +358,8 @@ export function DataTable<T>({
         <div className="flex items-center justify-between gap-4 border-t border-border px-3 py-2 text-xs text-muted">
           <span className="num tabular-nums">
             {current * pageSize! + 1}–
-            {Math.min((current + 1) * pageSize!, sortedRows.length)} of{" "}
+            {Math.min((current + 1) * pageSize!, sortedRows.length)}
+            {zh ? "，共 " : " of "}
             {sortedRows.length}
           </span>
           <div className="flex items-center gap-1">
@@ -366,9 +368,9 @@ export function DataTable<T>({
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={current === 0}
               className="rounded border border-border px-2 py-1 transition-colors enabled:hover:bg-surface-2 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-              aria-label="Previous page"
+              aria-label={zh ? "上一页" : "Previous page"}
             >
-              Prev
+              {zh ? "上一页" : "Prev"}
             </button>
             <span className="num px-1 tabular-nums">
               {current + 1} / {pageCount}
@@ -378,9 +380,9 @@ export function DataTable<T>({
               onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
               disabled={current >= pageCount - 1}
               className="rounded border border-border px-2 py-1 transition-colors enabled:hover:bg-surface-2 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-              aria-label="Next page"
+              aria-label={zh ? "下一页" : "Next page"}
             >
-              Next
+              {zh ? "下一页" : "Next"}
             </button>
           </div>
         </div>

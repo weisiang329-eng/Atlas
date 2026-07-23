@@ -608,14 +608,15 @@ missing English key fails the build — the guard is automatic.
 - [x] Page headers: Home, Companies, Rankings, Watchlist, Portfolio; Home cockpit body.
 - [ ] Live page bodies: Companies list/detail tabs, all `/financials/*`, Industries, Value Chain, Knowledge, Research, Reports, Agent.
 - [ ] Adopted module pages (ERP, CEO, Board, Trading, Markets, News, Alerts, Admin, Agent Ops, Memory, Learning) — most already ship Chinese copy from the design handoff; move it into the dictionary so English works too.
-- [~] Shared UI: **`DataState` messages + `PlannedModule` chrome done (PR #102)** —
-  `DataState` is now `"use client"` + `useLocale`, so every page's default
-  loading / empty / error text follows the switch (one chokepoint, whole-app
-  effect); `PlannedModule`'s badges/labels ("待数据 / 将呈现 / 阻塞于" + the
-  never-fabricate line) are localised too. **Still English-only:** `DataTable`
-  pagination/search, toast text, `CommandSearch`, and each `PlannedModule`
-  caller's `title`/`body`/`requires` **props** (those are per-page copy, not
-  chrome — a separate pass).
+- [x] Shared UI chrome — **DONE (PR #102 + #103).** `DataState` loading/empty/
+  error, `PlannedModule` badges/labels, `DataTable` search + pagination
+  (Prev/Next, range "共 N"), `CommandSearch` (trigger, placeholder, empty,
+  ↑↓/esc hints, aria), and `toast` aria-labels all follow the language switch.
+  Every one is `"use client"` + `useLocale`; `DataState` becoming client is safe
+  (its one server importer renders it across the boundary). **Deliberately left
+  for the per-page copy pass** (content, not shared chrome): `CommandSearch`
+  group labels + the command index it builds, and each `PlannedModule` caller's
+  `title`/`body`/`requires` **props**.
 - [ ] Company sub-tab labels (keys exist in `COMPANY_TAB_KEYS`, not yet consumed by `companyTabs()`).
 - [ ] Decide whether `<title>`/metadata should localise (currently English only; would need per-locale routes or client-side title updates).
 
