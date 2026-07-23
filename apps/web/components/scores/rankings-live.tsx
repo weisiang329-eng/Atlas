@@ -34,6 +34,14 @@ function tone(score: number | null): "positive" | "warning" | "negative" | "neut
 // shows the shape of a company profile at a glance.
 const factorCell = (v: number | null) => <FactorCell score={v} />;
 
+/** Ordinal suffix for a percentile — "81st", "22nd", "3rd". */
+function ordinal(n: number): string {
+  const r = Math.round(n);
+  const t = r % 100;
+  if (t >= 11 && t <= 13) return `${r}th`;
+  return `${r}${["th", "st", "nd", "rd"][r % 10] ?? "th"}`;
+}
+
 const columns: Column<ScoreRow>[] = [
   {
     key: "atlasScore",
@@ -46,6 +54,28 @@ const columns: Column<ScoreRow>[] = [
         <span className="text-faint">{r.grade}</span>
       </span>
     ),
+  },
+  {
+    // The RELATIVE reading, next to the absolute one. The peer count is in the
+    // cell, not a tooltip, because "81st of 17" and "81st of 500" mean very
+    // different things and the reader must see which they are getting.
+    key: "percentile",
+    header: "Rank",
+    numeric: true,
+    sortable: true,
+    sortAccessor: (r) => r.percentile?.values.composite ?? -1,
+    render: (r) => {
+      const v = r.percentile?.values.composite ?? null;
+      const n = r.percentile?.peerCounts.composite ?? 0;
+      return v === null ? (
+        <span className="text-faint">—</span>
+      ) : (
+        <span className="num text-fg">
+          {ordinal(v)}
+          <span className="text-faint"> /{n}</span>
+        </span>
+      );
+    },
   },
   {
     key: "name",
@@ -213,8 +243,8 @@ export function RankingsLive() {
         title={zh ? "评分排行榜" : "Leaderboard"}
         description={
           zh
-            ? "按 Atlas 评分排序。未评分公司排在末位，绝不用估算值填补。"
-            : "Ranked by Atlas Score. Unscored companies sort last — never filled with an estimate."
+            ? "按 Atlas 评分排序。「评分」是绝对分（阈值固定，不随覆盖范围变化）；「Rank」是相对分位，仅相对于 Atlas 已覆盖的公司，不是全市场。未评分公司排在末位，绝不用估算值填补。"
+            : "Ranked by Atlas Score. “Score” is absolute (fixed thresholds, coverage-independent); “Rank” is the percentile within Atlas's covered universe — not the market. Unscored companies sort last, never filled with an estimate."
         }
       />
       <Panel className="overflow-hidden">

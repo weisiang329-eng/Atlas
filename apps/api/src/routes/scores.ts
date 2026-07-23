@@ -9,6 +9,10 @@ import { Hono } from "hono";
 import type { Env } from "../index.ts";
 import { createDb, getPeriodsWithFacts, listCompanies } from "../db/repo.ts";
 import { computeScore } from "../domain/scoring.ts";
+import {
+  computePercentiles,
+  type ScoredEntity,
+} from "../domain/percentile.ts";
 
 type AppEnv = { Bindings: Env; Variables: { db: ReturnType<typeof createDb> } };
 
@@ -23,6 +27,9 @@ scores.get("/", async (c) => {
       const annual = await getPeriodsWithFacts(db, co.id, "annual", 4);
       const latest = annual[annual.length - 1]?.period.periodLabel ?? null;
       const result = computeScore(annual.map((p) => p.facts), latest);
+      const factors = Object.fromEntries(
+        result.factors.map((f) => [f.key, f.score === null ? null : Math.round(f.score)]),
+      );
       return {
         id: co.id,
         name: co.name,
@@ -32,14 +39,26 @@ scores.get("/", async (c) => {
         atlasScore: result.atlasScore,
         grade: result.grade,
         asOf: result.asOf,
-        factors: Object.fromEntries(
-          result.factors.map((f) => [f.key, f.score === null ? null : Math.round(f.score)]),
-        ),
+        factors,
       };
     }),
   );
 
+  // P010 v2 — the RELATIVE lens, computed across the whole universe at once
+  // (the absolute atlasScore above is untouched). Kept in the domain layer:
+  // the route ranks nothing itself, it hands the scores to computePercentiles.
+  const entities: ScoredEntity[] = rows.map((r) => ({
+    id: r.id,
+    composite: r.atlasScore,
+    factors: r.factors,
+  }));
+  const percentiles = computePercentiles(entities);
+  const withPercentiles = rows.map((r) => ({
+    ...r,
+    percentile: percentiles.get(r.id) ?? null,
+  }));
+
   // Ranked: scored companies first (desc), then unscored.
-  rows.sort((a, b) => (b.atlasScore ?? -1) - (a.atlasScore ?? -1));
-  return c.json(rows);
+  withPercentiles.sort((a, b) => (b.atlasScore ?? -1) - (a.atlasScore ?? -1));
+  return c.json(withPercentiles);
 });

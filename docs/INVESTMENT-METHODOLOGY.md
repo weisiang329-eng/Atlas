@@ -151,6 +151,41 @@ income-statement-only, so their scores omit leverage and liquidity entirely.
 The UI must always show which factors are `—`. A score is never presented
 without its factor breakdown.
 
+### 4.5 The percentile lens (P010 v2) — relative, alongside absolute
+
+`percentile.ts` adds a **second, relative reading** that sits next to the
+absolute score and never replaces it. For the composite and each factor it
+reports where a company ranks against the others Atlas covers, by mid-rank
+percentile (ties share the average rank).
+
+This does not contradict principle #4. The **absolute** `atlasScore` remains
+the stable, reproducible headline — a company's absolute score still does not
+move when coverage changes. The percentile is explicitly the other question:
+*"good, but good relative to whom?"* A 26% net margin is genuinely strong on
+its own terms and unremarkable for a fabless chip designer; a decision usually
+wants both readings, so both are shown, each labelled for what it is.
+
+Three honesty constraints, all enforced in code and asserted in
+`test-percentile.mjs`:
+
+1. **The percentile is within Atlas's coverage universe, not the market.**
+   Ranking 17 hand-picked AI-infrastructure and glove names is not ranking the
+   S&P. Every percentile therefore carries its **peer count**, and the UI shows
+   it ("81st of 17"), so nobody reads a small-universe rank as a market decile.
+   With a universe this small the percentile is coarse by construction — that
+   is a property to disclose, not hide.
+2. **A company is ranked for a factor only if it has that factor**, and it does
+   not pad anyone else's denominator when it doesn't. A peer with no
+   cash-quality score must not make everyone else look better ranked than they
+   are (the same discipline as §4.4's renormalisation, applied to ranking).
+3. **The absolute score is untouched.** The percentile is a pure addition to
+   the `/v1/scores` payload; removing it changes no existing number.
+
+Still v2-pending: percentile *within value-chain stage* (§7.3 — comparing a
+foundry to a glove maker is the coarseness this only partly fixes), and
+`score_history` persistence (§8), which needs a snapshot cadence and therefore
+waits on the scheduled-job/deploy work.
+
 ## 5. Industry layer — cycle signal (`industry.ts`)
 
 Company quality is not enough in a cyclical sector: a glove maker at a
@@ -210,7 +245,7 @@ Stated plainly, because a model whose weaknesses are hidden is a liability.
 | Version | Change | Unblocked by |
 | --- | --- | --- |
 | **v1 (live)** | Absolute-threshold 4-factor quality score | — |
-| **v2** | Cross-sectional **percentile** factor scores within value-chain stage (fixes §7.3); persist `score_history` so scores are versioned and auditable over time | nothing — buildable now |
+| **v2 — partly done (2026-07-23)** | Cross-sectional **percentile** factor scores (§4.5) — the universe-wide ranking is live at `/v1/scores`; **within-value-chain-stage** ranking (fixes §7.3) and `score_history` persistence are still open | stage-ranking: nothing; history: a snapshot cadence (deploy) |
 | **v2** | **Valuation factor** — P/E, EV/EBITDA, FCF yield, and a quality-vs-price view (the "is it cheap for a reason" question) | market-data key (P027) |
 | **v3** | **Sector-calibrated thresholds** — per-value-chain-stage floors/ceilings replacing one global set | v2 percentiles |
 | **v3** | **Backtest harness** — score-vs-forward-return study to convert §7.2 from judgment into evidence, published with results whatever they show | price history (P027) |

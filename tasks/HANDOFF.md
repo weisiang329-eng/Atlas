@@ -463,7 +463,17 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
   Also note TSMC's quarterly comes via **6-K**, which is not a structured
   quarterly report the way a 10-Q is — expect the reconciliation gate in
   `reconcileQuarters` to drop years, and check that before trusting output.
-- [ ] **P010 v2** — cross-sectional percentile factor scores; persist `score_history` (versioning); valuation multiples once price lands.
+- [x] **P010 v2 percentile scoring (2026-07-23)** — `domain/percentile.ts` +
+  `/v1/scores` now carries a **relative** rank alongside the absolute score,
+  and the Leaderboard shows a "Rank" column ("97th /17"). It is purely
+  additive: the owner-blessed absolute thresholds are untouched, so no existing
+  score moved. Honesty constraints in code + `test-percentile.mjs`: the
+  percentile is within COVERAGE (peer count travels with every value, so
+  "97th of 17" can't read as a market decile), a company is ranked for a factor
+  only if it has it and doesn't pad others' denominators, mid-rank ties.
+  Methodology doc §4.5. **Still open:** percentile *within value-chain stage*
+  (§7.3 — a foundry vs a glove maker), and `score_history` persistence, which
+  needs a snapshot cadence and so waits on the scheduled-job/deploy work.
 - [ ] **P021** — agent long-term memory: Supabase **pgvector** over research notes / entity profiles; semantic search tool for the agent.
 - [ ] **P023** — decision-outcome tracking: add outcome fields to the decision journal + a review view (feeds learning).
 - [ ] **P013 v2** — PDF export of company reports; industry & portfolio reports.
@@ -494,6 +504,30 @@ graph, `/reports/company/[id]`, Agent, **News**. **Still not real:**
 - [ ] Coverage is 17 companies — expand the universe (add to `apps/api/seed/data.mjs` + `apps/web/lib/universe.ts`, keep them in sync).
 - [ ] Sparse rows: SK hynix and the glove names are income-statement-only — add balance-sheet/cash-flow where available (their liquidity/leverage/cash factors are currently "—").
 - [ ] EDGAR caveats (documented in `management/programs/P022-ingestion-edgar.md`): pre-split diluted-share counts for old years (EPS only split-consistent recently) → add a split-adjustment table; combined-SG&A filers render the total on the G&A row.
+- [ ] **Split adjustment — DO NOT automate blindly (investigated 2026-07-23).**
+  I looked at building EPS split-adjustment and stopped, because the data
+  cannot support it safely yet. The share-count series is on **inconsistent,
+  filing-dependent bases**: SEC restates the trailing 2–3 comparative years to
+  the current split basis in each new 10-K, so where the series steps depends
+  on which filing each year came from, not on the real split date. A naive
+  "multiply by cumulative split ratio after the period" would double-adjust the
+  already-restated years. Worse, **Arista's data shows TWO ~4× steps
+  (FY2019 and FY2022) for a company that split 4:1 once** — one of them is
+  almost certainly a restatement artefact, and there is **no free external
+  anchor** to tell which. Shipping "split-adjusted EPS" on top of that would
+  fabricate plausible-but-wrong numbers (convention #1). Correct sequence:
+  (a) run the networked `refresh.mjs` so `facts.json` is current and complete,
+  (b) hand-verify each covered company's split history against its filings,
+  (c) store a per-company split table as reviewed reference data (like
+  `fiscal_year_end_month`), (d) THEN adjust at presentation. Steps (a)–(b) need
+  a human; do not skip them. Detection-from-data alone is not enough — it
+  "confirms" the Arista double-step as real.
+  - Note: revenue/margin/scores are **unaffected** (splits don't touch them),
+    and per-period as-reported EPS is correct in its own period's units. The
+    only thing that is wrong today is EPS *comparability across a split*, and
+    nothing currently draws an EPS trend across periods, so the live blast
+    radius is small — which is why this is a data-quality backlog item, not a
+    fire.
 
 ### 13.7 Tech-debt / cleanup
 - [ ] `apps/web/lib/mock/*` — delete each module as its page is wired (§13.3).

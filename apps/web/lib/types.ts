@@ -122,6 +122,16 @@ export interface ScoreResult {
 }
 
 /** GET /v1/scores — one leaderboard row. */
+/**
+ * P010 v2 — where a company ranks against the covered universe (NOT the
+ * market). `peerCounts` travels with every value so a small-universe rank is
+ * never read as a market decile.
+ */
+export interface ScorePercentile {
+  values: Record<string, number | null>;
+  peerCounts: Record<string, number>;
+}
+
 export interface ScoreRow {
   id: string;
   name: string;
@@ -132,6 +142,8 @@ export interface ScoreRow {
   grade: string;
   asOf: string | null;
   factors: Record<string, number | null>;
+  /** The relative lens, alongside the absolute atlasScore. */
+  percentile?: ScorePercentile | null;
 }
 
 /** A point in an industry metric or cycle-signal series. */
