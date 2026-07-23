@@ -689,15 +689,31 @@ had. Every driver now carries a `blocker` in one vocabulary and the endpoint
 groups them, sorted by what each item would unblock. **Do not add a fourth
 list — add a row.**
 
-Measured 2026-07-23: **32 drivers · 2 testable · 30 blocked.**
+**Re-measured against the seeded DB 2026-07-23 (late) — the earlier count was
+wrong and is corrected here.** Loading migrations 0008–0012 into PGlite and
+grouping `industry_driver.blocker` gives the authoritative figures below (the
+script is trivial: `SELECT blocker, count(*) ... GROUP BY blocker`). The prior
+table claimed "15 needs-extraction, the largest group, code nobody has
+written" — but migration **0012** had already reclassified that group, and the
+real numbers are very different. **needs-extraction is 1, not 15.**
+
+Measured: **32 drivers · 7 testable (`none`) · 25 blocked.**
 
 | Blocker | Drivers | What it actually needs |
 | --- | --- | --- |
-| **needs-extraction** | **15** | Nothing external. The numbers are in `financial_fact` already — capex, inventory, backlog. This is code nobody has written, and it is the **largest group by far**. |
-| needs-key | 4 | A FREE key: FRED (copper, auto/industrial inventory) ×2, EIA (electricity, natural gas) ×2 |
-| paid | 5 | Deliberately **not bought** — see below |
-| unavailable | 6 | Nobody publishes it at any price (CoWoS capacity, HBM yield, fab ramp timing, port-speed migration, new DC capacity MW) |
-| none | 2 | The glove ASP and latex series |
+| **unavailable** | **12** | Nobody publishes it at any price — earnings *commentary*, not an XBRL fact (utilisation, bit-shipment growth, HBM supply, GPU shipments) plus the structurally-unpublished (CoWoS capacity, yield, fab ramp timing, port-speed migration, new DC capacity MW). No extraction produces these. |
+| **none** (testable) | **7** | Already computed and shown: glove `asp_my` + `nbr_latex`, memory `inventory_days` ×2 and `maker_capex` ×2, equipment `fab_capex`. These are the derived-filings series in `domain/derived-series.ts`. |
+| paid | 5 | Deliberately **not bought** (TrendForce/SEMI) — see convention #8. |
+| needs-key | 4 | A FREE key: FRED (copper, auto/industrial inventory) ×2, EIA (electricity, natural gas) ×2. |
+| **needs-coverage** | **3** | FREE data, companies not in the universe: `hyperscaler_capex` / `datacenter_capex` (MSFT/GOOGL/AMZN/META filings) and `customer_capex`. This is a coverage-expansion job (add the names to `seed/data.mjs` + a networked EDGAR ingest), **not** an extraction. |
+| **needs-extraction** | **1** | `backlog_ratio` (dc-power-cooling / Vertiv) — the ONE genuine extraction. Needs `us-gaap:RevenueRemainingPerformanceObligation` added to `ingest/edgar-tags.ts` TAG_MAP, a `backlog_ratio` DERIVATION, **and** a networked `POST /v1/ingest/edgar` to backfill the RPO facts. The code is a small job; the data backfill needs network + the owner's DB, so no real series exists until then. `series_key` is still NULL. |
+
+> **Why this correction matters:** the old "15 needs-extraction, largest group,
+> just write code" line would send the next agent chasing work that does not
+> exist — 0012 already proved 4 of those keys are earnings commentary
+> (unavailable), 3 are coverage, and 3 were already extracted. The only
+> extraction actually left is one network-gated driver. Do not re-inflate this
+> number; re-run the GROUP BY against the DB if in doubt.
 
 **Free keys still outstanding** (register, then `wrangler secret put <NAME>`):
 
